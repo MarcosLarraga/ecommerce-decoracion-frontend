@@ -1,0 +1,29 @@
+// 🎨 Colores principales
+$primary-color: #ff6347;  // Color principal (puedes cambiarlo)
+$secondary-color: #f4f4f4;
+$text-color: #333;
+$background-color: #ffffff;
+$border-color: #ddd;
+
+// 📏 Espaciados
+$spacing-xs: 4px;
+$spacing-sm: 8px;
+$spacing-md: 16px;
+$spacing-lg: 24px;
+$spacing-xl: 32px;
+
+// 🔠 Tipografía
+$font-family-primary: 'Roboto', sans-serif;
+$font-size-base: 16px;
+$font-size-large: 18px;
+$font-size-small: 14px;
+
+// 📐 Breakpoints para responsive
+$breakpoint-sm: 600px;
+$breakpoint-md: 960px;
+$breakpoint-lg: 1280px;
+$breakpoint-xl: 1920px;
+
+// 📦 Sombra y bordes
+$box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+$border-radius: 8px;
