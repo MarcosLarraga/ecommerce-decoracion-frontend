@@ -12,7 +12,8 @@
   </script>
   
   <style scoped lang="scss">
-  @import '@/styles/variables';
+@use '@/styles/variables' as *;
+
   
   .navbar {
     display: flex;

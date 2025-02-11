@@ -19,5 +19,4 @@
   </script>
   
   <style scoped lang="scss">
-  @import '@/styles/variables';
-  </style>
+  @use '@/styles/variables' as *;  </style>

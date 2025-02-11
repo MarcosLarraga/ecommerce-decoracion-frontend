@@ -14,8 +14,7 @@
   </script>
   
   <style scoped lang="scss">
-  @import '@/styles/variables';
-
+  @use '@/styles/variables' as *;
 .product-card {
   background: $background-color;
   border-radius: $border-radius;
