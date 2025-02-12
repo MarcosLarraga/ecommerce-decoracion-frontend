@@ -1,5 +1,5 @@
 import { createApp } from 'vue';
-import App from './App.vue';
+import App from './App.vue'; // ✅ Corrección aquí
 
 // ✅ Importación correcta de Vuetify
 import { createVuetify } from 'vuetify';
@@ -11,6 +11,8 @@ import 'vuetify/styles';
 
 // ✅ Importar tu archivo global de estilos
 import '@/styles/main.scss';
+import '@mdi/font/css/materialdesignicons.css';
+
 
 // ✅ Importar Vue Router y Pinia
 import router from './router';
