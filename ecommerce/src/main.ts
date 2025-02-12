@@ -1,15 +1,27 @@
 import { createApp } from 'vue';
 import App from './App.vue';
+
+// ✅ Importación correcta de Vuetify
 import { createVuetify } from 'vuetify';
+import * as components from 'vuetify/components';
+import * as directives from 'vuetify/directives';
+
+// ✅ Importar estilos de Vuetify
 import 'vuetify/styles';
+
+// ✅ Importar tu archivo global de estilos
 import '@/styles/main.scss';
 
-
-
+// ✅ Importar Vue Router y Pinia
 import router from './router';
 import { createPinia } from 'pinia';
 
-const vuetify = createVuetify();
+// ✅ Crear la instancia de Vuetify con componentes y directivas
+const vuetify = createVuetify({
+  components,
+  directives,
+});
+
 const pinia = createPinia();
 
 const app = createApp(App);

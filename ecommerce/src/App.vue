@@ -1,13 +1,13 @@
 <template>
-  <div class="app">
-    <header class="header">
-      <NavBar />
-    </header>
-    <main>
-      <RouterView />
-    </main>
+  <v-app class="app">
+    <NavBar />
+    <v-main class="main">
+      <v-container fluid>
+        <RouterView />
+      </v-container>
+    </v-main>
     <Footer />
-  </div>
+  </v-app>
 </template>
 
 <script setup>
@@ -16,22 +16,19 @@ import NavBar from '@/components/NavBar.vue';
 import Footer from '@/components/Footer.vue';
 </script>
 
-<style scoped lang="scss">
+<style lang="scss">
 @use '@/styles/variables' as *;
-@use '@/styles/mixins' as *;
 
 .app {
-  background-color: $background-color;
+  background-color: $background-color !important;
   color: $text-color;
 }
 
-.header {
-  background-color: $background-color;
-  padding: 1rem;
-  border-bottom: 2px solid $border-color;
-}
-
-main {
-  min-height: 80vh;
+.main {
+  background-color: $background-color !important;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 </style>
