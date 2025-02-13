@@ -1,64 +1,117 @@
 <template>
-  <v-container class="home">
-    <v-row class="home__hero">
-      <v-col cols="12" md="6" class="home__content">
-        <h1 class="home__title">Bienvenido a LM Decor</h1>
-        <p class="home__subtitle">Explora nuestra colección exclusiva de decoración para el hogar.</p>
-        <v-btn color="primary" class="home__cta" to="/productos">Ver Productos</v-btn>
+  <v-container fluid class="home">
+    <!-- Hero Section -->
+    <v-row no-gutters>
+      <v-col cols="12" class="home__hero">
+        <v-img src="/fotos/vinicius-amnx-amano-17NCG_wOkMY-unsplash.jpg" alt="Nueva colección" class="home__hero-bg" cover />
+        <div class="home__hero-text">
+          <h1>Descubre la <br> nueva colección</h1>
+        </div>
       </v-col>
-      <v-col cols="12" md="6">
-        <v-img src="/fotos/logoLMDecoracion.png" alt="Decoración moderna" class="home__image"></v-img>
+    </v-row>
+
+    <!-- Categorías -->
+    <v-row justify="center" class="home__categories">
+      <v-col cols="12" class="home__title">
+        <h2>Categorías</h2>
+      </v-col>
+      <v-col cols="12" sm="4" v-for="category in categories" :key="category.name">
+        <v-card class="home__category">
+          <v-img :src="category.image" :alt="category.name" class="home__category-image" />
+          <v-card-text class="home__category-text">{{ category.name }}</v-card-text>
+        </v-card>
       </v-col>
     </v-row>
   </v-container>
 </template>
 
 <script setup>
+import { ref } from 'vue';
+
+const categories = ref([
+  { name: 'Textiles', image: '/fotos/textiles.jpg' },
+  { name: 'Pinturas', image: '/fotos/pinturas.jpg' },
+  { name: 'Confort', image: '/fotos/confort.jpg' }
+]);
 </script>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 @use '@/styles/variables' as *;
-@use '@/styles/mixins' as *;
 
 .home {
-  padding: $spacing-lg;
+  padding: 0;
+  margin: 0;
 
   &__hero {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    flex-direction: column;
+    position: relative;
+    width: 100vw;
+    height: 60vh;
+    overflow: hidden;
 
-    @include media-md {
-      flex-direction: row;
-      text-align: left;
+    @media (min-width: $breakpoint-md) {
+      height: 100vh;
+    }
+
+    &-bg {
+      width: 100vw;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    &-text {
+      position: absolute;
+      top: 50%;
+      left: 5%;
+      transform: translateY(-50%);
+      background: rgba(255, 255, 255, 0.8);
+      padding: $spacing-md;
+      border-radius: $border-radius;
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: $primary-color;
+
+      @media (min-width: $breakpoint-md) {
+        left: 10%;
+        font-size: 1.8rem;
+      }
     }
   }
 
-  &__content {
-    padding: $spacing-md;
-  }
-
   &__title {
-    font-size: $font-size-large;
-    color: $primary-color;
+    text-align: center;
+    font-size: 1.5rem;
     font-weight: bold;
+    margin: $spacing-lg 0;
   }
 
-  &__subtitle {
-    font-size: $font-size-base;
-    color: $text-color;
-    margin-top: $spacing-sm;
+  &__categories {
+    display: flex;
+    justify-content: center;
+    gap: $spacing-md;
+    margin-bottom: $spacing-xl;
   }
 
-  &__cta {
-    margin-top: $spacing-md;
-  }
-
-  &__image {
+  &__category {
+    text-align: center;
     border-radius: $border-radius;
     box-shadow: $box-shadow;
+    overflow: hidden;
+    transition: transform 0.3s ease-in-out;
+
+    &:hover {
+      transform: scale(1.05);
+    }
+  }
+
+  &__category-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+  }
+
+  &__category-text {
+    font-weight: bold;
+    padding-top: $spacing-sm;
   }
 }
 </style>

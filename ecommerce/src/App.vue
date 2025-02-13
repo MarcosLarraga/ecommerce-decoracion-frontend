@@ -1,11 +1,13 @@
 <template>
   <v-app class="app">
     <NavBar />
-    <v-main class="main">
-      <v-container fluid>
-        <RouterView />
-      </v-container>
-    </v-main>
+    <div class="layout">
+      <v-main class="main">
+        <v-container fluid class="content">
+          <RouterView />
+        </v-container>
+      </v-main>
+    </div>
     <Footer />
   </v-app>
 </template>
@@ -24,11 +26,20 @@ import Footer from '@/components/Footer.vue';
   color: $text-color;
 }
 
-.main {
-  background-color: $background-color !important;
-  min-height: 100vh;
+.layout {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  min-height: 100vh;
+}
+
+.main {
+  flex: 1;  /* Hace que el contenido crezca y empuje el footer abajo */
+  background-color: $background-color !important;
+}
+
+.content {
+  flex-grow: 1;
+  display: flex;
+  align-items: center; /* Centra contenido si es necesario */
 }
 </style>
