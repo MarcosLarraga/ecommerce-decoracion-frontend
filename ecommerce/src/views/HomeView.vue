@@ -1,21 +1,37 @@
+<script setup lang="ts">
+import { onMounted } from 'vue';
+import { useProductsStore } from '@/stores/productsStore';
+import { useCategoriesStore } from '@/stores/categoriesStore';
+
+const productsStore = useProductsStore();
+const categoriesStore = useCategoriesStore();
+
+onMounted(() => {
+  productsStore.fetchProducts();
+  categoriesStore.fetchCategories();
+});
+</script>
+
 <template>
   <v-container fluid class="home">
-    <!-- Hero Section -->
-    <v-row no-gutters>
-      <v-col cols="12" class="home__hero">
-        <v-img src="/fotos/vinicius-amnx-amano-17NCG_wOkMY-unsplash.jpg" alt="Nueva colección" class="home__hero-bg" cover />
-        <div class="home__hero-text">
-          <h1>Descubre la <br> nueva colección</h1>
-        </div>
+    <!-- Hero Section-->
+    <v-row no-gutters class="home__hero">
+      <v-col cols="12">
+        <v-img
+          src="/fotos/vinicius-amnx-amano-17NCG_wOkMY-unsplash.jpg"
+          alt="Nueva colección"
+          class="home__hero-bg"
+          cover
+        />
       </v-col>
     </v-row>
 
     <!-- Categorías -->
     <v-row justify="center" class="home__categories">
-      <v-col cols="12" class="home__title">
+      <v-col cols="12">
         <h2 class="section-title">Categorías</h2>
       </v-col>
-      <v-col cols="12" sm="4" v-for="category in categories" :key="category.name">
+      <v-col cols="12" sm="4" v-for="category in categoriesStore.allCategories" :key="category.name">
         <v-card class="home__category">
           <v-img :src="category.image" :alt="category.name" class="home__category-image" />
           <v-card-text class="home__category-text">{{ category.name }}</v-card-text>
@@ -27,49 +43,13 @@
     <v-container>
       <h2 class="section-title">Destacados</h2>
       <v-row>
-        <v-col
-          cols="6"
-          md="3"
-          v-for="product in (products.length ? products : defaultProducts)"
-          :key="product.id"
-        >
+        <v-col cols="6" md="3" v-for="product in productsStore.allProducts" :key="product.id">
           <ProductCard :product="product" />
         </v-col>
       </v-row>
     </v-container>
   </v-container>
 </template>
-
-<script setup>
-import { ref, onMounted } from 'vue';
-import ProductCard from '@/components/ProductCard.vue';
-
-const categories = ref([
-  { name: 'Textiles', image: '/fotos/textiles.jpg' },
-  { name: 'Pinturas', image: '/fotos/pinturas.jpg' },
-  { name: 'Confort', image: '/fotos/confort.jpg' }
-]);
-
-const products = ref([]);
-const defaultProducts = ref([
-  { id: 1, name: 'Ejemplo Producto 1', image: '/fotos/default1.jpg', price: '€19.99' },
-  { id: 2, name: 'Ejemplo Producto 2', image: '/fotos/default2.jpg', price: '€29.99' },
-  { id: 3, name: 'Ejemplo Producto 3', image: '/fotos/default3.jpg', price: '€39.99' },
-  { id: 4, name: 'Ejemplo Producto 4', image: '/fotos/default4.jpg', price: '€49.99' }
-]);
-
-const fetchProducts = async () => {
-  try {
-    const response = await fetch('https://api.example.com/products'); // Reemplaza con tu API
-    const data = await response.json();
-    products.value = data;
-  } catch (error) {
-    console.error('Error fetching products:', error);
-  }
-};
-
-onMounted(fetchProducts);
-</script>
 
 <style lang="scss" scoped>
 @use '@/styles/variables' as *;
@@ -79,45 +59,22 @@ onMounted(fetchProducts);
   margin: 0;
 
   &__hero {
-    position: relative;
     width: 100vw;
-    height: 60vh;
+    height: 40vh;
     overflow: hidden;
+    padding: 0 !important;
+    margin: 0 !important;
 
     @media (min-width: $breakpoint-md) {
-      height: 100vh;
+      height: 70vh;
     }
 
     &-bg {
       width: 100vw;
       height: 100%;
       object-fit: cover;
+      object-position: center center;
     }
-
-    &-text {
-      position: absolute;
-      top: 50%;
-      left: 5%;
-      transform: translateY(-50%);
-      background: rgba(255, 255, 255, 0.8);
-      padding: $spacing-md;
-      border-radius: $border-radius;
-      font-size: 1.5rem;
-      font-weight: bold;
-      color: $primary-color;
-
-      @media (min-width: $breakpoint-md) {
-        left: 10%;
-        font-size: 1.8rem;
-      }
-    }
-  }
-
-  &__title {
-    text-align: center;
-    font-size: 1.5rem;
-    font-weight: bold;
-    margin: $spacing-lg 0;
   }
 
   &__categories {

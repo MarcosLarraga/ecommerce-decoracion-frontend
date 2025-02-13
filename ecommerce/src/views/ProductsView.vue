@@ -11,7 +11,9 @@
 
 <script setup>
 import { onMounted } from 'vue';
-import { useProductStore } from '@/stores/productStore';
+import { useProductsStore } from '@/stores/productsStore';
+
+
 import ProductCard from '@/components/ProductCard.vue';
 
 const productStore = useProductStore();
