@@ -3,34 +3,33 @@
     <v-container>
       <v-row align="center" justify="space-between" no-gutters>
         <!-- Logo -->
-        <v-col cols="4" md="2">
+        <v-col cols="3" md="2">
           <router-link to="/" class="navbar__logo">
             <img src="/fotos/logoLMDecoracion.png" alt="Logo" class="navbar__logo-img" />
-            <span class="navbar__logo-text">Decoración</span>
           </router-link>
         </v-col>
 
         <!-- Menú hamburguesa para móvil -->
-        <v-col cols="4" class="d-flex d-md-none navbar__hamburger">
-          <v-btn icon @click="drawer = !drawer">
+        <v-col cols="8" class="d-flex justify-end align-center d-md-none">
+          <v-btn icon class="navbar__hamburger" @click="drawer = !drawer">
             <v-icon>mdi-menu</v-icon>
           </v-btn>
         </v-col>
 
         <!-- Menú de navegación para pantallas grandes -->
-        <v-col cols="4" class="d-none d-md-flex navbar__menu">
+        <v-col cols="6" class="d-none d-md-flex navbar__menu justify-center">
           <router-link to="/" class="navbar__menu-item">Home</router-link>
           <router-link to="/shop" class="navbar__menu-item">Shop</router-link>
           <router-link to="/about" class="navbar__menu-item">About</router-link>
           <router-link to="/contact" class="navbar__menu-item">Contact</router-link>
         </v-col>
 
-        <!-- Iconos de usuario y carrito -->
-        <v-col cols="4" md="2" class="navbar__icons">
-          <v-btn icon>
+        <!-- Iconos de usuario y carrito en desktop -->
+        <v-col cols="3" class="d-none d-md-flex justify-end navbar__icons">
+          <v-btn icon class="navbar__icon">
             <v-icon>mdi-account</v-icon>
           </v-btn>
-          <v-btn icon>
+          <v-btn icon class="navbar__icon">
             <v-icon>mdi-cart</v-icon>
           </v-btn>
         </v-col>
@@ -38,13 +37,20 @@
     </v-container>
   </v-app-bar>
 
-  <!-- Drawer para menú móvil -->
-  <v-navigation-drawer v-model="drawer" app temporary class="navbar__drawer">
+  <!-- Drawer para menú móvil con despliegue a la derecha -->
+  <v-navigation-drawer v-model="drawer" app temporary right class="navbar__drawer">
     <v-list>
       <v-list-item to="/" class="navbar__drawer-item">Home</v-list-item>
       <v-list-item to="/shop" class="navbar__drawer-item">Shop</v-list-item>
       <v-list-item to="/about" class="navbar__drawer-item">About</v-list-item>
       <v-list-item to="/contact" class="navbar__drawer-item">Contact</v-list-item>
+      <v-divider></v-divider>
+      <v-list-item to="/account" class="navbar__drawer-item">
+        <v-icon left>mdi-account</v-icon> Mi Cuenta
+      </v-list-item>
+      <v-list-item to="/cart" class="navbar__drawer-item">
+        <v-icon left>mdi-cart</v-icon> Carrito
+      </v-list-item>
     </v-list>
   </v-navigation-drawer>
 </template>
@@ -60,8 +66,8 @@ const drawer = ref(false);
 .navbar {
   background-color: $background-color;
   padding: $spacing-md 0;
-  box-shadow: $box-shadow;
-  border-bottom: 1px solid $border-color;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-bottom: 2px solid $primary-color;
 
   &__logo {
     display: flex;
@@ -70,63 +76,59 @@ const drawer = ref(false);
     color: $text-color;
 
     &-img {
-      height: 40px;
+      height: 45px;
       margin-right: $spacing-sm;
       border-radius: $border-radius;
     }
 
     &-text {
       font-family: $font-family-primary;
-      font-size: $font-size-base;
+      font-size: 1.2rem;
+      font-weight: bold;
     }
   }
 
   &__menu {
     display: flex;
-    gap: $spacing-lg;
+    gap: 60px;
+    align-items: center;
 
     &-item {
       text-decoration: none;
       color: $text-color;
       font-family: $font-family-primary;
-      font-size: $font-size-base;
-      transition: color 0.3s;
-      padding: $spacing-xs $spacing-sm;
-      border-radius: $border-radius;
+      font-size: 1.1rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      transition: color 0.3s ease-in-out;
 
       &:hover {
         color: $primary-color;
-        background-color: rgba($primary-color, 0.1);
       }
     }
-  }
-
-  &__icons {
-    display: flex;
-    justify-content: flex-end;
-    gap: $spacing-sm;
   }
 
   &__hamburger {
     display: flex;
-    justify-content: flex-end;
   }
 
-  &__drawer {
-    background-color: $background-color;
-    padding: $spacing-md;
+  &__icons {
+    display: flex;
+    gap: $spacing-md;
+    align-items: center;
+  }
 
-    &-item {
-      text-decoration: none;
-      color: $text-color;
-      font-size: $font-size-large;
-      padding: $spacing-sm 0;
-      font-family: $font-family-primary;
+  &__icon {
+    transition: transform 0.2s ease-in-out;
 
-      &:hover {
-        color: $primary-color;
-      }
+    &:hover {
+      transform: scale(1.1);
+      color: $primary-color;
     }
   }
+}
+
+.v-navigation-drawer .v-list {
+  margin-top: 10%;
 }
 </style>

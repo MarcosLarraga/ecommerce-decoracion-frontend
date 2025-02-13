@@ -7,7 +7,7 @@
         <v-btn color="primary" class="home__cta" to="/productos">Ver Productos</v-btn>
       </v-col>
       <v-col cols="12" md="6">
-        <v-img src="@/assets/home-banner.jpg" alt="Decoración moderna" class="home__image"></v-img>
+        <v-img src="/fotos/logoLMDecoracion.png" alt="Decoración moderna" class="home__image"></v-img>
       </v-col>
     </v-row>
   </v-container>
