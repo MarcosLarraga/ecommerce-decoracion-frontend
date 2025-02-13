@@ -33,10 +33,17 @@ onMounted(async () => {
       <v-col cols="12">
         <h2 class="section-title">Categorías</h2>
       </v-col>
-      <v-col cols="12" sm="4" v-for="category in categoriesStore.allCategories" :key="category.name">
+      <v-col
+        cols="12"
+        sm="4"
+        v-for="category in categoriesStore.allCategories"
+        :key="category.name"
+      >
         <v-card class="home__category">
-          <v-img :src="category.image" :alt="category.name" class="home__category-image" />
-          <v-card-text class="home__category-text">{{ category.name }}</v-card-text>
+          <v-img :src="category.image" :alt="category.name" cover class="home__category-image" />
+          <v-card-text class="home__category-text">
+            {{ category.name }}
+          </v-card-text>
         </v-card>
       </v-col>
     </v-row>
@@ -92,6 +99,7 @@ onMounted(async () => {
   }
 
   &__category {
+    height: 300px;
     text-align: center;
     border-radius: $border-radius;
     box-shadow: $box-shadow;
@@ -105,7 +113,7 @@ onMounted(async () => {
 
   &__category-image {
     width: 100%;
-    height: 200px;
+    height: 100%;
     object-fit: cover;
   }
 
