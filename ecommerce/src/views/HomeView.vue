@@ -2,13 +2,15 @@
 import { onMounted } from 'vue';
 import { useProductsStore } from '@/stores/productsStore';
 import { useCategoriesStore } from '@/stores/categoriesStore';
+import ProductCard from '@/components/ProductCard.vue';
 
 const productsStore = useProductsStore();
 const categoriesStore = useCategoriesStore();
 
-onMounted(() => {
-  productsStore.fetchProducts();
-  categoriesStore.fetchCategories();
+onMounted(async () => {
+  await productsStore.fetchProducts();
+  await categoriesStore.fetchCategories();
+  console.log('Productos después de fetch:', productsStore.allProducts);
 });
 </script>
 
@@ -18,7 +20,7 @@ onMounted(() => {
     <v-row no-gutters class="home__hero">
       <v-col cols="12">
         <v-img
-          src="/fotos/vinicius-amnx-amano-17NCG_wOkMY-unsplash.jpg"
+          src="/fotos/fotoHero.jpg"
           alt="Nueva colección"
           class="home__hero-bg"
           cover
@@ -43,7 +45,12 @@ onMounted(() => {
     <v-container>
       <h2 class="section-title">Destacados</h2>
       <v-row>
-        <v-col cols="6" md="3" v-for="product in productsStore.allProducts" :key="product.id">
+        <v-col
+          cols="6"
+          md="3"
+          v-for="product in (productsStore.allProducts.length ? productsStore.allProducts : productsStore.defaultProducts)"
+          :key="product.id"
+        >
           <ProductCard :product="product" />
         </v-col>
       </v-row>

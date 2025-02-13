@@ -20,9 +20,12 @@ export const useProductsStore = defineStore('productsStore', () => {
 
   const fetchProducts = async () => {
     try {
+      console.log('Fetching products...');
       const response = await fetch('https://api.example.com/products');
       const data = await response.json();
-      products.value = data.length ? data : defaultProducts;
+      console.log('Productos obtenidos:', data);
+
+      products.value = Array.isArray(data) && data.length ? data : defaultProducts;
     } catch (error) {
       console.error('Error fetching products:', error);
       products.value = defaultProducts;
@@ -36,6 +39,7 @@ export const useProductsStore = defineStore('productsStore', () => {
   return {
     products,
     allProducts,
-    fetchProducts
+    fetchProducts,
+    defaultProducts, // 🔹 Hacemos accesible defaultProducts
   };
 });
