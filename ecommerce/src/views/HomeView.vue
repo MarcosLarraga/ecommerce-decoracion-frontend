@@ -13,7 +13,7 @@
     <!-- Categorías -->
     <v-row justify="center" class="home__categories">
       <v-col cols="12" class="home__title">
-        <h2>Categorías</h2>
+        <h2 class="section-title">Categorías</h2>
       </v-col>
       <v-col cols="12" sm="4" v-for="category in categories" :key="category.name">
         <v-card class="home__category">
@@ -22,17 +22,53 @@
         </v-card>
       </v-col>
     </v-row>
+
+    <!-- Destacados -->
+    <v-container>
+      <h2 class="section-title">Destacados</h2>
+      <v-row>
+        <v-col
+          cols="6"
+          md="3"
+          v-for="product in (products.length ? products : defaultProducts)"
+          :key="product.id"
+        >
+          <ProductCard :product="product" />
+        </v-col>
+      </v-row>
+    </v-container>
   </v-container>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
+import ProductCard from '@/components/ProductCard.vue';
 
 const categories = ref([
   { name: 'Textiles', image: '/fotos/textiles.jpg' },
   { name: 'Pinturas', image: '/fotos/pinturas.jpg' },
   { name: 'Confort', image: '/fotos/confort.jpg' }
 ]);
+
+const products = ref([]);
+const defaultProducts = ref([
+  { id: 1, name: 'Ejemplo Producto 1', image: '/fotos/default1.jpg', price: '€19.99' },
+  { id: 2, name: 'Ejemplo Producto 2', image: '/fotos/default2.jpg', price: '€29.99' },
+  { id: 3, name: 'Ejemplo Producto 3', image: '/fotos/default3.jpg', price: '€39.99' },
+  { id: 4, name: 'Ejemplo Producto 4', image: '/fotos/default4.jpg', price: '€49.99' }
+]);
+
+const fetchProducts = async () => {
+  try {
+    const response = await fetch('https://api.example.com/products'); // Reemplaza con tu API
+    const data = await response.json();
+    products.value = data;
+  } catch (error) {
+    console.error('Error fetching products:', error);
+  }
+};
+
+onMounted(fetchProducts);
 </script>
 
 <style lang="scss" scoped>
@@ -113,5 +149,12 @@ const categories = ref([
     font-weight: bold;
     padding-top: $spacing-sm;
   }
+}
+
+.section-title {
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: $spacing-lg;
 }
 </style>

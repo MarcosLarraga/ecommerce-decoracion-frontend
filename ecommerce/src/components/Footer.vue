@@ -1,5 +1,5 @@
 <template>
-  <v-footer app class="footer" fixed>
+  <v-footer app class="footer" >
     <v-container>
       <v-row justify="center" class="footer__content">
         <v-col cols="12" md="3" class="footer__section">
@@ -43,6 +43,10 @@
 
 <style lang="scss" scoped>
 @use '@/styles/variables' as *;
+
+.v-footer {
+  position: relative !important;
+}
 
 .footer {
   background-color: $secondary-color;

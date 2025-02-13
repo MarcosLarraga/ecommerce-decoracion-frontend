@@ -1,5 +1,5 @@
 import { createApp } from 'vue';
-import App from './App.vue'; // ✅ Corrección aquí
+import App from './App.vue'; 
 
 // ✅ Importación correcta de Vuetify
 import { createVuetify } from 'vuetify';

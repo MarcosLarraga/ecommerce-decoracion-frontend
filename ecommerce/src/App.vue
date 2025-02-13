@@ -33,9 +33,14 @@ import Footer from '@/components/Footer.vue';
 }
 
 .main {
-  flex: 1;  /* Hace que el contenido crezca y empuje el footer abajo */
+  flex: 1; 
   background-color: $background-color !important;
 }
+
+.v-main {
+  padding-bottom: 0 !important;
+}
+
 
 .content {
   flex-grow: 1;
