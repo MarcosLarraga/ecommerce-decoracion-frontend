@@ -45,6 +45,6 @@ import Footer from '@/components/Footer.vue';
 .content {
   flex-grow: 1;
   display: flex;
-  align-items: center; /* Centra contenido si es necesario */
+  align-items: center;
 }
 </style>

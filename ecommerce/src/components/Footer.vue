@@ -6,7 +6,7 @@
           <nav class="footer__nav">
             <router-link to="/" class="footer__link">Home</router-link>
             <router-link to="/shop" class="footer__link">Shop</router-link>
-            <router-link to="/contact" class="footer__link">Contact</router-link>
+            <router-link to="/contacto" class="footer__link">Contacto</router-link>
             <router-link to="/blog" class="footer__link">Blog</router-link>
           </nav>
         </v-col>

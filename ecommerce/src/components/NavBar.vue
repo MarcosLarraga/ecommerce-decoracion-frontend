@@ -21,7 +21,7 @@
           <router-link to="/" class="navbar__menu-item">Home</router-link>
           <router-link to="/shop" class="navbar__menu-item">Shop</router-link>
           <router-link to="/about" class="navbar__menu-item">About</router-link>
-          <router-link to="/contact" class="navbar__menu-item">Contact</router-link>
+          <router-link to="/contacto" class="navbar__menu-item">Contacto</router-link>
         </v-col>
 
         <!-- Iconos de usuario y carrito en desktop -->
@@ -43,7 +43,7 @@
       <v-list-item to="/" class="navbar__drawer-item">Home</v-list-item>
       <v-list-item to="/shop" class="navbar__drawer-item">Shop</v-list-item>
       <v-list-item to="/about" class="navbar__drawer-item">About</v-list-item>
-      <v-list-item to="/contact" class="navbar__drawer-item">Contact</v-list-item>
+      <v-list-item to="/contacto" class="navbar__drawer-item">Contacto</v-list-item>
       <v-divider></v-divider>
       <v-list-item to="/account" class="navbar__drawer-item">
         <v-icon left>mdi-account</v-icon> Mi Cuenta
