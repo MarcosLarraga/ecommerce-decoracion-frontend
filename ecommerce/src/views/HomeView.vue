@@ -16,15 +16,19 @@ onMounted(async () => {
 
 <template>
   <v-container fluid class="home">
-    <!-- Hero Section-->
+    <!-- Hero Section -->
     <v-row no-gutters class="home__hero">
-      <v-col cols="12">
+      <v-col cols="12" class="home__hero-container">
         <v-img
-          src="/fotos/fotoHero.jpg"
+          src="/fotos/fotoHero1.jpg"
           alt="Nueva colección"
           class="home__hero-bg"
           cover
         />
+        <!-- Texto de Bienvenida -->
+        <div class="home__hero-text">
+          <h1>Descubre los mejores complementos para tu hogar</h1>
+        </div>
       </v-col>
     </v-row>
 
@@ -41,9 +45,9 @@ onMounted(async () => {
       >
         <v-card class="home__category">
           <v-img :src="category.image" :alt="category.name" cover class="home__category-image" />
-          <v-card-text class="home__category-text">
+          <div class="home__category-title">
             {{ category.name }}
-          </v-card-text>
+          </div>
         </v-card>
       </v-col>
     </v-row>
@@ -76,18 +80,54 @@ onMounted(async () => {
     width: 100vw;
     height: 40vh;
     overflow: hidden;
-    padding: 0 !important;
-    margin: 0 !important;
+    position: relative;
 
     @media (min-width: $breakpoint-md) {
       height: 70vh;
     }
 
+    &-container {
+      position: relative;
+    }
+
     &-bg {
-      width: 100vw;
+      width: 100%;
       height: 100%;
       object-fit: cover;
       object-position: center center;
+    }
+
+    &-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      color: black; // Texto en negro
+      font-weight: bold;
+      width: 80%;
+      max-width: 600px;
+
+      h1 {
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+      }
+
+      p {
+        font-size: 1.5rem;
+      }
+
+      @media (max-width: 768px) {
+        width: 90%;
+
+        h1 {
+          font-size: 2rem;
+        }
+
+        p {
+          font-size: 1.2rem;
+        }
+      }
     }
   }
 
@@ -105,6 +145,9 @@ onMounted(async () => {
     box-shadow: $box-shadow;
     overflow: hidden;
     transition: transform 0.3s ease-in-out;
+    position: relative;
+    display: flex;
+    flex-direction: column;
 
     &:hover {
       transform: scale(1.05);
@@ -113,13 +156,20 @@ onMounted(async () => {
 
   &__category-image {
     width: 100%;
-    height: 100%;
+    height: 80%;
     object-fit: cover;
+    flex-grow: 1;
   }
 
-  &__category-text {
+  &__category-title {
+    background-color: white;
+    color: black;
+    font-size: 1.2rem;
     font-weight: bold;
-    padding-top: $spacing-sm;
+    text-align: center;
+    padding: 12px 0;
+    width: 100%;
+    flex-shrink: 0;
   }
 }
 
