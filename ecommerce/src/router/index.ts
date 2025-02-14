@@ -4,6 +4,7 @@ import ProductsView from '@/views/ProductsView.vue';
 import CartView from '@/views/CartView.vue';
 
 
+
 const routes = [
   { path: '/', component: HomeView },
   { path: '/productos', component: ProductsView },
