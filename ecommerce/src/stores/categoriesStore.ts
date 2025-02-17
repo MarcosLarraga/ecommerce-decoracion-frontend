@@ -11,8 +11,8 @@ export const useCategoriesStore = defineStore('categoriesStore', () => {
 
   const defaultCategories: Category[] = [
     { name: 'Textiles', image: '/fotos/textiles.jpg' },
-    { name: 'Pinturas', image: '/fotos/pinturas.jpg' },
-    { name: 'Confort', image: '/fotos/confort.jpg' }
+    { name: 'Decoracion Vertical', image: '/fotos/Decoracion Vertical.jpg' },
+    { name: 'Accesorio Decorativo', image: '/fotos/Accesorio Decorativo.jpg' }
   ];
 
   const fetchCategories = async () => {
