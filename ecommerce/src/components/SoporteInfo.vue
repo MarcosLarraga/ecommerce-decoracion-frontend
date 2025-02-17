@@ -17,7 +17,7 @@ const benefits = ref([
   { icon: 'mdi-trophy', title: 'Alta Calidad', text: 'Fabricado con los mejores materiales' },
   { icon: 'mdi-shield-check', title: 'Garantía de Protección', text: '2 años de garantía' },
   { icon: 'mdi-truck-fast', title: 'Envío Gratis', text: 'Pedidos superiores a 150€' },
-  { icon: 'mdi-headset', title: 'Atención 24/7', text: 'Soporte dedicado' },
+  { icon: 'mdi-headset', title: 'Atención 24/7', text: 'Soporte personalizado' },
 ]);
 </script>
 
