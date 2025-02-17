@@ -1,79 +1,66 @@
 <template>
-  <v-card class="product-card">
-    <v-img :src="product.image" :alt="product.name" height="200" class="product-card__image"></v-img>
-    <v-card-title class="product-card__title">{{ product.name }}</v-card-title>
-    <v-card-subtitle class="product-card__price">{{ product.price }}</v-card-subtitle>
-    <v-card-actions class="product-card__actions">
-      <v-btn class="product-card__button" icon>
-        <v-icon>mdi-cart</v-icon>
+  <v-card class="product-card" :to="`/product/${producto.id}`" elevation="4">
+    <v-img :src="producto.urlImagen" alt="Imagen del producto" class="product-card__image" />
+    <v-card-title class="product-card__title">{{ producto.nombre }}</v-card-title>
+    <v-card-subtitle class="product-card__price">{{ producto.precio | currency }}</v-card-subtitle>
+    <v-card-actions>
+      <v-btn
+        color="primary"
+        @click="addToCart"
+        class="product-card__add-to-cart-btn"
+      >
+        Añadir al carrito
       </v-btn>
     </v-card-actions>
   </v-card>
 </template>
 
-<script setup>
-defineProps(['product']);
+<script setup lang="ts">
+import { defineProps } from 'vue';
+
+const props = defineProps({
+  producto: Object, // Recibe el producto como prop
+});
+
+const addToCart = () => {
+  console.log('Producto añadido al carrito', props.producto);
+};
 </script>
 
-<style scoped lang="scss">
-@use '@/styles/variables' as *;
-
+<style scoped>
 .product-card {
-  background: #f5f5f5;
-  border-radius: 16px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  padding: $spacing-md;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-  overflow: hidden;
-  
-  &:hover {
-    transform: scale(1.03);
-    box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.15);
-  }
+  max-width: 300px;
+  margin: 10px;
+  border-radius: 8px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
 
-  &__image {
-    border-radius: 12px;
-    object-fit: cover;
-  }
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+}
 
-  &__title {
-    font-size: $font-size-large;
-    color: $primary-color;
-    font-weight: bold;
-    margin-top: $spacing-sm;
-  }
+.product-card__image {
+  height: 250px;
+  object-fit: cover;
+  border-radius: 8px;
+}
 
-  
-  &__price {
-    color: rgb(87, 87, 87);
-    font-weight: bold;
-    margin-bottom: $spacing-sm;
-  }
+.product-card__title {
+  font-weight: bold;
+  font-size: 1.2rem;
+  margin: 10px 0;
+}
 
-  &__actions {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-  }
+.product-card__price {
+  font-size: 1.1rem;
+  color: #4caf50;
+}
 
-  &__button {
-    width: 50px;
-    height: 50px;
-    background-color: $primary-color;
-    color: white;
-    font-weight: bold;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.3s;
-    &:hover {
-      background-color: #007a3d;
-    }
-  }
+.product-card__add-to-cart-btn {
+  width: 100%;
+  font-size: 1rem;
+  font-weight: bold;
+  text-transform: uppercase;
 }
 </style>

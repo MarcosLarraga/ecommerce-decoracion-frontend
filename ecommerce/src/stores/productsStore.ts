@@ -1,45 +1,47 @@
 import { defineStore } from 'pinia';
-import { ref, computed, onMounted } from 'vue';
 
-interface Product {
+interface Producto {
   id: number;
-  name: string;
-  image: string;
-  price: string;
+  nombre: string;
+  precio: number;
+  categoriaId: number;
+  urlImagen: string;
+  descripcion: string;
 }
 
-export const useProductsStore = defineStore('productsStore', () => {
-  const products = ref<Product[]>([]);
+export const useProductsStore = defineStore('products', {
+  state: () => ({
+    allProducts: [] as Producto[],
+    randomProducts: [] as Producto[],  // Productos aleatorios
+    loading: false,
+    error: null as string | null,
+  }),
 
-  const defaultProducts: Product[] = [
-    { id: 1, name: 'Ejemplo Producto 1', image: '/fotos/default1.jpg', price: '€19.99' },
-    { id: 2, name: 'Ejemplo Producto 2', image: '/fotos/default2.jpg', price: '€29.99' },
-    { id: 3, name: 'Ejemplo Producto 3', image: '/fotos/default3.jpg', price: '€39.99' },
-    { id: 4, name: 'Ejemplo Producto 4', image: '/fotos/default4.jpg', price: '€49.99' }
-  ];
+  actions: {
+    // Obtener todos los productos
+    async fetchProducts() {
+      this.loading = true;
+      this.error = null;
 
-  const fetchProducts = async () => {
-    try {
-      console.log('Fetching products...');
-      const response = await fetch('https://api.example.com/products');
-      const data = await response.json();
-      console.log('Productos obtenidos:', data);
+      try {
+        const response = await fetch('http://localhost:5162/api/Producto');
+        if (!response.ok) {
+          throw new Error('Error al obtener los productos');
+        }
+        const data = await response.json();
+        this.allProducts = data;
+        this.getRandomProducts(); // Seleccionamos los 4 productos aleatorios después de obtener todos
+      } catch (error) {
+        this.error = error instanceof Error ? error.message : 'Hubo un error';
+      } finally {
+        this.loading = false;
+      }
+    },
 
-      products.value = Array.isArray(data) && data.length ? data : defaultProducts;
-    } catch (error) {
-      console.error('Error fetching products:', error);
-      products.value = defaultProducts;
-    }
-  };
-
-  const allProducts = computed(() => products.value);
-
-  onMounted(fetchProducts);
-
-  return {
-    products,
-    allProducts,
-    fetchProducts,
-    defaultProducts, // 🔹 Hacemos accesible defaultProducts
-  };
+    // Seleccionar 4 productos aleatorios de la lista de todos los productos
+    getRandomProducts() {
+      const shuffled = [...this.allProducts].sort(() => 0.5 - Math.random()); // Mezcla los productos aleatoriamente
+      this.randomProducts = shuffled.slice(0, 4); // Selecciona los primeros 4 productos aleatorios
+    },
+  },
 });

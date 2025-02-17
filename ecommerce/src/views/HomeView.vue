@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted } from 'vue';
+import { onMounted, ref } from 'vue';
 import { useProductsStore } from '@/stores/productsStore';
 import { useCategoriesStore } from '@/stores/categoriesStore';
 import ProductCard from '@/components/ProductCard.vue';
@@ -8,10 +8,10 @@ const productsStore = useProductsStore();
 const categoriesStore = useCategoriesStore();
 
 onMounted(async () => {
-  await productsStore.fetchProducts();
+  await productsStore.fetchProducts(); // Carga los productos y selecciona aleatoriamente 4
   await categoriesStore.fetchCategories();
-  console.log('Productos después de fetch:', productsStore.allProducts);
 });
+
 </script>
 
 <template>
@@ -25,7 +25,6 @@ onMounted(async () => {
           class="home__hero-bg"
           cover
         />
-        <!-- Texto de Bienvenida -->
         <div class="home__hero-text">
           <h1>Descubre los mejores complementos para tu hogar</h1>
         </div>
@@ -41,37 +40,33 @@ onMounted(async () => {
         cols="12"
         sm="4"
         v-for="category in categoriesStore.allCategories"
-        :key="category.name"
+        :key="category.id"
       >
-        <v-card class="home__category">
-          <v-img :src="category.image" :alt="category.name" cover class="home__category-image" />
+        <v-card @click="filterByCategory(category.id)" class="home__category">
           <div class="home__category-title">
-            {{ category.name }}
+            {{ category.nombre }}
           </div>
         </v-card>
       </v-col>
     </v-row>
 
-    <!-- Destacados -->
+    <!-- Productos Aleatorios -->
     <v-container>
-      <h2 class="section-title">Destacados</h2>
+      <h2 class="section-title">Productos Destacados</h2>
       <v-row>
         <v-col
           cols="6"
           md="3"
-          v-for="product in (productsStore.allProducts.length ? productsStore.allProducts : productsStore.defaultProducts)"
+          v-for="product in productsStore.randomProducts"
           :key="product.id"
         >
-          <ProductCard :product="product" />
+          <ProductCard :producto="product" />
         </v-col>
       </v-row>
     </v-container>
   </v-container>
 </template>
-
-<style lang="scss" scoped>
-@use '@/styles/variables' as *;
-
+<style scoped>
 .home {
   padding: 0;
   margin: 0;
@@ -81,84 +76,26 @@ onMounted(async () => {
     height: 40vh;
     overflow: hidden;
     position: relative;
-
-    @media (min-width: $breakpoint-md) {
-      height: 70vh;
-    }
-
-    &-container {
-      position: relative;
-    }
-
-    &-bg {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      object-position: center center;
-    }
-
-    &-text {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      text-align: center;
-      color: black; // Texto en negro
-      font-weight: bold;
-      width: 80%;
-      max-width: 600px;
-
-      h1 {
-        font-size: 2.5rem;
-        margin-bottom: 0.5rem;
-      }
-
-      p {
-        font-size: 1.5rem;
-      }
-
-      @media (max-width: 768px) {
-        width: 90%;
-
-        h1 {
-          font-size: 2rem;
-        }
-
-        p {
-          font-size: 1.2rem;
-        }
-      }
-    }
   }
 
   &__categories {
     display: flex;
     justify-content: center;
-    gap: $spacing-md;
-    margin-bottom: $spacing-xl;
+    gap: 20px;
+    margin-bottom: 20px;
   }
 
   &__category {
     height: 300px;
     text-align: center;
-    border-radius: $border-radius;
-    box-shadow: $box-shadow;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     overflow: hidden;
     transition: transform 0.3s ease-in-out;
-    position: relative;
-    display: flex;
-    flex-direction: column;
-
-    &:hover {
-      transform: scale(1.05);
-    }
   }
 
-  &__category-image {
-    width: 100%;
-    height: 80%;
-    object-fit: cover;
-    flex-grow: 1;
+  &__category:hover {
+    transform: scale(1.05);
   }
 
   &__category-title {
@@ -168,8 +105,6 @@ onMounted(async () => {
     font-weight: bold;
     text-align: center;
     padding: 12px 0;
-    width: 100%;
-    flex-shrink: 0;
   }
 }
 
@@ -177,6 +112,6 @@ onMounted(async () => {
   text-align: center;
   font-size: 1.5rem;
   font-weight: bold;
-  margin-bottom: $spacing-lg;
+  margin-bottom: 20px;
 }
 </style>
