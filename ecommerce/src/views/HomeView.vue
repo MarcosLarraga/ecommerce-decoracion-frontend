@@ -1,117 +1,174 @@
-<script setup lang="ts">
-import { onMounted, ref } from 'vue';
-import { useProductsStore } from '@/stores/productsStore';
-import { useCategoriesStore } from '@/stores/categoriesStore';
-import ProductCard from '@/components/ProductCard.vue';
-
-const productsStore = useProductsStore();
-const categoriesStore = useCategoriesStore();
-
-onMounted(async () => {
-  await productsStore.fetchProducts(); // Carga los productos y selecciona aleatoriamente 4
-  await categoriesStore.fetchCategories();
-});
-
-</script>
-
 <template>
   <v-container fluid class="home">
     <!-- Hero Section -->
     <v-row no-gutters class="home__hero">
       <v-col cols="12" class="home__hero-container">
-        <v-img
-          src="/fotos/fotoHero1.jpg"
-          alt="Nueva colección"
-          class="home__hero-bg"
-          cover
-        />
-        <div class="home__hero-text">
-          <h1>Descubre los mejores complementos para tu hogar</h1>
+        <v-img src="/fotos/fotoHero1.jpg" alt="Nueva colección" class="home__hero-bg" cover />
+        <div class="home__hero-overlay">
+          <h1 class="home__hero-title">Descubre los mejores complementos para tu hogar</h1>
         </div>
       </v-col>
     </v-row>
 
-    <!-- Categorías -->
-    <v-row justify="center" class="home__categories">
-      <v-col cols="12">
-        <h2 class="section-title">Categorías</h2>
-      </v-col>
-      <v-col
-        cols="12"
-        sm="4"
-        v-for="category in categoriesStore.allCategories"
-        :key="category.id"
-      >
-        <v-card @click="filterByCategory(category.id)" class="home__category">
-          <div class="home__category-title">
-            {{ category.nombre }}
-          </div>
-        </v-card>
-      </v-col>
-    </v-row>
 
-    <!-- Productos Aleatorios -->
+    <!-- Categorías -->
+    <v-container>
+      <h2 class="section-title">Categorías</h2>
+      <v-row justify="center">
+        <v-col cols="12" sm="6" md="4" lg="3" v-for="category in categoriesStore.allCategories" :key="category.id">
+          <v-card class="home__category" @click="goToCategory(category.name)">
+            <v-img :src="category.image" :alt="category.name" class="home__category-image" />
+            <div class="home__category-title">
+              {{ category.name }}
+            </div>
+          </v-card>
+        </v-col>
+      </v-row>
+    </v-container>
+
+    <!-- Productos Destacados -->
     <v-container>
       <h2 class="section-title">Productos Destacados</h2>
-      <v-row>
-        <v-col
-          cols="6"
-          md="3"
-          v-for="product in productsStore.randomProducts"
-          :key="product.id"
-        >
+      <v-row justify="center">
+        <v-col cols="12" sm="6" md="4" lg="3" v-for="product in productsStore.randomProducts" :key="product.id">
           <ProductCard :producto="product" />
         </v-col>
       </v-row>
     </v-container>
   </v-container>
 </template>
-<style scoped>
+
+<script setup lang="ts">
+import { onMounted } from 'vue';
+import { useCategoriesStore } from '@/stores/categoriesStore';
+import { useProductsStore } from '@/stores/productsStore';
+import { useRouter } from 'vue-router';
+import ProductCard from '@/components/ProductCard.vue';
+
+const categoriesStore = useCategoriesStore();
+const productsStore = useProductsStore();
+const router = useRouter();
+
+// Cargar categorías y productos destacados
+onMounted(async () => {
+  await categoriesStore.fetchCategories();
+  await productsStore.fetchProducts();
+  console.log("Categorías cargadas:", categoriesStore.allCategories);
+});
+
+// Función para navegar a la vista de productos con la categoría seleccionada
+const goToCategory = (categoryName: string) => {
+  router.push({ path: '/products', query: { category: categoryName } });
+};
+</script>
+
+<style lang="scss" scoped>
+@use '@/styles/variables' as *;
+
+@use '@/styles/variables' as *;
+
 .home {
   padding: 0;
   margin: 0;
 
   &__hero {
     width: 100vw;
-    height: 40vh;
+    height: 55vh; // ✅ Aumentamos la altura del Hero en móviles
     overflow: hidden;
     position: relative;
+    display: flex;
+    justify-content: center;
+    margin-top: 0; // ✅ Asegurar que esté justo debajo del navbar
+
+    @media (min-width: $breakpoint-md) {
+      height: 70vh; // ✅ Más altura en pantallas grandes
+    }
+
+    &-bg {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    &-overlay {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0, 0, 0, 0.6); // ✅ Fondo más oscuro para legibilidad
+      padding: $spacing-sm;
+      border-radius: $border-radius;
+      text-align: center;
+      width: 85%; // ✅ Más pequeño en móviles para que no se corte
+      max-width: 600px;
+
+      @media (min-width: $breakpoint-md) {
+        padding: $spacing-md;
+        width: 70%;
+      }
+    }
+
+    &-title {
+      font-size: $font-size-base; // ✅ Tamaño más pequeño en móviles
+      font-family: $font-family-primary;
+      color: $background-color;
+      font-weight: bold;
+      text-transform: uppercase;
+      margin: 0;
+
+      @media (min-width: $breakpoint-md) {
+        font-size: 2rem; // ✅ Tamaño más grande en pantallas grandes
+      }
+    }
   }
 
   &__categories {
     display: flex;
     justify-content: center;
-    gap: 20px;
-    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: $spacing-md;
+    margin-bottom: $spacing-lg;
   }
 
   &__category {
-    height: 300px;
+    height: 250px;
     text-align: center;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: $border-radius;
+    box-shadow: $box-shadow;
     overflow: hidden;
     transition: transform 0.3s ease-in-out;
-  }
+    cursor: pointer;
+    background-color: $background-color;
 
-  &__category:hover {
-    transform: scale(1.05);
+    &:hover {
+      transform: scale(1.05);
+    }
   }
 
   &__category-title {
-    background-color: white;
-    color: black;
-    font-size: 1.2rem;
+    background-color: rgba(255, 255, 255, 0.85);
+    color: $text-color;
+    font-size: $font-size-large;
     font-weight: bold;
     text-align: center;
-    padding: 12px 0;
+    padding: $spacing-sm;
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+  }
+
+  &__category-image {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
   }
 }
 
 .section-title {
   text-align: center;
-  font-size: 1.5rem;
+  font-size: $font-size-large;
   font-weight: bold;
-  margin-bottom: 20px;
+  margin: $spacing-lg 0;
 }
+
 </style>
