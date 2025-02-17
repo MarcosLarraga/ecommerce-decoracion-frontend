@@ -3,7 +3,7 @@
     <NavBar />
     <div class="layout">
       <v-main class="main">
-        <v-container fluid class="content">
+        <v-container fluid class="pa-0">
           <RouterView />
         </v-container>
       </v-main>

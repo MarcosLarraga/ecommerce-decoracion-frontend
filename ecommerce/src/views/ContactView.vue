@@ -17,7 +17,7 @@ const submitForm = () => {
 </script>
 
 <template>
-  <v-container fluid class="page-container">
+  <v-container fluid class="pa-0">
     <PageHero title="Contacto" imageSrc="/fotos/PageHero.jpg" />
 
     <v-container class="contact-container">
@@ -61,13 +61,6 @@ const submitForm = () => {
   flex-grow: 1;
   text-align: center;
   padding: 20px;
-}
-
-.v-container {
-  padding: 0px !important;
-  margin: 0px !important;
-  width: 100vw !important;
-  max-width: 100vw !important;
 }
 
 .contact-title {
