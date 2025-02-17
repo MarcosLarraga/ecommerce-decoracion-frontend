@@ -5,3 +5,19 @@ body {
   color: $text-color;
   background-color: $background-color;
 }
+
+form button,
+form .v-btn {
+  background-color: $primary-color !important;
+  color: white !important;
+  font-weight: bold;
+  text-transform: uppercase;
+  border-radius: $form-button-radius;
+  box-shadow: $form-button-shadow;
+  transition: background-color 0.3s ease-in-out;
+}
+
+form button:hover,
+form .v-btn:hover {
+  background-color: $primary-color-hover !important;
+}

@@ -1,29 +1,32 @@
-// 🎨 Colores principales
+// Colores principales
 $primary-color: #06AA51;
+$primary-color-hover: darken($primary-color, 10%);
 $secondary-color: #000000;
 $background-color: #ffffff;
 $text-color: #000000;
 $border-color: #333333;
 
-// 📏 Espaciados
+// Espaciados
 $spacing-xs: 4px;
 $spacing-sm: 8px;
 $spacing-md: 16px;
 $spacing-lg: 24px;
 $spacing-xl: 32px;
 
-// 🔠 Tipografía
+// Tipografía
 $font-family-primary: 'Roboto', sans-serif;
 $font-size-base: 16px;
 $font-size-large: 18px;
 $font-size-small: 14px;
 
-// 📐 Breakpoints para responsive
+// Breakpoints para responsive
 $breakpoint-sm: 600px;
 $breakpoint-md: 960px;
 $breakpoint-lg: 1280px;
 $breakpoint-xl: 1920px;
 
-// 📦 Sombra y bordes
-$box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+// Estilos de botones en formularios
+$form-button-radius: 8px;
 $border-radius: 8px;
+$form-button-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+$box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);

@@ -84,8 +84,6 @@ const submitForm = () => {
 .contact-btn {
   margin-top: 15px;
   margin-bottom: 50px;
-  background-color: #007a3d !important;
-  color: white !important;
   font-weight: bold;
   text-transform: uppercase;
   width: 120px !important;

@@ -26,10 +26,10 @@
 
         <!-- Iconos de usuario y carrito en desktop -->
         <v-col cols="3" class="d-none d-md-flex justify-end navbar__icons">
-          <v-btn icon class="navbar__icon">
+          <v-btn icon class="navbar__icon" @click="redirectToLogin">
             <v-icon>mdi-account</v-icon>
           </v-btn>
-          <v-btn icon class="navbar__icon">
+          <v-btn icon class="navbar__icon" to="/carrito">
             <v-icon>mdi-cart</v-icon>
           </v-btn>
         </v-col>
@@ -45,10 +45,10 @@
       <v-list-item to="/about" class="navbar__drawer-item">About</v-list-item>
       <v-list-item to="/contacto" class="navbar__drawer-item">Contacto</v-list-item>
       <v-divider></v-divider>
-      <v-list-item to="/account" class="navbar__drawer-item">
+      <v-list-item @click="redirectToLogin" class="navbar__drawer-item">
         <v-icon left>mdi-account</v-icon> Mi Cuenta
       </v-list-item>
-      <v-list-item to="/cart" class="navbar__drawer-item">
+      <v-list-item to="/carrito" class="navbar__drawer-item">
         <v-icon left>mdi-cart</v-icon> Carrito
       </v-list-item>
     </v-list>
@@ -57,7 +57,14 @@
 
 <script setup>
 import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+
 const drawer = ref(false);
+const router = useRouter();
+
+const redirectToLogin = () => {
+  router.push('/login'); // Envía a la vista de login
+};
 </script>
 
 <style lang="scss" scoped>
@@ -80,12 +87,6 @@ const drawer = ref(false);
       margin-right: $spacing-sm;
       border-radius: $border-radius;
     }
-
-    &-text {
-      font-family: $font-family-primary;
-      font-size: 1.2rem;
-      font-weight: bold;
-    }
   }
 
   &__menu {
@@ -106,10 +107,6 @@ const drawer = ref(false);
         color: $primary-color;
       }
     }
-  }
-
-  &__hamburger {
-    display: flex;
   }
 
   &__icons {
