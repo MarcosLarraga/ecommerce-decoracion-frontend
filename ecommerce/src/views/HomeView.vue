@@ -12,7 +12,8 @@
     <section class="home__categories">
       <h2 class="section-title">Categorías</h2>
       <div class="categories-grid">
-        <div class="category-card" v-for="category in categoriesStore.allCategories" :key="category.id" @click="goToCategory(category.name)">
+        <div class="category-card" v-for="category in categoriesStore.allCategories" :key="category.id"
+          @click="goToCategory(category.name)">
           <img :src="category.image || '/fotos/default.jpg'" :alt="category.name" class="category-card__image" />
           <div class="category-card__title">{{ category.name }}</div>
         </div>
@@ -47,19 +48,19 @@ onMounted(async () => {
   console.log("Categorías cargadas:", categoriesStore.allCategories);
 });
 
-// Función para navegar a la vista de productos con la categoría seleccionada
+// Función para navegar a la página de shop con la categoría seleccionada
 const goToCategory = (categoryName: string) => {
-  router.push({ path: '/products', query: { category: categoryName } });
+  router.push({ path: '/shop', query: { category: categoryName } }); // 🔥 Redirigir a shop con query param
 };
 </script>
+
 <style lang="scss" scoped>
 @use '@/styles/variables' as *;
 
 .home {
   padding: 0;
   margin: 0;
-  
-  // 📌 **Hero Section**
+
   &__hero {
     width: 100vw;
     height: 60vh;
@@ -88,37 +89,31 @@ const goToCategory = (categoryName: string) => {
     }
 
     &-title {
-      font-size: $font-size-base;
+      font-size: 2rem;
       font-family: $font-family-primary;
       color: $background-color;
       font-weight: bold;
       text-transform: uppercase;
-
-      @media (min-width: $breakpoint-md) {
-        font-size: 2rem;
-      }
     }
   }
 
-  
-  // 📌 **Categorías**
   &__categories {
     text-align: center;
-    padding: 36px 0; // 🔥 Menos espacio arriba y abajo
+    padding: 36px 0;
     width: 100%;
     margin: 0 auto;
 
     .categories-grid {
       display: flex;
       flex-wrap: wrap;
-      justify-content: center; // 🔥 Centramos todo el contenido
-      gap: 125px; // 🔥 Menos espacio entre las tarjetas
+      justify-content: center;
+      gap: 50px;
     }
 
     .category-card {
       position: relative;
-      width: 280px; // 🔥 Tarjetas de tamaño uniforme
-      height: 330px;
+      width: 300px;
+      height: 350px;
       border-radius: $border-radius;
       overflow: hidden;
       box-shadow: $box-shadow;
@@ -152,29 +147,26 @@ const goToCategory = (categoryName: string) => {
     }
   }
 
-  // 📌 **Productos**
   &__products {
     text-align: center;
-    padding: 36px  0; // 🔥 Menos espacio
+    padding: 36px 0;
     width: 100%;
     margin: 0 auto;
 
     .products-grid {
       display: flex;
       flex-wrap: wrap;
-      justify-content: center; // 🔥 Centrar los productos
-      gap: 46px; // 🔥 Menos espacio entre productos
+      justify-content: center;
+      gap: 40px;
     }
   }
 }
 
-// 📌 **Títulos más grandes y alineados**
+// 📌 **Títulos más grandes**
 .section-title {
   text-align: center;
-  font-size: 2rem;
+  font-size: 2.2rem;
   font-weight: bold;
   margin-bottom: 32px;
 }
-
 </style>
-

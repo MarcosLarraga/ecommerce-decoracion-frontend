@@ -52,7 +52,7 @@ export const useProductsStore = defineStore('products', {
       }
 
       const shuffled = [...this.allProducts].sort(() => 0.5 - Math.random()); // Mezcla los productos aleatoriamente
-      this.randomProducts = shuffled.slice(0, 4); // Selecciona los primeros 4 productos aleatorios
+      this.randomProducts = shuffled.slice(0, 5); // Selecciona los primeros 5 productos aleatorios
 
       console.log("🔀 Productos aleatorios seleccionados:", this.randomProducts);
     },

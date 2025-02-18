@@ -24,14 +24,15 @@
           <router-link to="/contacto" class="navbar__menu-item">Contacto</router-link>
         </v-col>
 
-        <!-- Iconos de usuario y carrito en desktop -->
+        <!-- Iconos de usuario y carrito en desktop (con contador de productos) -->
         <v-col cols="3" class="d-none d-md-flex justify-end navbar__icons">
-          <v-btn icon class="navbar__icon">
+          <router-link to="/account" class="navbar__icon">
             <v-icon>mdi-account</v-icon>
-          </v-btn>
-          <v-btn icon class="navbar__icon">
+          </router-link>
+          <router-link to="/cart" class="navbar__icon navbar__cart">
             <v-icon>mdi-cart</v-icon>
-          </v-btn>
+            <span v-if="cartStore.totalItems > 0" class="cart-badge">{{ cartStore.totalItems }}</span>
+          </router-link>
         </v-col>
       </v-row>
     </v-container>
@@ -40,16 +41,17 @@
   <!-- Drawer para menú móvil con despliegue a la derecha -->
   <v-navigation-drawer v-model="drawer" app temporary right class="navbar__drawer">
     <v-list>
-      <v-list-item to="/" class="navbar__drawer-item">Home</v-list-item>
-      <v-list-item to="/shop" class="navbar__drawer-item">Shop</v-list-item>
-      <v-list-item to="/about" class="navbar__drawer-item">About</v-list-item>
-      <v-list-item to="/contacto" class="navbar__drawer-item">Contacto</v-list-item>
+      <v-list-item to="/" class="navbar__drawer-item" @click="drawer = false">Home</v-list-item>
+      <v-list-item to="/shop" class="navbar__drawer-item" @click="drawer = false">Shop</v-list-item>
+      <v-list-item to="/about" class="navbar__drawer-item" @click="drawer = false">About</v-list-item>
+      <v-list-item to="/contacto" class="navbar__drawer-item" @click="drawer = false">Contacto</v-list-item>
       <v-divider></v-divider>
-      <v-list-item to="/account" class="navbar__drawer-item">
+      <v-list-item to="/account" class="navbar__drawer-item" @click="drawer = false">
         <v-icon left>mdi-account</v-icon> Mi Cuenta
       </v-list-item>
-      <v-list-item to="/cart" class="navbar__drawer-item">
+      <v-list-item to="/cart" class="navbar__drawer-item" @click="drawer = false">
         <v-icon left>mdi-cart</v-icon> Carrito
+        <span v-if="cartStore.totalItems > 0" class="cart-badge">{{ cartStore.totalItems }}</span>
       </v-list-item>
     </v-list>
   </v-navigation-drawer>
@@ -57,7 +59,10 @@
 
 <script setup>
 import { ref } from 'vue';
+import { useCartStore } from '@/stores/cartStore'; // Acceder al estado del carrito
+
 const drawer = ref(false);
+const cartStore = useCartStore();
 </script>
 
 <style lang="scss" scoped>
@@ -79,12 +84,6 @@ const drawer = ref(false);
       height: 45px;
       margin-right: $spacing-sm;
       border-radius: $border-radius;
-    }
-
-    &-text {
-      font-family: $font-family-primary;
-      font-size: 1.2rem;
-      font-weight: bold;
     }
   }
 
@@ -120,11 +119,30 @@ const drawer = ref(false);
 
   &__icon {
     transition: transform 0.2s ease-in-out;
+    position: relative;
 
     &:hover {
       transform: scale(1.1);
       color: $primary-color;
     }
+  }
+
+  &__cart {
+    position: relative;
+  }
+
+  .cart-badge {
+    position: absolute;
+    top: -5px;
+    right: -10px;
+    background: red;
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 4px 6px;
+    border-radius: 50%;
+    min-width: 20px;
+    text-align: center;
   }
 }
 
