@@ -1,33 +1,33 @@
-import { createApp } from 'vue';
-import App from './App.vue'; 
+// src/main.ts
+import { createApp } from 'vue'
+import App from './App.vue' 
 
-// ✅ Importación correcta de Vuetify
-import { createVuetify } from 'vuetify';
-import * as components from 'vuetify/components';
-import * as directives from 'vuetify/directives';
+import { createVuetify } from 'vuetify'
+import * as components from 'vuetify/components'
+import * as directives from 'vuetify/directives'
+import 'vuetify/styles'
 
-// ✅ Importar estilos de Vuetify
-import 'vuetify/styles';
+import '@/styles/main.scss'
+import '@mdi/font/css/materialdesignicons.css'
 
-// ✅ Importar tu archivo global de estilos
-import '@/styles/main.scss';
-import '@mdi/font/css/materialdesignicons.css';
+import router from './router'
+import { createPinia } from 'pinia'
 
+import { useUserStore } from '@/stores/userStore'
 
-// ✅ Importar Vue Router y Pinia
-import router from './router';
-import { createPinia } from 'pinia';
-
-// ✅ Crear la instancia de Vuetify con componentes y directivas
 const vuetify = createVuetify({
   components,
-  directives,
-});
+  directives
+})
 
-const pinia = createPinia();
+const pinia = createPinia()
 
-const app = createApp(App);
-app.use(router);
-app.use(pinia);
-app.use(vuetify);
-app.mount('#app');
+const app = createApp(App)
+app.use(router)
+app.use(pinia)
+app.use(vuetify)
+
+const userStore = useUserStore()
+userStore.restoreSession()
+
+app.mount('#app')
