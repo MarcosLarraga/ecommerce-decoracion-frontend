@@ -1,10 +1,31 @@
-<!-- src/views/LoginView.vue -->
+<script setup lang="ts">
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+
+const email = ref('');
+const password = ref('');
+const router = useRouter();
+
+const rules = {
+  required: (value: string) => !!value || 'Campo obligatorio',
+  email: (value: string) =>
+    /\S+@\S+\.\S+/.test(value) || 'Ingresa un correo válido',
+};
+
+const login = () => {
+  console.log('Iniciando sesión con:', email.value, password.value);
+  // Rediriges a donde quieras luego de loguear, por ejemplo: 
+  router.push('/');
+};
+</script>
+
 <template>
+  <!-- Reemplazamos v-container por un div para mayor control del 100% de la pantalla -->
   <div class="login-container d-flex justify-center align-center">
     <v-card class="login-card pa-6">
       <v-card-title class="text-center">Iniciar Sesión</v-card-title>
       <v-card-text>
-        <v-form @submit.prevent="loginHandler">
+        <v-form @submit.prevent="login">
           <v-text-field
             v-model="email"
             label="Correo Electrónico"
@@ -23,7 +44,7 @@
             variant="outlined"
           ></v-text-field>
 
-          <v-btn type="submit" block class="login-btn mt-4">
+          <v-btn type="submit" block class="login-btn">
             Ingresar
           </v-btn>
 
@@ -39,52 +60,20 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { useUserStore } from '@/stores/userStore'
-
-const email = ref('')
-const password = ref('')
-const router = useRouter()
-const userStore = useUserStore()
-
-const rules = {
-  required: (value: string) => !!value || 'Campo obligatorio',
-  email: (value: string) =>
-    /\S+@\S+\.\S+/.test(value) || 'Ingresa un correo válido',
-}
-
-async function loginHandler() {
-  try {
-    // Llamar a la acción login del store
-    await userStore.login(email.value, password.value)
-
-    // Opcional: si quieres redirigir según el rol del usuario:
-    if (userStore.role === 'admin') {
-      router.push('/admin')
-    } else {
-      // El usuario normal lo mandas a la Home
-      router.push('/')
-    }
-  } catch (error) {
-    alert('Error al iniciar sesión. Revisa tus credenciales.')
-  }
-}
-</script>
-
 <style scoped>
 .login-container {
   width: 100%;
   min-height: 100vh;
   margin: 0;
   padding: 0;
+
   background: url('/fotos/login-register.jpg') no-repeat center center;
   background-size: cover;
+
   display: flex;
   align-items: center;
   justify-content: center;
-  position: relative;
+  position: relative; 
 }
 
 .login-container::before {
