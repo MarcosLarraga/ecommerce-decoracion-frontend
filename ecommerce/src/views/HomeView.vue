@@ -1,41 +1,32 @@
 <template>
-  <v-container fluid class="home">
+  <div class="home">
     <!-- Hero Section -->
-    <v-row no-gutters class="home__hero">
-      <v-col cols="12" class="home__hero-container">
-        <v-img src="/fotos/fotoHero1.jpg" alt="Nueva colección" class="home__hero-bg" cover />
-        <div class="home__hero-overlay">
-          <h1 class="home__hero-title">Descubre los mejores complementos para tu hogar</h1>
-        </div>
-      </v-col>
-    </v-row>
-
+    <div class="home__hero">
+      <img src="/fotos/fotoHero1.jpg" alt="Nueva colección" class="home__hero-bg" />
+      <div class="home__hero-overlay">
+        <h1 class="home__hero-title">Descubre los mejores complementos para tu hogar</h1>
+      </div>
+    </div>
 
     <!-- Categorías -->
-    <v-container>
+    <section class="home__categories">
       <h2 class="section-title">Categorías</h2>
-      <v-row justify="center">
-        <v-col cols="12" sm="6" md="4" lg="3" v-for="category in categoriesStore.allCategories" :key="category.id">
-          <v-card class="home__category" @click="goToCategory(category.name)">
-            <v-img :src="category.image" :alt="category.name" class="home__category-image" />
-            <div class="home__category-title">
-              {{ category.name }}
-            </div>
-          </v-card>
-        </v-col>
-      </v-row>
-    </v-container>
+      <div class="categories-grid">
+        <div class="category-card" v-for="category in categoriesStore.allCategories" :key="category.id" @click="goToCategory(category.name)">
+          <img :src="category.image || '/fotos/default.jpg'" :alt="category.name" class="category-card__image" />
+          <div class="category-card__title">{{ category.name }}</div>
+        </div>
+      </div>
+    </section>
 
     <!-- Productos Destacados -->
-    <v-container>
+    <section class="home__products">
       <h2 class="section-title">Productos Destacados</h2>
-      <v-row justify="center">
-        <v-col cols="12" sm="6" md="4" lg="3" v-for="product in productsStore.randomProducts" :key="product.id">
-          <ProductCard :producto="product" />
-        </v-col>
-      </v-row>
-    </v-container>
-  </v-container>
+      <div class="products-grid">
+        <ProductCard v-for="product in productsStore.randomProducts" :key="product.id" :producto="product" />
+      </div>
+    </section>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -61,28 +52,21 @@ const goToCategory = (categoryName: string) => {
   router.push({ path: '/products', query: { category: categoryName } });
 };
 </script>
-
 <style lang="scss" scoped>
-@use '@/styles/variables' as *;
-
 @use '@/styles/variables' as *;
 
 .home {
   padding: 0;
   margin: 0;
-
+  
+  // 📌 **Hero Section**
   &__hero {
     width: 100vw;
-    height: 55vh; // ✅ Aumentamos la altura del Hero en móviles
-    overflow: hidden;
+    height: 60vh;
     position: relative;
+    overflow: hidden;
     display: flex;
     justify-content: center;
-    margin-top: 0; // ✅ Asegurar que esté justo debajo del navbar
-
-    @media (min-width: $breakpoint-md) {
-      height: 70vh; // ✅ Más altura en pantallas grandes
-    }
 
     &-bg {
       width: 100%;
@@ -95,80 +79,102 @@ const goToCategory = (categoryName: string) => {
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      background: rgba(0, 0, 0, 0.6); // ✅ Fondo más oscuro para legibilidad
-      padding: $spacing-sm;
+      background: rgba(0, 0, 0, 0.6);
+      padding: $spacing-md;
       border-radius: $border-radius;
       text-align: center;
-      width: 85%; // ✅ Más pequeño en móviles para que no se corte
+      width: 90%;
       max-width: 600px;
-
-      @media (min-width: $breakpoint-md) {
-        padding: $spacing-md;
-        width: 70%;
-      }
     }
 
     &-title {
-      font-size: $font-size-base; // ✅ Tamaño más pequeño en móviles
+      font-size: $font-size-base;
       font-family: $font-family-primary;
       color: $background-color;
       font-weight: bold;
       text-transform: uppercase;
-      margin: 0;
 
       @media (min-width: $breakpoint-md) {
-        font-size: 2rem; // ✅ Tamaño más grande en pantallas grandes
+        font-size: 2rem;
       }
     }
   }
 
+  
+  // 📌 **Categorías**
   &__categories {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: $spacing-md;
-    margin-bottom: $spacing-lg;
-  }
-
-  &__category {
-    height: 250px;
     text-align: center;
-    border-radius: $border-radius;
-    box-shadow: $box-shadow;
-    overflow: hidden;
-    transition: transform 0.3s ease-in-out;
-    cursor: pointer;
-    background-color: $background-color;
+    padding: 36px 0; // 🔥 Menos espacio arriba y abajo
+    width: 100%;
+    margin: 0 auto;
 
-    &:hover {
-      transform: scale(1.05);
+    .categories-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center; // 🔥 Centramos todo el contenido
+      gap: 125px; // 🔥 Menos espacio entre las tarjetas
+    }
+
+    .category-card {
+      position: relative;
+      width: 280px; // 🔥 Tarjetas de tamaño uniforme
+      height: 330px;
+      border-radius: $border-radius;
+      overflow: hidden;
+      box-shadow: $box-shadow;
+      cursor: pointer;
+      transition: transform 0.3s ease-in-out;
+
+      &:hover {
+        transform: scale(1.05);
+      }
+
+      &__image {
+        width: 100%;
+        height: 85%;
+        object-fit: cover;
+      }
+
+      &__title {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        height: 15%;
+        background: rgba(255, 255, 255, 0.9);
+        color: $text-color;
+        font-size: 1.2rem;
+        font-weight: bold;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
     }
   }
 
-  &__category-title {
-    background-color: rgba(255, 255, 255, 0.85);
-    color: $text-color;
-    font-size: $font-size-large;
-    font-weight: bold;
+  // 📌 **Productos**
+  &__products {
     text-align: center;
-    padding: $spacing-sm;
+    padding: 36px  0; // 🔥 Menos espacio
     width: 100%;
-    position: absolute;
-    bottom: 0;
-  }
+    margin: 0 auto;
 
-  &__category-image {
-    height: 100%;
-    width: 100%;
-    object-fit: cover;
+    .products-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center; // 🔥 Centrar los productos
+      gap: 46px; // 🔥 Menos espacio entre productos
+    }
   }
 }
 
+// 📌 **Títulos más grandes y alineados**
 .section-title {
   text-align: center;
-  font-size: $font-size-large;
+  font-size: 2rem;
   font-weight: bold;
-  margin: $spacing-lg 0;
+  margin-bottom: 32px;
 }
 
 </style>
+

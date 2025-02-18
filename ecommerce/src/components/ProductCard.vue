@@ -1,28 +1,28 @@
 <template>
-  <v-card class="product-card">
+  <div class="product-card">
     <!-- Imagen del producto -->
-    <v-img :src="producto.urlImagen" alt="Imagen del producto" class="product-card__image" />
+    <div class="product-card__image-wrapper">
+      <img :src="producto.urlImagen" alt="Imagen del producto" class="product-card__image" />
+    </div>
 
     <!-- Contenido de la tarjeta -->
-    <v-card-title class="product-card__title">
-      {{ producto.nombre }}
-    </v-card-title>
-
-    <v-card-subtitle class="product-card__price">
-      {{ producto.precio }} €
-    </v-card-subtitle>
+    <div class="product-card__info">
+      <h3 class="product-card__title">{{ producto.nombre }}</h3>
+      <p class="product-card__price">{{ producto.precio }} €</p>
+    </div>
 
     <!-- Botón de añadir al carrito -->
-    <v-card-actions class="product-card__actions">
-      <v-btn icon class="product-card__cart-btn" @click="addToCart">
-        <v-icon>mdi-cart</v-icon>
-      </v-btn>
-    </v-card-actions>
-  </v-card>
+    <button class="product-card__cart-btn" @click="addToCart">
+      <font-awesome-icon :icon="faShoppingCart" />
+    </button>
+
+  </div>
 </template>
 
 <script setup lang="ts">
 import { defineProps } from 'vue';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { faShoppingCart } from '@fortawesome/free-solid-svg-icons';
 
 const props = defineProps({
   producto: Object, // Recibe el producto como prop
@@ -37,42 +37,55 @@ const addToCart = () => {
 @use '@/styles/variables' as *;
 
 .product-card {
-  width: 100%;  // ✅ Ocupará todo el ancho en mobile
-  max-width: 250px;
+  width: 100%;
+  max-width: 220px;
   height: auto;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
   border-radius: $border-radius;
-  box-shadow: $box-shadow;
-  background-color: $background-color;
+  background-color: #ffffff;
+  border: 1px solid #dddddd;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.08);
   overflow: hidden;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  margin: $spacing-md auto;  // ✅ Centrado automático en mobile
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  padding: $spacing-xs;
+  margin: $spacing-sm;
 
   &:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+    transform: translateY(-3px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
   }
 }
 
+.product-card__image-wrapper {
+  width: 100%;
+  height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
 
 .product-card__image {
   width: 100%;
-  height: 180px;
-  object-fit: cover;
+  height: 100%;
+  object-fit: contain; // ✅ Las imágenes no se cortan
+}
+
+.product-card__info {
+  padding: $spacing-xs;
 }
 
 .product-card__title {
   font-size: $font-size-small;
   font-weight: bold;
-  padding: $spacing-xs;
   color: $text-color;
-  white-space: normal; // ✅ Permite que el texto pase a otra línea
+  white-space: normal;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-height: 3.6em; // ✅ Controla el tamaño del título
+  max-height: 3.6em;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -82,29 +95,26 @@ const addToCart = () => {
   font-size: $font-size-base;
   color: $primary-color;
   font-weight: bold;
-}
-
-.product-card__actions {
-  display: flex;
-  justify-content: center;
-  width: 100%;
-  margin-top: auto;
-  padding-bottom: $spacing-xs;
+  margin-top: $spacing-xs;
 }
 
 .product-card__cart-btn {
   background-color: $primary-color;
-  color: $background-color;
+  border: none;
   border-radius: 50%;
   width: 40px;
   height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background-color 0.3s ease;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  margin-top: $spacing-xs;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+  color: white; // ✅ El icono se ve blanco sin necesidad de filtros
 
   &:hover {
-    opacity: 0.8;
+    opacity: 0.85;
   }
 }
 
@@ -113,13 +123,13 @@ const addToCart = () => {
     max-width: 100%;
   }
 
-  .product-card__image {
-    height: 150px;
+  .product-card__image-wrapper {
+    height: 160px;
   }
 
   .product-card__title {
     font-size: $font-size-small;
-    max-height: none; // ✅ Permite mostrar todo el texto en móviles
+    max-height: none;
     -webkit-line-clamp: unset;
   }
 

@@ -8,28 +8,26 @@ interface Category {
   name: string;
   description: string;
   image: string;
-  route: string;
 }
 
 export const useCategoriesStore = defineStore('categories', () => {
   const allCategories = ref<Category[]>([]); // Lista de categorías
 
-  // Función para obtener las categorías desde la API y asignar imágenes/rutas dinámicas
+  // Función para obtener las categorías desde la API
   const fetchCategories = async () => {
     try {
-      const response = await axios.get('http://localhost:5162/api/Categoria'); // ✅ Usa Axios para la petición
+      const response = await axios.get('http://localhost:5162/api/Categoria'); // ✅ Petición a la API
       const data = response.data; // ✅ Extrae los datos correctamente
 
-      // Asignar imágenes y rutas dinámicamente
+      // Asignar datos correctamente usando la URL de imagen de la API
       allCategories.value = data.map((category: any) => ({
         id: category.id,
-        name: category.nombre, // ✅ Ajuste de nombres según la API
+        name: category.nombre,
         description: category.descripcion,
-        image: `/fotos/${category.nombre.replace(/\s+/g, "_")}.jpg`, // ✅ Imagen con el mismo nombre que la categoría
-        route: `/products?category=${category.nombre}` // ✅ Ruta dinámica
+        image: category.urlImagen && category.urlImagen.trim() !== "" ? category.urlImagen : '/fotos/default.jpg' // ✅ Si no hay imagen, usa una por defecto
       }));
 
-      console.log("Categorías procesadas:", allCategories.value);
+      console.log("Categorías cargadas:", allCategories.value);
     } catch (error) {
       console.error("Error al obtener categorías:", error);
     }
