@@ -36,11 +36,8 @@
             <router-link to="/account" class="navbar__icon" @click="redirectToLogin">
               <v-icon>mdi-account</v-icon>
             </router-link>
-          </template>
-          <router-link to="/cart" class="navbar__icon navbar__cart" to="/carrito">
-            <v-icon>mdi-cart</v-icon>
             <span v-if="cartStore.totalItems > 0" class="cart-badge">{{ cartStore.totalItems }}</span>
-          </router-link>
+          </template>
         </v-col>
       </v-row>
     </v-container>
@@ -54,7 +51,11 @@
       <v-list-item to="/about" class="navbar__drawer-item" @click="drawer = false">About</v-list-item>
       <v-list-item to="/contacto" class="navbar__drawer-item" @click="drawer = false">Contacto</v-list-item>
       <v-divider></v-divider>
-      <v-list-item v-if="store.isAuthenticated" @click="logout" class="navbar__drawer-item" @click="drawer = false">
+      <v-list-item
+        v-if="store.isAuthenticated"
+        class="navbar__drawer-item"
+        @click="handleLogout"
+      >
         <v-icon left>mdi-logout</v-icon> Cerrar Sesión
       </v-list-item>
       <v-list-item v-else @click="redirectToLogin" class="navbar__drawer-item">
@@ -68,25 +69,34 @@
   </v-navigation-drawer>
 </template>
 
-<script setup>
-import { ref } from 'vue';
-import { useCartStore } from '@/stores/cartStore';
-
+<script setup lang="ts">
+import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useUserStore } from '@/stores/userStore';
+import { useCartStore } from '@/stores/cartStore';
 
 const drawer = ref(false);
-const cartStore = useCartStore();
 const router = useRouter();
 const store = useUserStore();
+const cartStore = useCartStore();
+
+onMounted(() => {
+  console.log('User en Navbar:', store.user);
+});
 
 const redirectToLogin = () => {
   router.push('/login');
 };
 
 const logout = () => {
+  console.log('Cerrando sesión para:', store.user);
   store.logout();
   router.push('/login');
+};
+
+const handleLogout = () => {
+  logout();
+  drawer.value = false;
 };
 </script>
 
@@ -98,11 +108,6 @@ const logout = () => {
   padding: $spacing-md 0;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   border-bottom: 2px solid $primary-color;
-
-  // Aumenta el margen del ícono del carrito
-  .mdi-cart {
-    margin-left: 50px !important;
-  }
 
   &__logo {
     display: flex;
@@ -119,7 +124,7 @@ const logout = () => {
 
   &__menu {
     display: flex;
-    gap: 60px; // Espacio horizontal entre los enlaces
+    gap: 60px;
     align-items: center;
 
     &-item {
@@ -140,7 +145,7 @@ const logout = () => {
   &__icons {
     display: flex;
     align-items: center;
-    gap: 1rem; // Espacio entre íconos
+    gap: 1rem;
 
     .navbar__username {
       margin-right: $spacing-sm;
@@ -154,37 +159,28 @@ const logout = () => {
     color: #000 !important;
     transition: transform 0.2s ease-in-out;
 
-    // Aumentar tamaño de íconos
-    & v-icon {
-      font-size: 28px !important; // Ajusta a tu gusto (28px, 32px, etc.)
-    }
-
     &:hover {
       transform: scale(1.1);
-      color: $primary-color; // Cambia de color al pasar el ratón
+      color: $primary-color;
     }
-  }
-
-  &__cart {
-    position: relative;
-  }
-
-  .cart-badge {
-    position: absolute;
-    top: -5px;
-    right: -10px;
-    background: red;
-    color: white;
-    font-size: 12px;
-    font-weight: bold;
-    padding: 4px 6px;
-    border-radius: 50%;
-    min-width: 20px;
-    text-align: center;
   }
 }
 
 .v-navigation-drawer .v-list {
   margin-top: 10%;
+}
+
+.cart-badge {
+  position: absolute;
+  top: -5px;
+  right: -10px;
+  background: red;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 4px 6px;
+  border-radius: 50%;
+  min-width: 20px;
+  text-align: center;
 }
 </style>
