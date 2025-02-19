@@ -4,6 +4,7 @@ import ProductsView from '@/views/ProductsView.vue';
 import CartView from '@/views/CartView.vue';
 import ContactView from '@/views/ContactView.vue';
 import LoginView from '@/views/LoginView.vue';
+import RegisterView from '@/views/RegisterView.vue';
 
 const routes = [
   { path: '/', component: HomeView },
@@ -11,6 +12,7 @@ const routes = [
   { path: '/carrito', component: CartView },
   { path: '/contacto', component: ContactView },
   { path: '/login', component: LoginView },
+  { path: '/register', component: RegisterView },
 ];
 
 const router = createRouter({
