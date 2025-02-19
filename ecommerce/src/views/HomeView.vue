@@ -147,7 +147,9 @@ const goToCategory = (categoryName: string) => {
     }
   }}
 
-
+.home__products{
+  padding: 16px;
+}
 // 📌 **Títulos más grandes**
 .section-title {
   text-align: center;

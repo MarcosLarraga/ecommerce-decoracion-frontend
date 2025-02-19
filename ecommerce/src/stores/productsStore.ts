@@ -11,51 +11,70 @@ interface ProductoDTO {
 
 export const useProductsStore = defineStore('products', {
   state: () => ({
-    allProducts: [] as ProductoDTO[], // Aquí usamos el DTO
-    randomProducts: [] as ProductoDTO[], // Productos aleatorios
-    loading: false,
-    error: null as string | null,
+    allProducts: [] as ProductoDTO[], // Lista de productos obtenidos desde la API
+    randomProducts: [] as ProductoDTO[], // Productos aleatorios seleccionados
+    loading: false, // Estado de carga
+    error: null as string | null, // Mensaje de error si ocurre algún problema
   }),
 
   actions: {
-    // Obtener todos los productos desde el endpoint que devuelve el DTO
+    /**
+     * Obtiene todos los productos desde la API y los almacena en el estado.
+     */
     async fetchProducts() {
       this.loading = true;
       this.error = null;
-      console.log("⏳ fetchProducts() llamado, iniciando carga...");
+      console.log("⏳ [fetchProducts] Iniciando la carga de productos...");
 
       try {
-        // Usamos el endpoint que retorna productos como ProductoDTO
-        const response = await fetch('http://localhost:5162/api/Producto/dto');
+        // Petición al endpoint que devuelve productos en formato ProductoDTO
+        const response = await fetch('http://localhost:5162/api/Producto/dto', {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          }
+        });
+
         if (!response.ok) {
-          throw new Error('❌ Error al obtener los productos');
+          throw new Error(`❌ Error HTTP ${response.status}: ${response.statusText}`);
         }
 
-        const data = await response.json();
-        console.log("✅ Productos obtenidos desde la API:", data); // Verifica los datos recibidos
+        const data: ProductoDTO[] = await response.json();
 
-        this.allProducts = data; // Asignamos directamente los productos DTO a allProducts
-        this.getRandomProducts(); // Seleccionamos los 5 productos aleatorios después de obtener todos
+        if (!Array.isArray(data)) {
+          throw new Error("❌ Error: La API no devolvió una lista de productos.");
+        }
+
+        console.log("✅ [fetchProducts] Productos obtenidos correctamente:", data);
+
+        this.allProducts = data; // Guardamos los productos en el estado
+        this.getRandomProducts(); // Seleccionamos productos aleatorios
+
       } catch (error) {
-        this.error = error instanceof Error ? error.message : 'Hubo un error';
-        console.error("⚠️ Error en fetchProducts:", this.error);
+        this.error = error instanceof Error ? error.message : '❌ Error desconocido al obtener productos';
+        console.error("⚠️ [fetchProducts] Error:", this.error);
+
       } finally {
         this.loading = false;
-        console.log("✅ fetchProducts() finalizado.");
+        console.log("✅ [fetchProducts] Proceso finalizado.");
       }
     },
 
-    // Seleccionar 5 productos aleatorios de la lista de todos los productos
+    /**
+     * Selecciona 5 productos aleatorios de la lista obtenida de la API.
+     */
     getRandomProducts() {
       if (this.allProducts.length === 0) {
-        console.warn("⚠️ No hay productos para seleccionar aleatoriamente.");
+        console.warn("⚠️ [getRandomProducts] No hay productos para seleccionar aleatoriamente.");
         return;
       }
 
-      const shuffled = [...this.allProducts].sort(() => 0.5 - Math.random()); // Mezcla aleatoriamente los productos
-      this.randomProducts = shuffled.slice(0, 5); // Selecciona los primeros 5 productos aleatorios
+      // Mezcla los productos aleatoriamente y selecciona los primeros 5
+      const shuffled = [...this.allProducts].sort(() => 0.5 - Math.random());
+      this.randomProducts = shuffled.slice(0, 5);
 
-      console.log("🔀 Productos aleatorios seleccionados:", this.randomProducts);
-    },
-  },
+      console.log("🔀 [getRandomProducts] Productos aleatorios seleccionados:", this.randomProducts);
+    }
+  }
 });

@@ -59,7 +59,7 @@
 
 <script setup>
 import { ref } from 'vue';
-import { useCartStore } from '@/stores/cartStore'; // Acceder al estado del carrito
+import { useCartStore } from '@/stores/cartStore';
 
 const drawer = ref(false);
 const cartStore = useCartStore();
@@ -73,6 +73,11 @@ const cartStore = useCartStore();
   padding: $spacing-md 0;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   border-bottom: 2px solid $primary-color;
+
+  // Aumenta el margen del ícono del carrito
+  .mdi-cart {
+    margin-left: 50px !important;
+  }
 
   &__logo {
     display: flex;
@@ -89,7 +94,7 @@ const cartStore = useCartStore();
 
   &__menu {
     display: flex;
-    gap: 60px;
+    gap: 60px; // Espacio horizontal entre los enlaces
     align-items: center;
 
     &-item {
@@ -113,17 +118,23 @@ const cartStore = useCartStore();
 
   &__icons {
     display: flex;
-    gap: $spacing-md;
     align-items: center;
+    gap: 1rem; // Espacio entre íconos
   }
 
   &__icon {
-    transition: transform 0.2s ease-in-out;
     position: relative;
+    color: #000 !important;
+    transition: transform 0.2s ease-in-out;
+
+    // Aumentar tamaño de íconos
+    & v-icon {
+      font-size: 28px !important; // Ajusta a tu gusto (28px, 32px, etc.)
+    }
 
     &:hover {
       transform: scale(1.1);
-      color: $primary-color;
+      color: $primary-color; // Cambia de color al pasar el ratón
     }
   }
 
