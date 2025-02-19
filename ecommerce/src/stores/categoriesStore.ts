@@ -1,38 +1,37 @@
 import { defineStore } from 'pinia';
-import { ref, computed, onMounted } from 'vue';
+import { ref } from 'vue';
+import axios from 'axios';
 
+// Definir la interfaz para una categoría
 interface Category {
+  id: number;
   name: string;
+  description: string;
   image: string;
 }
 
-export const useCategoriesStore = defineStore('categoriesStore', () => {
-  const categories = ref<Category[]>([]);
+export const useCategoriesStore = defineStore('categories', () => {
+  const allCategories = ref<Category[]>([]); // Lista de categorías
 
-  const defaultCategories: Category[] = [
-    { name: 'Textiles', image: '/fotos/textiles.jpg' },
-    { name: 'Decoracion Vertical', image: '/fotos/Decoracion Vertical.jpg' },
-    { name: 'Accesorio Decorativo', image: '/fotos/Accesorio Decorativo.jpg' }
-  ];
-
+  // Función para obtener las categorías desde la API
   const fetchCategories = async () => {
     try {
-      const response = await fetch('https://api.example.com/categories');
-      const data = await response.json();
-      categories.value = data.length ? data : defaultCategories;
+      const response = await axios.get('http://localhost:5162/api/Categoria'); // ✅ Petición a la API
+      const data = response.data; // ✅ Extrae los datos correctamente
+
+      // Asignar datos correctamente usando la URL de imagen de la API
+      allCategories.value = data.map((category: any) => ({
+        id: category.id,
+        name: category.nombre,
+        description: category.descripcion,
+        image: category.urlImagen && category.urlImagen.trim() !== "" ? category.urlImagen : '/fotos/default.jpg' // ✅ Si no hay imagen, usa una por defecto
+      }));
+
+      console.log("Categorías cargadas:", allCategories.value);
     } catch (error) {
-      console.error('Error fetching categories:', error);
-      categories.value = defaultCategories;
+      console.error("Error al obtener categorías:", error);
     }
   };
 
-  const allCategories = computed(() => categories.value);
-
-  onMounted(fetchCategories);
-
-  return {
-    categories,
-    allCategories,
-    fetchCategories
-  };
+  return { allCategories, fetchCategories };
 });

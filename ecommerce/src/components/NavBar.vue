@@ -24,7 +24,7 @@
           <router-link to="/contacto" class="navbar__menu-item">Contacto</router-link>
         </v-col>
 
-        <!-- Iconos de usuario y carrito en desktop -->
+        <!-- Iconos de usuario y carrito en desktop (con contador de productos) -->
         <v-col cols="3" class="d-none d-md-flex justify-end navbar__icons">
           <template v-if="store.isAuthenticated">
             <span class="navbar__username">{{ store.user.nombre }}</span>
@@ -33,13 +33,14 @@
             </v-btn>
           </template>
           <template v-else>
-            <v-btn icon class="navbar__icon" @click="redirectToLogin">
+            <router-link to="/account" class="navbar__icon" @click="redirectToLogin">
               <v-icon>mdi-account</v-icon>
-            </v-btn>
+            </router-link>
           </template>
-          <v-btn icon class="navbar__icon" to="/carrito">
+          <router-link to="/cart" class="navbar__icon navbar__cart" to="/carrito">
             <v-icon>mdi-cart</v-icon>
-          </v-btn>
+            <span v-if="cartStore.totalItems > 0" class="cart-badge">{{ cartStore.totalItems }}</span>
+          </router-link>
         </v-col>
       </v-row>
     </v-container>
@@ -48,19 +49,20 @@
   <!-- Drawer para menú móvil -->
   <v-navigation-drawer v-model="drawer" app temporary right class="navbar__drawer">
     <v-list>
-      <v-list-item to="/" class="navbar__drawer-item">Home</v-list-item>
-      <v-list-item to="/shop" class="navbar__drawer-item">Shop</v-list-item>
-      <v-list-item to="/about" class="navbar__drawer-item">About</v-list-item>
-      <v-list-item to="/contacto" class="navbar__drawer-item">Contacto</v-list-item>
+      <v-list-item to="/" class="navbar__drawer-item" @click="drawer = false">Home</v-list-item>
+      <v-list-item to="/shop" class="navbar__drawer-item" @click="drawer = false">Shop</v-list-item>
+      <v-list-item to="/about" class="navbar__drawer-item" @click="drawer = false">About</v-list-item>
+      <v-list-item to="/contacto" class="navbar__drawer-item" @click="drawer = false">Contacto</v-list-item>
       <v-divider></v-divider>
-      <v-list-item v-if="store.isAuthenticated" @click="logout" class="navbar__drawer-item">
+      <v-list-item v-if="store.isAuthenticated" @click="logout" class="navbar__drawer-item" @click="drawer = false">
         <v-icon left>mdi-logout</v-icon> Cerrar Sesión
       </v-list-item>
       <v-list-item v-else @click="redirectToLogin" class="navbar__drawer-item">
         <v-icon left>mdi-account</v-icon> Mi Cuenta
       </v-list-item>
-      <v-list-item to="/carrito" class="navbar__drawer-item">
+      <v-list-item to="/cart" class="navbar__drawer-item" @click="drawer = false">
         <v-icon left>mdi-cart</v-icon> Carrito
+        <span v-if="cartStore.totalItems > 0" class="cart-badge">{{ cartStore.totalItems }}</span>
       </v-list-item>
     </v-list>
   </v-navigation-drawer>
@@ -68,10 +70,13 @@
 
 <script setup>
 import { ref } from 'vue';
+import { useCartStore } from '@/stores/cartStore';
+
 import { useRouter } from 'vue-router';
 import { useUserStore } from '@/stores/userStore';
 
 const drawer = ref(false);
+const cartStore = useCartStore();
 const router = useRouter();
 const store = useUserStore();
 
@@ -94,6 +99,11 @@ const logout = () => {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   border-bottom: 2px solid $primary-color;
 
+  // Aumenta el margen del ícono del carrito
+  .mdi-cart {
+    margin-left: 50px !important;
+  }
+
   &__logo {
     display: flex;
     align-items: center;
@@ -109,7 +119,7 @@ const logout = () => {
 
   &__menu {
     display: flex;
-    gap: 60px;
+    gap: 60px; // Espacio horizontal entre los enlaces
     align-items: center;
 
     &-item {
@@ -129,8 +139,8 @@ const logout = () => {
 
   &__icons {
     display: flex;
-    gap: $spacing-md;
     align-items: center;
+    gap: 1rem; // Espacio entre íconos
 
     .navbar__username {
       margin-right: $spacing-sm;
@@ -140,12 +150,37 @@ const logout = () => {
   }
 
   &__icon {
+    position: relative;
+    color: #000 !important;
     transition: transform 0.2s ease-in-out;
+
+    // Aumentar tamaño de íconos
+    & v-icon {
+      font-size: 28px !important; // Ajusta a tu gusto (28px, 32px, etc.)
+    }
 
     &:hover {
       transform: scale(1.1);
-      color: $primary-color;
+      color: $primary-color; // Cambia de color al pasar el ratón
     }
+  }
+
+  &__cart {
+    position: relative;
+  }
+
+  .cart-badge {
+    position: absolute;
+    top: -5px;
+    right: -10px;
+    background: red;
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 4px 6px;
+    border-radius: 50%;
+    min-width: 20px;
+    text-align: center;
   }
 }
 

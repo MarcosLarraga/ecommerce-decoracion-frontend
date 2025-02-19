@@ -1,10 +1,268 @@
-@use 'variables' as *;
-
-body {
-  font-family: $font-family-primary;
-  color: $text-color;
-  background-color: $background-color;
-}
+/* ==================================================
+   🎨 VARIABLES Y MIXINS
+   ================================================== */
+   @use 'variables' as *;
+   @use 'mixins' as *;
+   
+   /* ==================================================
+      🌍 ESTILOS GLOBALES
+      ================================================== */
+   body {
+     font-family: $font-family-primary;
+     background-color: $background-color;
+     color: $text-color;
+     margin: 0;
+     padding: 0;
+     box-sizing: border-box;
+   }
+   
+   /* ==================================================
+      🔝 NAVBAR
+      ================================================== */
+   .navbar {
+     background-color: $background-color;
+     padding: $spacing-md 0;
+     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+     border-bottom: 2px solid $primary-color;
+     display: flex;
+     justify-content: space-between;
+     align-items: center;
+   
+     &__menu {
+       display: flex;
+       gap: 60px;
+       align-items: center;
+   
+       &-item {
+         text-decoration: none;
+         color: $text-color;
+         font-family: $font-family-primary;
+         font-size: 1.1rem;
+         font-weight: 600;
+         transition: color 0.3s ease-in-out;
+   
+         &:hover {
+           color: $primary-color;
+         }
+       }
+     }
+   
+     &__icons {
+       display: flex;
+       gap: $spacing-md;
+     }
+   
+     &__icon {
+       transition: transform 0.2s ease-in-out;
+       position: relative;
+   
+       &:hover {
+         transform: scale(1.1);
+         color: $primary-color;
+       }
+     }
+   }
+   
+   /* ==================================================
+      📦 PRODUCT CARD
+      ================================================== */
+      /* ✅ Estilo Global para las Tarjetas de Productos */
+      .products-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); 
+        gap: 16px;
+        justify-content: center;
+        width: 100%;
+        max-width: 1200px;
+        margin: auto;
+      }
+      
+      .product-card {
+        width: 100%;
+        max-width: 250px; /* 📌 Tamaño más grande */
+        min-height: 340px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        border-radius: $border-radius;
+        background-color: #ffffff;
+        border: 1px solid #dddddd;
+        box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        padding: $spacing-xs;
+        margin: auto;
+        position: relative;
+      
+        &:hover {
+          transform: translateY(-3px);
+          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+        }
+      
+        &__content {
+          text-decoration: none;
+          color: inherit;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          width: 100%;
+        }
+      
+        &__image-wrapper {
+          width: 100%;
+          height: 180px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          overflow: hidden;
+        }
+      
+        &__image {
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
+        }
+      
+        &__info {
+          padding: $spacing-xs;
+        }
+      
+        &__title {
+          font-size: 1rem;
+          font-weight: bold;
+          color: $text-color;
+          text-decoration: none; /* 🔥 Quitar subrayado */
+        }
+      
+        &__price {
+          font-size: 1.1rem;
+          color: $primary-color;
+          font-weight: bold;
+          margin-top: $spacing-xs;
+        }
+      
+        /* 📌 Botón del carrito en mejor posición */
+        &__cart-btn {
+          background-color: $primary-color;
+          border: none;
+          border-radius: 50%;
+          width: 40px;
+          height: 40px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          transition: opacity 0.2s ease;
+          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+          color: white;
+          position: absolute;
+          bottom: 15px; /* 📌 Más arriba */
+          right: 15px;
+      
+          &:hover {
+            opacity: 0.85;
+          }
+        }
+      }
+      
+      /* 📱 **RESPONSIVE: DOS TARJETAS POR FILA EN MÓVIL** */
+      @media (max-width: 768px) {
+        .products-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      
+        .product-card {
+          max-width: 100%;
+        }
+      
+        .product-card__image-wrapper {
+          height: 140px;
+        }
+      }
+      
+   
+   /* ==================================================
+      🏠 HOME PAGE
+      ================================================== */
+   .home {
+     padding: 0;
+     margin: 0;
+   
+     &__hero {
+       width: 100vw;
+       height: 60vh;
+       position: relative;
+       overflow: hidden;
+       display: flex;
+       justify-content: center;
+   
+       &-bg {
+         width: 100%;
+         height: 100%;
+         object-fit: cover;
+       }
+     }
+   }
+   
+   /* ==================================================
+      🛍️ SHOP PAGE
+      ================================================== */
+   .shop {
+     width: 90%;
+     max-width: 1200px;
+     margin: 100px auto 0;
+     text-align: center;
+   
+     &__grid {
+       display: grid;
+       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+       gap: 16px;
+       justify-content: center;
+     }
+   }
+   
+   /* ==================================================
+      📢 FOOTER
+      ================================================== */
+   .footer {
+     background-color: $secondary-color;
+     color: $background-color;
+     padding: $spacing-lg 0;
+     text-align: center;
+     width: 100%;
+     margin-top: auto;
+   
+     &__nav {
+       display: flex;
+       justify-content: center;
+       gap: $spacing-md;
+       margin-bottom: $spacing-md;
+     }
+   
+     &__link {
+       text-decoration: none;
+       color: $background-color;
+       font-size: $font-size-base;
+       transition: color 0.3s;
+   
+       &:hover {
+         color: $primary-color;
+       }
+     }
+   }
+   
+   /* ==================================================
+      📱 RESPONSIVE STYLES
+      ================================================== */
+   @media (max-width: 768px) {
+     .products-grid {
+       grid-template-columns: repeat(2, 1fr);
+     }
+     .product-card {
+       max-width: 100%;
+     }
+   }
 
 form button,
 form .v-btn {
@@ -21,3 +279,4 @@ form button:hover,
 form .v-btn:hover {
   background-color: $primary-color-hover !important;
 }
+   
