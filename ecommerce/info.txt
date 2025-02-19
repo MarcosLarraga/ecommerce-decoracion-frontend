@@ -1,0 +1,6 @@
+libreria iconos
+npm install @fortawesome/fontawesome-svg-core @fortawesome/free-solid-svg-icons @fortawesome/vue-fontawesome
+
+libreria pinia (login)
+npm install pinia-plugin-persistedstate
+
