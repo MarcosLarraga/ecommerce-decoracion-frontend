@@ -26,9 +26,17 @@
 
         <!-- Iconos de usuario y carrito en desktop -->
         <v-col cols="3" class="d-none d-md-flex justify-end navbar__icons">
-          <v-btn icon class="navbar__icon" @click="redirectToLogin">
-            <v-icon>mdi-account</v-icon>
-          </v-btn>
+          <template v-if="store.isAuthenticated">
+            <span class="navbar__username">{{ store.user.nombre }}</span>
+            <v-btn icon class="navbar__icon" @click="logout">
+              <v-icon>mdi-logout</v-icon>
+            </v-btn>
+          </template>
+          <template v-else>
+            <v-btn icon class="navbar__icon" @click="redirectToLogin">
+              <v-icon>mdi-account</v-icon>
+            </v-btn>
+          </template>
           <v-btn icon class="navbar__icon" to="/carrito">
             <v-icon>mdi-cart</v-icon>
           </v-btn>
@@ -37,7 +45,7 @@
     </v-container>
   </v-app-bar>
 
-  <!-- Drawer para menú móvil con despliegue a la derecha -->
+  <!-- Drawer para menú móvil -->
   <v-navigation-drawer v-model="drawer" app temporary right class="navbar__drawer">
     <v-list>
       <v-list-item to="/" class="navbar__drawer-item">Home</v-list-item>
@@ -45,7 +53,10 @@
       <v-list-item to="/about" class="navbar__drawer-item">About</v-list-item>
       <v-list-item to="/contacto" class="navbar__drawer-item">Contacto</v-list-item>
       <v-divider></v-divider>
-      <v-list-item @click="redirectToLogin" class="navbar__drawer-item">
+      <v-list-item v-if="store.isAuthenticated" @click="logout" class="navbar__drawer-item">
+        <v-icon left>mdi-logout</v-icon> Cerrar Sesión
+      </v-list-item>
+      <v-list-item v-else @click="redirectToLogin" class="navbar__drawer-item">
         <v-icon left>mdi-account</v-icon> Mi Cuenta
       </v-list-item>
       <v-list-item to="/carrito" class="navbar__drawer-item">
@@ -58,12 +69,19 @@
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { useUserStore } from '@/stores/userStore';
 
 const drawer = ref(false);
 const router = useRouter();
+const store = useUserStore();
 
 const redirectToLogin = () => {
-  router.push('/login'); // Envía a la vista de login
+  router.push('/login');
+};
+
+const logout = () => {
+  store.logout();
+  router.push('/login');
 };
 </script>
 
@@ -113,6 +131,12 @@ const redirectToLogin = () => {
     display: flex;
     gap: $spacing-md;
     align-items: center;
+
+    .navbar__username {
+      margin-right: $spacing-sm;
+      font-weight: bold;
+      color: $text-color;
+    }
   }
 
   &__icon {
