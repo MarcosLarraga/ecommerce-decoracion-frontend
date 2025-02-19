@@ -24,9 +24,10 @@
           <router-link to="/contacto" class="navbar__menu-item">Contacto</router-link>
         </v-col>
 
-        <!-- Iconos de usuario y carrito en desktop (con contador de productos) -->
+        <!-- Iconos de usuario y carrito en desktop -->
         <v-col cols="3" class="d-none d-md-flex justify-end navbar__icons">
           <template v-if="store.isAuthenticated">
+            <!-- Mostrar solo el nombre del usuario -->
             <span class="navbar__username">{{ store.user.nombre }}</span>
             <v-btn icon class="navbar__icon" @click="logout">
               <v-icon>mdi-logout</v-icon>
@@ -36,8 +37,12 @@
             <router-link to="/account" class="navbar__icon" @click="redirectToLogin">
               <v-icon>mdi-account</v-icon>
             </router-link>
-            <span v-if="cartStore.totalItems > 0" class="cart-badge">{{ cartStore.totalItems }}</span>
           </template>
+          <!-- Ícono del carrito siempre visible -->
+          <router-link to="/cart" class="navbar__icon navbar__cart">
+            <v-icon>mdi-cart</v-icon>
+            <span v-if="cartStore.totalItems > 0" class="cart-badge">{{ cartStore.totalItems }}</span>
+          </router-link>
         </v-col>
       </v-row>
     </v-container>
@@ -58,7 +63,7 @@
       >
         <v-icon left>mdi-logout</v-icon> Cerrar Sesión
       </v-list-item>
-      <v-list-item v-else @click="redirectToLogin" class="navbar__drawer-item">
+      <v-list-item v-else class="navbar__drawer-item" @click="redirectToLogin">
         <v-icon left>mdi-account</v-icon> Mi Cuenta
       </v-list-item>
       <v-list-item to="/cart" class="navbar__drawer-item" @click="drawer = false">
@@ -163,6 +168,10 @@ const handleLogout = () => {
       transform: scale(1.1);
       color: $primary-color;
     }
+  }
+
+  &__cart {
+    position: relative;
   }
 }
 
