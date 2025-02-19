@@ -4,8 +4,8 @@
 
     <!-- Filtro de categorías -->
     <div class="shop__filter">
-      <label for="categorySelect">Filtrar por categoría:</label>
-      <select id="categorySelect" v-model="selectedCategory">
+      <label for="categorySelect" class="shop__filter-label">Filtrar por categoría:</label>
+      <select id="categorySelect" v-model="selectedCategory" class="shop__filter-select">
         <option value="Todas">Todas</option>
         <option v-for="category in categoriesStore.allCategories" :key="category.id" :value="category.name">
           {{ category.name }}
@@ -14,7 +14,7 @@
     </div>
 
     <!-- Lista de productos -->
-    <div class="shop__grid">
+    <div class="products-grid">
       <ProductCard v-for="product in filteredProducts" :key="product.id" :producto="product" />
     </div>
   </div>
@@ -22,7 +22,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { useRoute } from 'vue-router';
 import { useProductsStore } from '@/stores/productsStore';
 import { useCategoriesStore } from '@/stores/categoriesStore';
 import ProductCard from '@/components/ProductCard.vue';
@@ -30,7 +30,6 @@ import ProductCard from '@/components/ProductCard.vue';
 const productsStore = useProductsStore();
 const categoriesStore = useCategoriesStore();
 const route = useRoute();
-const router = useRouter();
 
 // Estado para la categoría seleccionada
 const selectedCategory = ref<string>('Todas');
@@ -82,41 +81,50 @@ const filteredProducts = computed(() => {
 </script>
 
 <style lang="scss" scoped>
+@use '@/styles/variables' as *;
+
+/* 📌 Diseño General */
 .shop {
-  width: 90%;
+  width: 100%;
   max-width: 1200px;
-  margin: 100px auto 0;
+  padding: $spacing-md;
   text-align: center;
 
   &__title {
-    font-size: 2.5rem;
+    font-size: 2rem;
     font-weight: bold;
-    margin-bottom: 20px;
+    margin-bottom: $spacing-md;
   }
 
+  /* 📌 Filtro de categorías */
   &__filter {
-    margin-bottom: 20px;
+    margin-bottom: $spacing-md;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: $spacing-sm;
 
-    label {
-      font-size: 1.2rem;
+    &-label {
+      font-size: $font-size-base;
       font-weight: bold;
-      margin-right: 10px;
     }
 
-    select {
-      padding: 8px;
-      font-size: 1rem;
-      border: 1px solid #ccc;
-      border-radius: 5px;
+    &-select {
+      padding: $spacing-xs;
+      font-size: $font-size-base;
+      border: 1px solid $border-color;
+      border-radius: $border-radius;
       cursor: pointer;
+      width: 250px;
+      background: white;
     }
   }
-
-  &__grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 20px;
-    justify-content: center;
-  }
+}
+/* 📌 **Títulos más grandes** */
+.section-title {
+  text-align: center;
+  font-size: 2.2rem;
+  font-weight: bold;
+  margin-bottom: 32px;
 }
 </style>

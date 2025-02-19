@@ -145,22 +145,8 @@ const goToCategory = (categoryName: string) => {
         justify-content: center;
       }
     }
-  }
+  }}
 
-  &__products {
-    text-align: center;
-    padding: 36px 0;
-    width: 100%;
-    margin: 0 auto;
-
-    .products-grid {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 40px;
-    }
-  }
-}
 
 // 📌 **Títulos más grandes**
 .section-title {
