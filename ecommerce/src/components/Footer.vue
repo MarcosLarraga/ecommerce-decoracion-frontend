@@ -12,8 +12,7 @@
         </v-col>
 
         <v-col cols="12" md="3" class="footer__section footer__logo">
-          <!-- Sustituimos la imagen por el componente LogoCanvas -->
-          <LogoCanvas class="footer__logo-img" />
+          <LogoCanvasWhite class="footer__logo-img" />
         </v-col>
 
         <v-col cols="12" md="3" class="footer__section footer__social">
@@ -33,6 +32,7 @@
       </v-row>
 
       <v-divider class="footer__divider"></v-divider>
+
       <v-row justify="center" class="footer__bottom">
         <v-col cols="12" class="text-center footer__copyright">
           2025 LM DECORACIONES. All rights reserved
@@ -43,8 +43,8 @@
 </template>
 
 <script setup>
-// 1) Importamos el componente de tu logo en canvas
-import LogoCanvas from '@/components/LogoCanvas.vue'
+// Importamos el componente blanco
+import LogoCanvasWhite from '@/components/LogoCanvasWhite.vue'
 </script>
 
 <style lang="scss" scoped>
@@ -89,12 +89,9 @@ import LogoCanvas from '@/components/LogoCanvas.vue'
     }
   }
 
-  /* 
-    Reutilizamos la clase 'footer__logo-img' 
-    para forzar el tamaño del canvas a 50px de altura 
-    (o el que necesites), manteniendo la animación.
-  */
   &__logo-img {
+    /* Mantiene la misma altura forzada que antes (50px). 
+       El canvas se escalará visualmente a este tamaño */
     height: 50px;
     margin-bottom: $spacing-sm;
   }

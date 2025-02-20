@@ -5,8 +5,8 @@
         <!-- Logo -->
         <v-col cols="3" md="2">
           <router-link to="/" class="navbar__logo">
-            <!-- Sustitución de la imagen estática por el componente LogoCanvas -->
-            <LogoCanvas class="navbar__logo-img" />
+            <!-- Sustitución de la imagen estática por el componente LogoCanvasBlack -->
+            <LogoCanvasBlack class="navbar__logo-img" />
           </router-link>
         </v-col>
 
@@ -110,7 +110,7 @@ import { useUserStore } from '@/stores/userStore';
 import { useCartStore } from '@/stores/cartStore';
 
 // IMPORTA TU COMPONENTE
-import LogoCanvas from '@/components/LogoCanvas.vue';
+import LogoCanvasBlack from '@/components/LogoCanvasBlack.vue';
 
 const drawer = ref(false);
 const router = useRouter();
