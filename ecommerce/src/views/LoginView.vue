@@ -2,7 +2,7 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useUserStore } from '@/stores/userStore';
-import Alerta from '@/components/Alerta.vue';
+import PopupAlert from '@/components/Alerta.vue';
 
 const email = ref('');
 const password = ref('');
@@ -24,7 +24,6 @@ const login = async () => {
   if (store.user) {
     router.push('/');
   } else {
-    // Si ocurre un error (credenciales incorrectas, por ejemplo)
     alertType.value = 'error';
     alertMessage.value = 'Correo o contraseña incorrectos';
     // Ocultar el mensaje de error después de 10 segundos
@@ -40,13 +39,12 @@ const clearAlert = () => {
 </script>
 
 <template>
-  <div class="login-container d-flex justify-center align-center">
-    <!-- Ubicación de la alerta, por ejemplo, encima del card -->
-    <div class="alert-top">
-      <Alerta :message="alertMessage" :type="alertType" @dismiss="clearAlert" />
+  <div class="login d-flex justify-center align-center">
+    <!-- Contenedor para la alerta fijo en la parte superior, con top: 100px -->
+    <div class="login__alert">
+      <PopupAlert :message="alertMessage" :type="alertType" @dismiss="clearAlert" />
     </div>
-
-    <v-card class="login-card pa-6">
+    <v-card class="login__card pa-6">
       <v-card-title class="text-center">Iniciar Sesión</v-card-title>
       <v-card-text>
         <v-form @submit.prevent="login">
@@ -57,6 +55,7 @@ const clearAlert = () => {
             required
             :rules="[rules.required, rules.email]"
             variant="outlined"
+            class="login__input"
           ></v-text-field>
           <v-text-field
             v-model="password"
@@ -65,13 +64,14 @@ const clearAlert = () => {
             required
             :rules="[rules.required]"
             variant="outlined"
+            class="login__input"
           ></v-text-field>
-          <v-btn type="submit" block class="login-btn">
+          <v-btn type="submit" block class="login__button">
             Ingresar
           </v-btn>
           <p class="text-center mt-4">
             ¿No tienes cuenta?
-            <router-link to="/register" class="register-link">
+            <router-link to="/register" class="login__register-link">
               Regístrate aquí
             </router-link>
           </p>
@@ -82,7 +82,7 @@ const clearAlert = () => {
 </template>
 
 <style scoped>
-.login-container {
+.login {
   width: 100%;
   min-height: 100vh;
   margin: 0;
@@ -95,7 +95,7 @@ const clearAlert = () => {
   position: relative;
 }
 
-.login-container::before {
+.login::before {
   content: "";
   position: absolute;
   top: 0;
@@ -107,16 +107,16 @@ const clearAlert = () => {
   z-index: 0;
 }
 
-.alert-top {
-  position: absolute;
-  top: 30px;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  z-index: 2;
+/* Ajuste de posición para la alerta: top 100px */
+.login__alert {
+  position: fixed;
+  top: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
 }
 
-.login-card {
+.login__card {
   position: relative;
   z-index: 1;
   width: 100%;
@@ -127,12 +127,16 @@ const clearAlert = () => {
   padding: 20px;
 }
 
-.register-link:hover {
+.login__input {
+  margin-bottom: 16px;
+}
+
+.login__register-link:hover {
   text-decoration: underline;
 }
 
 @media (min-width: 768px) {
-  .login-card {
+  .login__card {
     max-width: 400px;
     padding: 40px;
   }

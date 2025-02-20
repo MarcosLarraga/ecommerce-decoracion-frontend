@@ -2,7 +2,7 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useUserStore } from '@/stores/userStore';
-import Alerta from '@/components/Alerta.vue'; // Asegúrate de que la ruta sea correcta
+import Alerta from '@/components/Alerta.vue';
 
 const nombre = ref('');
 const email = ref('');
@@ -15,8 +15,10 @@ const store = useUserStore();
 
 const rules = {
   required: (value: string) => !!value || 'Campo obligatorio',
-  email: (value: string) =>
-    /\S+@\S+\.\S+/.test(value) || 'Ingresa un correo válido',
+  email: (value: string) => {
+    const pattern = /^[^\s@]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return pattern.test(value) || 'Ingresa un correo válido';
+  }
 };
 
 const register = async () => {
@@ -35,7 +37,6 @@ const register = async () => {
   } else {
     alertType.value = 'error';
     alertMessage.value = 'Error en registro: ' + store.error;
-    // Ocultar el mensaje de error después de 10 segundos
     setTimeout(() => {
       alertMessage.value = '';
     }, 10000);
@@ -48,13 +49,12 @@ const clearAlert = () => {
 </script>
 
 <template>
-  <div class="register-container d-flex justify-center align-center">
-    <!-- Ubicación de la alerta por encima del card -->
-    <div class="alert-top">
+  <div class="register d-flex justify-center align-center">
+    <!-- Contenedor para la alerta -->
+    <div class="register__alert">
       <Alerta :message="alertMessage" :type="alertType" @dismiss="clearAlert" />
     </div>
-
-    <v-card class="register-card pa-6">
+    <v-card class="register__card pa-6">
       <v-card-title class="text-center">Registrarse</v-card-title>
       <v-card-text>
         <v-form @submit.prevent="register">
@@ -64,6 +64,7 @@ const clearAlert = () => {
             required
             :rules="[rules.required]"
             variant="outlined"
+            class="register__input"
           ></v-text-field>
           <v-text-field
             v-model="email"
@@ -72,6 +73,7 @@ const clearAlert = () => {
             required
             :rules="[rules.required, rules.email]"
             variant="outlined"
+            class="register__input"
           ></v-text-field>
           <v-text-field
             v-model="password"
@@ -80,13 +82,14 @@ const clearAlert = () => {
             required
             :rules="[rules.required]"
             variant="outlined"
+            class="register__input"
           ></v-text-field>
-          <v-btn type="submit" block class="register-btn">
+          <v-btn type="submit" block class="register__button">
             Registrarse
           </v-btn>
           <p class="text-center mt-4">
             ¿Ya tienes cuenta?
-            <router-link to="/login" class="login-link">
+            <router-link to="/login" class="register__login-link">
               Inicia sesión aquí
             </router-link>
           </p>
@@ -97,7 +100,7 @@ const clearAlert = () => {
 </template>
 
 <style scoped>
-.register-container {
+.register {
   width: 100%;
   min-height: 100vh;
   margin: 0;
@@ -107,10 +110,10 @@ const clearAlert = () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  position: relative; /* Importante para usar posicionamiento absoluto en los hijos */
+  position: relative;
 }
 
-.register-container::before {
+.register::before {
   content: "";
   position: absolute;
   top: 0;
@@ -122,16 +125,15 @@ const clearAlert = () => {
   z-index: 0;
 }
 
-.alert-top {
-  position: absolute;
-  top: 30px; /* Ajusta según tu preferencia */
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  z-index: 2; /* Para que quede sobre el card */
+.register__alert {
+  position: fixed;
+  top: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
 }
 
-.register-card {
+.register__card {
   position: relative;
   z-index: 1;
   width: 100%;
@@ -142,12 +144,16 @@ const clearAlert = () => {
   padding: 20px;
 }
 
-.login-link:hover {
+.register__input {
+  margin-bottom: 16px;
+}
+
+.register__login-link:hover {
   text-decoration: underline;
 }
 
 @media (min-width: 768px) {
-  .register-card {
+  .register__card {
     max-width: 400px;
     padding: 40px;
   }

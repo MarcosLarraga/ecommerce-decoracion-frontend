@@ -31,6 +31,6 @@
   </script>
   
   <style scoped>
-  /* Aquí puedes agregar estilos personalizados si lo necesitas */
+  /* estilos personalizados*/
   </style>
   
