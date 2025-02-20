@@ -2,9 +2,13 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useUserStore } from '@/stores/userStore';
+import Alerta from '@/components/Alerta.vue';
 
 const email = ref('');
 const password = ref('');
+const alertMessage = ref('');
+const alertType = ref(''); // 'success' o 'error'
+
 const router = useRouter();
 const store = useUserStore();
 
@@ -19,12 +23,29 @@ const login = async () => {
   await store.login({ email: email.value, password: password.value });
   if (store.user) {
     router.push('/');
+  } else {
+    // Si ocurre un error (credenciales incorrectas, por ejemplo)
+    alertType.value = 'error';
+    alertMessage.value = 'Correo o contraseña incorrectos';
+    // Ocultar el mensaje de error después de 10 segundos
+    setTimeout(() => {
+      alertMessage.value = '';
+    }, 10000);
   }
+};
+
+const clearAlert = () => {
+  alertMessage.value = '';
 };
 </script>
 
 <template>
   <div class="login-container d-flex justify-center align-center">
+    <!-- Ubicación de la alerta, por ejemplo, encima del card -->
+    <div class="alert-top">
+      <Alerta :message="alertMessage" :type="alertType" @dismiss="clearAlert" />
+    </div>
+
     <v-card class="login-card pa-6">
       <v-card-title class="text-center">Iniciar Sesión</v-card-title>
       <v-card-text>
@@ -84,6 +105,15 @@ const login = async () => {
   background: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(5px);
   z-index: 0;
+}
+
+.alert-top {
+  position: absolute;
+  top: 30px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  z-index: 2;
 }
 
 .login-card {

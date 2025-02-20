@@ -2,10 +2,14 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useUserStore } from '@/stores/userStore';
+import Alerta from '@/components/Alerta.vue'; // Asegúrate de que la ruta sea correcta
 
 const nombre = ref('');
 const email = ref('');
 const password = ref('');
+const alertMessage = ref('');
+const alertType = ref(''); // 'success' o 'error'
+
 const router = useRouter();
 const store = useUserStore();
 
@@ -22,14 +26,34 @@ const register = async () => {
     password: password.value,
   };
   await store.register(userData);
-  if (store.user) {
-    router.push('/login');
+  if (!store.error) {
+    alertType.value = 'success';
+    alertMessage.value = 'Registro exitoso. Por favor, inicia sesión.';
+    setTimeout(() => {
+      router.push('/login');
+    }, 2000);
+  } else {
+    alertType.value = 'error';
+    alertMessage.value = 'Error en registro: ' + store.error;
+    // Ocultar el mensaje de error después de 10 segundos
+    setTimeout(() => {
+      alertMessage.value = '';
+    }, 10000);
   }
+};
+
+const clearAlert = () => {
+  alertMessage.value = '';
 };
 </script>
 
 <template>
   <div class="register-container d-flex justify-center align-center">
+    <!-- Ubicación de la alerta por encima del card -->
+    <div class="alert-top">
+      <Alerta :message="alertMessage" :type="alertType" @dismiss="clearAlert" />
+    </div>
+
     <v-card class="register-card pa-6">
       <v-card-title class="text-center">Registrarse</v-card-title>
       <v-card-text>
@@ -83,7 +107,7 @@ const register = async () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  position: relative;
+  position: relative; /* Importante para usar posicionamiento absoluto en los hijos */
 }
 
 .register-container::before {
@@ -96,6 +120,15 @@ const register = async () => {
   background: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(5px);
   z-index: 0;
+}
+
+.alert-top {
+  position: absolute;
+  top: 30px; /* Ajusta según tu preferencia */
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  z-index: 2; /* Para que quede sobre el card */
 }
 
 .register-card {

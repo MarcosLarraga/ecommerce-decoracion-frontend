@@ -30,10 +30,9 @@ export const useUserStore = defineStore('userStore', {
           Email: userData.email,
           Password: userData.password,
         };
-        console.log('Payload para registro:', payload);
         const response = await axios.post('/api/Usuario/register', payload);
         console.log('Respuesta de registro:', response.data);
-        this.user = response.data;
+        // No asignamos this.user para que no se inicie sesión automáticamente.
         this.error = null;
       } catch (error: any) {
         console.error('Error en registro:', error.response ? error.response.data : 'Error de conexión');
@@ -42,7 +41,7 @@ export const useUserStore = defineStore('userStore', {
       }
     },
     logout() {
-      console.log('Cerrando sesión para el usuario:', this.user);
+      console.log('Cerrando sesión para:', this.user);
       this.user = null;
       this.error = null;
       console.log('Sesión cerrada.');
