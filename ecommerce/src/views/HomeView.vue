@@ -50,7 +50,7 @@ onMounted(async () => {
 
 // Función para navegar a la página de shop con la categoría seleccionada
 const goToCategory = (categoryName: string) => {
-  router.push({ path: '/shop', query: { category: categoryName } }); // 🔥 Redirigir a shop con query param
+  router.push({ path: '/shop', query: { category: categoryName } });
 };
 </script>
 
@@ -80,7 +80,6 @@ const goToCategory = (categoryName: string) => {
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      background: rgba(0, 0, 0, 0.6);
       padding: $spacing-md;
       border-radius: $border-radius;
       text-align: center;
@@ -91,7 +90,7 @@ const goToCategory = (categoryName: string) => {
     &-title {
       font-size: 2rem;
       font-family: $font-family-primary;
-      color: $background-color;
+      color: $text-color;
       font-weight: bold;
       text-transform: uppercase;
     }
@@ -150,7 +149,8 @@ const goToCategory = (categoryName: string) => {
 .home__products{
   padding: 16px;
 }
-// 📌 **Títulos más grandes**
+
+// Títulos más grandes
 .section-title {
   text-align: center;
   font-size: 2.2rem;

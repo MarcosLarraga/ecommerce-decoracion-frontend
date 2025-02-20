@@ -19,6 +19,16 @@ const rules = {
 };
 
 const login = async () => {
+  // Validar que ambos campos estén completos
+  if (!email.value || !password.value) {
+    alertType.value = 'error';
+    alertMessage.value = 'Por favor, complete todos los campos.';
+    setTimeout(() => {
+      alertMessage.value = '';
+    }, 10000);
+    return;
+  }
+
   console.log('Iniciando sesión con:', email.value, password.value);
   await store.login({ email: email.value, password: password.value });
   if (store.user) {
@@ -107,7 +117,7 @@ const clearAlert = () => {
   z-index: 0;
 }
 
-/* Ajuste de posición para la alerta: top 100px */
+/* Contenedor para la alerta con posición fija */
 .login__alert {
   position: fixed;
   top: 100px;

@@ -5,7 +5,8 @@
         <!-- Logo -->
         <v-col cols="3" md="2">
           <router-link to="/" class="navbar__logo">
-            <img src="/fotos/logoLMDecoracion.png" alt="Logo" class="navbar__logo-img" />
+            <!-- Sustitución de la imagen estática por el componente LogoCanvas -->
+            <LogoCanvas class="navbar__logo-img" />
           </router-link>
         </v-col>
 
@@ -41,7 +42,9 @@
           <!-- Ícono del carrito siempre visible -->
           <router-link to="/cart" class="navbar__icon navbar__cart">
             <v-icon>mdi-cart</v-icon>
-            <span v-if="cartStore.totalItems > 0" class="cart-badge">{{ cartStore.totalItems }}</span>
+            <span v-if="cartStore.totalItems > 0" class="cart-badge">
+              {{ cartStore.totalItems }}
+            </span>
           </router-link>
         </v-col>
       </v-row>
@@ -51,10 +54,26 @@
   <!-- Drawer para menú móvil -->
   <v-navigation-drawer v-model="drawer" app temporary right class="navbar__drawer">
     <v-list>
-      <v-list-item to="/" class="navbar__drawer-item" @click="drawer = false">Home</v-list-item>
-      <v-list-item to="/shop" class="navbar__drawer-item" @click="drawer = false">Shop</v-list-item>
-      <v-list-item to="/about" class="navbar__drawer-item" @click="drawer = false">About</v-list-item>
-      <v-list-item to="/contacto" class="navbar__drawer-item" @click="drawer = false">Contacto</v-list-item>
+      <v-list-item
+        to="/"
+        class="navbar__drawer-item"
+        @click="drawer = false"
+      >Home</v-list-item>
+      <v-list-item
+        to="/shop"
+        class="navbar__drawer-item"
+        @click="drawer = false"
+      >Shop</v-list-item>
+      <v-list-item
+        to="/about"
+        class="navbar__drawer-item"
+        @click="drawer = false"
+      >About</v-list-item>
+      <v-list-item
+        to="/contacto"
+        class="navbar__drawer-item"
+        @click="drawer = false"
+      >Contacto</v-list-item>
       <v-divider></v-divider>
       <v-list-item
         v-if="store.isAuthenticated"
@@ -63,12 +82,22 @@
       >
         <v-icon left>mdi-logout</v-icon> Cerrar Sesión
       </v-list-item>
-      <v-list-item v-else class="navbar__drawer-item" @click="redirectToLogin">
+      <v-list-item
+        v-else
+        class="navbar__drawer-item"
+        @click="redirectToLogin"
+      >
         <v-icon left>mdi-account</v-icon> Mi Cuenta
       </v-list-item>
-      <v-list-item to="/cart" class="navbar__drawer-item" @click="drawer = false">
+      <v-list-item
+        to="/cart"
+        class="navbar__drawer-item"
+        @click="drawer = false"
+      >
         <v-icon left>mdi-cart</v-icon> Carrito
-        <span v-if="cartStore.totalItems > 0" class="cart-badge">{{ cartStore.totalItems }}</span>
+        <span v-if="cartStore.totalItems > 0" class="cart-badge">
+          {{ cartStore.totalItems }}
+        </span>
       </v-list-item>
     </v-list>
   </v-navigation-drawer>
@@ -79,6 +108,9 @@ import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useUserStore } from '@/stores/userStore';
 import { useCartStore } from '@/stores/cartStore';
+
+// IMPORTA TU COMPONENTE
+import LogoCanvas from '@/components/LogoCanvas.vue';
 
 const drawer = ref(false);
 const router = useRouter();
@@ -121,9 +153,15 @@ const handleLogout = () => {
     color: $text-color;
 
     &-img {
+      /* Reutilizamos esta clase para el Canvas */
       height: 45px;
       margin-right: $spacing-sm;
       border-radius: $border-radius;
+      /* 
+        Si deseas ajustar anchura para tu canvas,
+        puedes poner width: 45px; (u otro valor)
+        height: auto; etc. 
+      */
     }
   }
 
@@ -191,5 +229,12 @@ const handleLogout = () => {
   border-radius: 50%;
   min-width: 20px;
   text-align: center;
+}
+
+.navbar__logo-img {
+  height: 85px;       
+  margin-right: 8px; 
+  border-radius: 8px; 
+  margin-top: 15px;
 }
 </style>

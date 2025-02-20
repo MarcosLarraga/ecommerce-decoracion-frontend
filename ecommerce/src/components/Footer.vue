@@ -1,5 +1,5 @@
 <template>
-  <v-footer app class="footer" >
+  <v-footer app class="footer">
     <v-container>
       <v-row justify="center" class="footer__content">
         <v-col cols="12" md="3" class="footer__section">
@@ -12,7 +12,8 @@
         </v-col>
 
         <v-col cols="12" md="3" class="footer__section footer__logo">
-          <img src="/fotos/logoBlanco.png" alt="Logo" class="footer__logo-img" />
+          <!-- Sustituimos la imagen por el componente LogoCanvas -->
+          <LogoCanvas class="footer__logo-img" />
         </v-col>
 
         <v-col cols="12" md="3" class="footer__section footer__social">
@@ -40,6 +41,11 @@
     </v-container>
   </v-footer>
 </template>
+
+<script setup>
+// 1) Importamos el componente de tu logo en canvas
+import LogoCanvas from '@/components/LogoCanvas.vue'
+</script>
 
 <style lang="scss" scoped>
 @use '@/styles/variables' as *;
@@ -83,6 +89,11 @@
     }
   }
 
+  /* 
+    Reutilizamos la clase 'footer__logo-img' 
+    para forzar el tamaño del canvas a 50px de altura 
+    (o el que necesites), manteniendo la animación.
+  */
   &__logo-img {
     height: 50px;
     margin-bottom: $spacing-sm;
