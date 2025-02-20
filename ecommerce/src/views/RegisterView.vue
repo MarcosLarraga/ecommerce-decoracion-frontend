@@ -22,12 +22,24 @@ const rules = {
 };
 
 const register = async () => {
+  // Validar que todos los campos estén completos
+  if (!nombre.value || !email.value || !password.value) {
+    alertType.value = 'error';
+    alertMessage.value = 'Por favor, complete todos los campos.';
+    setTimeout(() => {
+      alertMessage.value = '';
+    }, 10000);
+    return;
+  }
+  
   const userData = {
     nombre: nombre.value,
     email: email.value,
     password: password.value,
   };
+  
   await store.register(userData);
+  
   if (!store.error) {
     alertType.value = 'success';
     alertMessage.value = 'Registro exitoso. Por favor, inicia sesión.';
@@ -36,7 +48,7 @@ const register = async () => {
     }, 2000);
   } else {
     alertType.value = 'error';
-    alertMessage.value = 'Error en registro: ' + store.error;
+    alertMessage.value = store.error;
     setTimeout(() => {
       alertMessage.value = '';
     }, 10000);
@@ -49,12 +61,12 @@ const clearAlert = () => {
 </script>
 
 <template>
-  <div class="register d-flex justify-center align-center">
-    <!-- Contenedor para la alerta -->
-    <div class="register__alert">
+  <div class="register-container d-flex justify-center align-center">
+    <!-- Alerta fija en la parte superior -->
+    <div class="alert-top">
       <Alerta :message="alertMessage" :type="alertType" @dismiss="clearAlert" />
     </div>
-    <v-card class="register__card pa-6">
+    <v-card class="register-card pa-6">
       <v-card-title class="text-center">Registrarse</v-card-title>
       <v-card-text>
         <v-form @submit.prevent="register">
@@ -64,7 +76,7 @@ const clearAlert = () => {
             required
             :rules="[rules.required]"
             variant="outlined"
-            class="register__input"
+            class="input-field"
           ></v-text-field>
           <v-text-field
             v-model="email"
@@ -73,7 +85,7 @@ const clearAlert = () => {
             required
             :rules="[rules.required, rules.email]"
             variant="outlined"
-            class="register__input"
+            class="input-field"
           ></v-text-field>
           <v-text-field
             v-model="password"
@@ -82,14 +94,14 @@ const clearAlert = () => {
             required
             :rules="[rules.required]"
             variant="outlined"
-            class="register__input"
+            class="input-field"
           ></v-text-field>
-          <v-btn type="submit" block class="register__button">
+          <v-btn type="submit" block class="register-btn">
             Registrarse
           </v-btn>
           <p class="text-center mt-4">
             ¿Ya tienes cuenta?
-            <router-link to="/login" class="register__login-link">
+            <router-link to="/login" class="login-link">
               Inicia sesión aquí
             </router-link>
           </p>
@@ -100,7 +112,7 @@ const clearAlert = () => {
 </template>
 
 <style scoped>
-.register {
+.register-container {
   width: 100%;
   min-height: 100vh;
   margin: 0;
@@ -113,7 +125,7 @@ const clearAlert = () => {
   position: relative;
 }
 
-.register::before {
+.register-container::before {
   content: "";
   position: absolute;
   top: 0;
@@ -125,7 +137,8 @@ const clearAlert = () => {
   z-index: 0;
 }
 
-.register__alert {
+/* Alerta fija en la parte superior */
+.alert-top {
   position: fixed;
   top: 100px;
   left: 50%;
@@ -133,7 +146,7 @@ const clearAlert = () => {
   z-index: 9999;
 }
 
-.register__card {
+.register-card {
   position: relative;
   z-index: 1;
   width: 100%;
@@ -144,16 +157,16 @@ const clearAlert = () => {
   padding: 20px;
 }
 
-.register__input {
+.input-field {
   margin-bottom: 16px;
 }
 
-.register__login-link:hover {
+.login-link:hover {
   text-decoration: underline;
 }
 
 @media (min-width: 768px) {
-  .register__card {
+  .register-card {
     max-width: 400px;
     padding: 40px;
   }

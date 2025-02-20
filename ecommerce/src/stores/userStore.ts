@@ -36,7 +36,24 @@ export const useUserStore = defineStore('userStore', {
         this.error = null;
       } catch (error: any) {
         console.error('Error en registro:', error.response ? error.response.data : 'Error de conexión');
-        this.error = error.response ? error.response.data : 'Error de conexión';
+        if (error.response) {
+          switch (error.response.status) {
+            case 400:
+              // Error 400: Datos inválidos (por ejemplo, email no válido, campos faltantes)
+              this.error = error.response.data;
+              break;
+            case 409:
+              // Error 409: Conflicto (por ejemplo, el usuario ya existe con ese correo)
+              this.error = error.response.data;
+              break;
+            default:
+              // Otros errores, por ejemplo, 500 (Error inesperado en el servidor)
+              this.error = error.response.data || 'Error inesperado en el servidor.';
+              break;
+          }
+        } else {
+          this.error = 'Error de conexión';
+        }
         this.user = null;
       }
     },
