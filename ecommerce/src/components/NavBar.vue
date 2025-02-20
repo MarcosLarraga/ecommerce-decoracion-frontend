@@ -113,6 +113,9 @@ const handleLogout = () => {
   padding: $spacing-md 0;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   border-bottom: 2px solid $primary-color;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 
   &__logo {
     display: flex;
@@ -128,15 +131,16 @@ const handleLogout = () => {
   }
 
   &__menu {
-    display: flex;
-    gap: 60px;
+    display: none; // Oculto por defecto en móviles
+    flex-direction: column;
+    gap: 20px;
     align-items: center;
 
     &-item {
       text-decoration: none;
       color: $text-color;
       font-family: $font-family-primary;
-      font-size: 1.1rem;
+      font-size: 1rem;
       font-weight: 600;
       letter-spacing: 0.5px;
       transition: color 0.3s ease-in-out;
@@ -152,7 +156,7 @@ const handleLogout = () => {
     align-items: center;
     gap: 1rem;
 
-    .navbar__username {
+    &-username {
       margin-right: $spacing-sm;
       font-weight: bold;
       color: $text-color;
@@ -172,24 +176,75 @@ const handleLogout = () => {
 
   &__cart {
     position: relative;
+    display: flex;
+    align-items: center;
+
+    &-badge {
+      position: absolute;
+      top: -5px;
+      right: -10px;
+      background: red;
+      color: white;
+      font-size: 12px;
+      font-weight: bold;
+      padding: 4px 6px;
+      border-radius: 50%;
+      min-width: 20px;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
   }
+
+  &__drawer {
+    &-menu {
+      display: flex;
+      flex-direction: column;
+      gap: $spacing-md;
+      padding: $spacing-md;
+
+      &-item {
+        text-decoration: none;
+        color: $text-color;
+        font-size: $font-size-base;
+        font-weight: bold;
+        padding: $spacing-sm;
+        transition: background-color 0.3s ease-in-out;
+
+        &:hover {
+          background-color: rgba(0, 0, 0, 0.05);
+        }
+      }
+    }
+  }
+  
 }
 
-.v-navigation-drawer .v-list {
+:deep(.v-navigation-drawer__content) {
   margin-top: 10%;
 }
 
-.cart-badge {
-  position: absolute;
-  top: -5px;
-  right: -10px;
-  background: red;
-  color: white;
-  font-size: 12px;
-  font-weight: bold;
-  padding: 4px 6px;
-  border-radius: 50%;
-  min-width: 20px;
-  text-align: center;
+/* 📱 Mobile First: se ajusta para escritorio */
+@media (min-width: 768px) {
+  .navbar {
+    flex-direction: row;
+    padding: $spacing-md 0;
+
+    &__menu {
+      display: flex;
+      flex-direction: row;
+      gap: 60px;
+    }
+
+    &__cart-badge {
+      top: -8px;
+      right: -12px;
+      font-size: 12px;
+      padding: 3px 6px;
+      min-width: 18px;
+    }
+  }
 }
+
 </style>

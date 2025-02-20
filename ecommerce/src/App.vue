@@ -2,11 +2,9 @@
   <v-app class="app">
     <NavBar />
     <div class="layout">
-      <v-main class="main">
-        <v-container fluid class="pa-0">
-          <RouterView />
-        </v-container>
-      </v-main>
+      <section class="content">
+        <RouterView />
+      </section>
     </div>
     <Footer />
   </v-app>
@@ -19,32 +17,7 @@ import Footer from '@/components/Footer.vue';
 </script>
 
 <style lang="scss">
+@use '@/styles/main.scss';
 @use '@/styles/variables' as *;
 
-.app {
-  background-color: $background-color !important;
-  color: $text-color;
-}
-
-.layout {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-}
-
-.main {
-  flex: 1; 
-  background-color: $background-color !important;
-}
-
-.v-main {
-  padding-bottom: 0 !important;
-}
-
-
-.content {
-  flex-grow: 1;
-  display: flex;
-  align-items: center;
-}
 </style>

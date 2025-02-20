@@ -23,13 +23,24 @@ export const useCartStore = defineStore('cart', {
 
     removeFromCart(productId: number) {
       const index = this.cart.findIndex((item) => item.id === productId);
-
       if (index !== -1) {
-        if (this.cart[index].quantity > 1) {
-          this.cart[index].quantity -= 1;
-        } else {
-          this.cart.splice(index, 1);
-        }
+        this.cart.splice(index, 1);
+      }
+    },
+
+    // ✅ Método para aumentar la cantidad de un producto
+    increaseQuantity(productId: number) {
+      const product = this.cart.find((item) => item.id === productId);
+      if (product) {
+        product.quantity += 1;
+      }
+    },
+
+    // ✅ Método para disminuir la cantidad de un producto
+    decreaseQuantity(productId: number) {
+      const product = this.cart.find((item) => item.id === productId);
+      if (product && product.quantity > 1) {
+        product.quantity -= 1;
       }
     },
   },
