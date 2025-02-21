@@ -6,6 +6,7 @@ import ContactView from '@/views/ContactView.vue';
 import ProductDetailView from '@/views/ProductDetailView.vue';
 import LoginView from '@/views/LoginView.vue';
 import RegisterView from '@/views/RegisterView.vue';
+import Guia from '@/views/Guia.vue'; // ✅ Importamos la nueva vista
 
 const routes = [
   { path: '/', component: HomeView },
@@ -15,6 +16,7 @@ const routes = [
   { path: '/product/:id', component: ProductDetailView, props: true }, // ✅ Ruta dinámica para cada producto
   { path: '/login', component: LoginView },
   { path: '/register', component: RegisterView },
+  { path: '/guia', component: Guia } // ✅ Agregamos la nueva ruta para la Guía
 ];
 
 const router = createRouter({

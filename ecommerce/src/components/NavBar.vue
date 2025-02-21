@@ -21,7 +21,7 @@
         <v-col cols="6" class="d-none d-md-flex navbar__menu justify-center">
           <router-link to="/" class="navbar__menu-item">Home</router-link>
           <router-link to="/shop" class="navbar__menu-item">Tienda</router-link>
-          <router-link to="/about" class="navbar__menu-item">Sobre Nosotros</router-link>
+          <router-link to="/guia" class="navbar__menu-item">Guía</router-link>
           <router-link to="/contacto" class="navbar__menu-item">Contacto</router-link>
         </v-col>
 
@@ -65,10 +65,10 @@
         @click="drawer = false"
       >Shop</v-list-item>
       <v-list-item
-        to="/about"
+        to="/guia"
         class="navbar__drawer-item"
         @click="drawer = false"
-      >About</v-list-item>
+      >guia</v-list-item>
       <v-list-item
         to="/contacto"
         class="navbar__drawer-item"
