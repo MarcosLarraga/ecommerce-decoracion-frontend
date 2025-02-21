@@ -1,71 +1,159 @@
 import { defineStore } from 'pinia';
 import axios from 'axios';
+import * as JWTDecodeModule from 'jwt-decode';
 
-axios.defaults.baseURL = 'http://localhost:5162';
-
-export const useUserStore = defineStore('userStore', {
+export const useUserStore = defineStore('user', {
   state: () => ({
+    token: localStorage.getItem('token') || '',
     user: null as any,
-    error: null as string | null,
+    loading: false,
+    error: ''
   }),
+  getters: {
+    isAuthenticated: (state) => !!state.token
+  },
   actions: {
-    async login(credentials: { email: string; password: string }) {
-      console.log('Login iniciado con:', credentials);
+    decodeToken(token: string) {
       try {
-        const response = await axios.post('/api/Usuario/login', credentials);
-        console.log('Respuesta de login:', response.data);
-        this.user = response.data;
-        this.error = null;
-      } catch (error: any) {
-        console.error('Error en login:', error.response ? error.response.data : 'Error de conexión');
-        this.error = error.response ? error.response.data : 'Error de conexión';
-        this.user = null;
+        return JWTDecodeModule.default(token);
+      } catch (err) {
+        console.warn('Error decodificando el token:', err);
+        return null;
       }
     },
-    async register(userData: { nombre: string; email: string; password: string }) {
-      console.log('Registro iniciado con:', userData);
+    async login(email: string, password: string) {
+      this.loading = true;
+      this.error = '';
       try {
-        const payload = {
-          Nombre: userData.nombre,
-          Email: userData.email,
-          Password: userData.password,
-        };
-        const response = await axios.post('/api/Usuario/register', payload);
-        console.log('Respuesta de registro:', response.data);
-        // No asignamos this.user para que no se inicie sesión automáticamente.
-        this.error = null;
-      } catch (error: any) {
-        console.error('Error en registro:', error.response ? error.response.data : 'Error de conexión');
-        if (error.response) {
-          switch (error.response.status) {
-            case 400:
-              // Error 400: Datos inválidos (por ejemplo, email no válido, campos faltantes)
-              this.error = error.response.data;
-              break;
-            case 409:
-              // Error 409: Conflicto (por ejemplo, el usuario ya existe con ese correo)
-              this.error = error.response.data;
-              break;
-            default:
-              // Otros errores, por ejemplo, 500 (Error inesperado en el servidor)
-              this.error = error.response.data || 'Error inesperado en el servidor.';
-              break;
-          }
-        } else {
-          this.error = 'Error de conexión';
+        console.log('Enviando login con', { email, password });
+        const response = await axios.post('http://localhost:5162/api/auth/login', { email, password });
+        console.log('LOGIN response data:', response.data);
+        
+        // Extraemos la propiedad "token" en minúscula
+        const { token } = response.data;
+        if (!token) {
+          this.error = 'La API no devolvió un token.';
+          return;
         }
-        this.user = null;
+        this.token = token;
+        localStorage.setItem('token', token);
+        const decoded: any = this.decodeToken(token);
+        if (decoded) {
+          this.user = {
+            id: decoded.sub,
+            email: decoded.email,
+            nombre: decoded.name || decoded.email,
+            role: decoded.role
+          };
+        }
+      } catch (err: any) {
+        console.error('Error en login:', err);
+        this.error = err.response?.data || 'Error al iniciar sesión';
+      } finally {
+        this.loading = false;
+      }
+    },
+    async register(nombre: string, email: string, password: string) {
+      this.loading = true;
+      this.error = '';
+      try {
+        console.log('Enviando register con', { nombre, email, password });
+        const response = await axios.post('http://localhost:5162/api/auth/register', { nombre, email, password });
+        console.log('REGISTER response data:', response.data);
+      } catch (err: any) {
+        console.error('Error en register:', err);
+        this.error = err.response?.data || 'Error en el registro';
+      } finally {
+        this.loading = false;
+      }
+    },
+    async forgotPassword(email: string) {
+      this.loading = true;
+      this.error = '';
+      try {
+        console.log('Enviando forgotPassword con', { email });
+        const response = await axios.post('http://localhost:5162/api/auth/forgot-password', { email });
+        console.log('FORGOT PASSWORD response:', response.data);
+        return response.data;
+      } catch (err: any) {
+        console.error('Error en forgotPassword:', err);
+        this.error = err.response?.data || 'Error al enviar correo de reseteo';
+        throw new Error(this.error);
+      } finally {
+        this.loading = false;
+      }
+    },
+    async resetPassword(token: string, newPassword: string) {
+      this.loading = true;
+      this.error = '';
+      try {
+        console.log('Enviando resetPassword con', { token, newPassword });
+        const response = await axios.post('http://localhost:5162/api/auth/reset-password', { token, newPassword });
+        console.log('RESET PASSWORD response:', response.data);
+        return response.data;
+      } catch (err: any) {
+        console.error('Error en resetPassword:', err);
+        this.error = err.response?.data || 'Error al restablecer la contraseña';
+        throw new Error(this.error);
+      } finally {
+        this.loading = false;
+      }
+    },
+    async googleLogin(idToken: string) {
+      this.loading = true;
+      this.error = '';
+      try {
+        console.log('Enviando googleLogin con', { idToken });
+        const response = await axios.post('http://localhost:5162/api/auth/google-login', { idToken });
+        console.log('GOOGLE LOGIN response data:', response.data);
+        
+        // Extraemos "token" de la respuesta
+        const { token } = response.data;
+        if (!token) {
+          this.error = 'La API no devolvió token en googleLogin.';
+          return;
+        }
+        this.token = token;
+        localStorage.setItem('token', token);
+        const decoded: any = this.decodeToken(token);
+        if (decoded) {
+          this.user = {
+            id: decoded.sub,
+            email: decoded.email,
+            nombre: decoded.name || decoded.email,
+            role: decoded.role
+          };
+        }
+      } catch (err: any) {
+        console.error('Error en googleLogin:', err);
+        this.error = err.response?.data || 'Error al iniciar sesión con Google';
+      } finally {
+        this.loading = false;
       }
     },
     logout() {
-      console.log('Cerrando sesión para:', this.user);
+      console.log('Haciendo logout.');
+      this.token = '';
       this.user = null;
-      this.error = null;
-      console.log('Sesión cerrada.');
+      localStorage.removeItem('token');
     },
-  },
-  getters: {
-    isAuthenticated: (state) => !!state.user,
-  },
-  persist: true,
+    initialize() {
+      if (this.token) {
+        console.log('Inicializando store con token:', this.token);
+        const decoded: any = this.decodeToken(this.token);
+        if (decoded) {
+          this.user = {
+            id: decoded.sub,
+            email: decoded.email,
+            nombre: decoded.name || decoded.email,
+            role: decoded.role
+          };
+        } else {
+          this.logout();
+        }
+      } else {
+        console.log('No hay token en localStorage.');
+      }
+    }
+  }
 });

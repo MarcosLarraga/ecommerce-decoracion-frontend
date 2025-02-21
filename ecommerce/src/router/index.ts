@@ -6,15 +6,19 @@ import ContactView from '@/views/ContactView.vue';
 import ProductDetailView from '@/views/ProductDetailView.vue';
 import LoginView from '@/views/LoginView.vue';
 import RegisterView from '@/views/RegisterView.vue';
+import ForgotPasswordView from '@/views/ForgotPasswordView.vue';
+import Guia from '@/views/Guia.vue'; // ✅ Importamos la nueva vista
 
 const routes = [
   { path: '/', component: HomeView },
   { path: '/shop', component: ProductsView },
   { path: '/cart', component: CartView },
   { path: '/contacto', component: ContactView },
-  { path: '/product/:id', component: ProductDetailView, props: true }, // ✅ Ruta dinámica para cada producto
+  { path: '/product/:id', component: ProductDetailView, props: true },
   { path: '/login', component: LoginView },
   { path: '/register', component: RegisterView },
+  { path: '/forgot-password', component: ForgotPasswordView },
+  { path: '/guia', component: Guia } // ✅ Agregamos la nueva ruta para la Guía
 ];
 
 const router = createRouter({
@@ -22,9 +26,9 @@ const router = createRouter({
   routes,
   scrollBehavior(to, from, savedPosition) {
     if (savedPosition) {
-      return savedPosition; // Si el usuario usa el botón "atrás", vuelve a la posición guardada
+      return savedPosition;
     } else {
-      return { top: 0, behavior: 'smooth' }; // Siempre sube al inicio con desplazamiento suave
+      return { top: 0, behavior: 'smooth' };
     }
   }
 });

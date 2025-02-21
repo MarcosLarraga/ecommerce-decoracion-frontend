@@ -33,7 +33,7 @@ const props = defineProps({
 });
 
 const addToCart = (event: Event) => {
-  event.stopPropagation(); // ✅ Evita que el clic en el botón active el `router-link`
+  event.stopPropagation(); // Evita que el clic en el botón active el `router-link`
   if (props.producto) {
     cartStore.addToCart({
       id: props.producto.id,
