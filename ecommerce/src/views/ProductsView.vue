@@ -14,8 +14,13 @@
     </div>
 
     <!-- Lista de productos -->
-    <div class="products-grid">
-      <ProductCard v-for="product in filteredProducts" :key="product.id" :producto="product" />
+    <div class="shop__products">
+      <ProductCard
+        v-for="product in filteredProducts"
+        :key="product.id"
+        :producto="product"
+        class="shop__product-card"
+      />
     </div>
   </div>
 </template>
@@ -31,21 +36,17 @@ const productsStore = useProductsStore();
 const categoriesStore = useCategoriesStore();
 const route = useRoute();
 
-// Estado para la categoría seleccionada
 const selectedCategory = ref<string>('Todas');
 
-// Cargar productos y categorías al montar la vista
 onMounted(async () => {
   await productsStore.fetchProducts();
   await categoriesStore.fetchCategories();
 
-  // Si la URL tiene una categoría en la query, seleccionarla automáticamente
   if (route.query.category) {
     selectedCategory.value = String(route.query.category);
   }
 });
 
-// Escuchar cambios en la URL y actualizar el filtro si la categoría cambia
 watch(() => route.query.category, (newCategory) => {
   if (newCategory) {
     selectedCategory.value = String(newCategory);
@@ -83,7 +84,6 @@ const filteredProducts = computed(() => {
 <style lang="scss" scoped>
 @use '@/styles/variables' as *;
 
-/* 📌 Diseño General */
 .shop {
   width: 100%;
   max-width: 1200px;
@@ -96,7 +96,6 @@ const filteredProducts = computed(() => {
     margin-bottom: $spacing-md;
   }
 
-  /* 📌 Filtro de categorías */
   &__filter {
     margin-bottom: $spacing-md;
     display: flex;
@@ -115,16 +114,30 @@ const filteredProducts = computed(() => {
       border: 1px solid $border-color;
       border-radius: $border-radius;
       cursor: pointer;
-      width: 250px;
+      width: 100%;
+      max-width: 250px;
       background: white;
     }
   }
+
+  &__products {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: $spacing-md;
+    justify-items: center;
+  }
+
+  &__product-card {
+    width: 100%;
+    max-width: 300px;
+  }
 }
-/* 📌 **Títulos más grandes** */
-.section-title {
-  text-align: center;
-  font-size: 2.2rem;
-  font-weight: bold;
-  margin-bottom: 32px;
+
+@media (min-width: 768px) {
+  .shop {
+    &__products {
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    }
+  }
 }
 </style>

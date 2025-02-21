@@ -19,7 +19,6 @@ const rules = {
 };
 
 const login = async () => {
-  // Validar que ambos campos estén completos
   if (!email.value || !password.value) {
     alertType.value = 'error';
     alertMessage.value = 'Por favor, complete todos los campos.';
@@ -31,12 +30,12 @@ const login = async () => {
 
   console.log('Iniciando sesión con:', email.value, password.value);
   await store.login({ email: email.value, password: password.value });
+
   if (store.user) {
     router.push('/');
   } else {
     alertType.value = 'error';
     alertMessage.value = 'Correo o contraseña incorrectos';
-    // Ocultar el mensaje de error después de 10 segundos
     setTimeout(() => {
       alertMessage.value = '';
     }, 10000);
@@ -49,13 +48,13 @@ const clearAlert = () => {
 </script>
 
 <template>
-  <div class="login d-flex justify-center align-center">
-    <!-- Contenedor para la alerta fijo en la parte superior, con top: 100px -->
+  <div class="login">
+    <!-- Contenedor para la alerta fijo en la parte superior -->
     <div class="login__alert">
       <PopupAlert :message="alertMessage" :type="alertType" @dismiss="clearAlert" />
     </div>
-    <v-card class="login__card pa-6">
-      <v-card-title class="text-center">Iniciar Sesión</v-card-title>
+    <v-card class="login__card">
+      <v-card-title class="login__title">Iniciar Sesión</v-card-title>
       <v-card-text>
         <v-form @submit.prevent="login">
           <v-text-field
@@ -76,10 +75,10 @@ const clearAlert = () => {
             variant="outlined"
             class="login__input"
           ></v-text-field>
-          <v-btn type="submit" block class="login__button">
+          <v-btn type="submit" block class="login__submit-btn">
             Ingresar
           </v-btn>
-          <p class="text-center mt-4">
+          <p class="login__text">
             ¿No tienes cuenta?
             <router-link to="/register" class="login__register-link">
               Regístrate aquí
@@ -92,6 +91,7 @@ const clearAlert = () => {
 </template>
 
 <style scoped>
+
 .login {
   width: 100%;
   min-height: 100vh;
@@ -117,7 +117,6 @@ const clearAlert = () => {
   z-index: 0;
 }
 
-/* Contenedor para la alerta con posición fija */
 .login__alert {
   position: fixed;
   top: 100px;
@@ -137,8 +136,27 @@ const clearAlert = () => {
   padding: 20px;
 }
 
+.login__title {
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
 .login__input {
   margin-bottom: 16px;
+}
+
+.login__submit-btn {
+  width: 100%;
+}
+
+.login__text {
+  text-align: center;
+  margin-top: 16px;
+}
+
+.login__register-link {
+  color: blue;
 }
 
 .login__register-link:hover {
@@ -148,7 +166,7 @@ const clearAlert = () => {
 @media (min-width: 768px) {
   .login__card {
     max-width: 400px;
-    padding: 40px;
+    padding: 30px;
   }
 }
 </style>

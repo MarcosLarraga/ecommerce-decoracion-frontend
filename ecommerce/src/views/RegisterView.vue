@@ -22,7 +22,6 @@ const rules = {
 };
 
 const register = async () => {
-  // Validar que todos los campos estén completos
   if (!nombre.value || !email.value || !password.value) {
     alertType.value = 'error';
     alertMessage.value = 'Por favor, complete todos los campos.';
@@ -61,13 +60,14 @@ const clearAlert = () => {
 </script>
 
 <template>
-  <div class="register-container d-flex justify-center align-center">
-    <!-- Alerta fija en la parte superior -->
-    <div class="alert-top">
+  <div class="register">
+    <!-- Alerta -->
+    <div class="register__alert">
       <Alerta :message="alertMessage" :type="alertType" @dismiss="clearAlert" />
     </div>
-    <v-card class="register-card pa-6">
-      <v-card-title class="text-center">Registrarse</v-card-title>
+
+    <v-card class="register__card">
+      <v-card-title class="register__title">Registrarse</v-card-title>
       <v-card-text>
         <v-form @submit.prevent="register">
           <v-text-field
@@ -76,7 +76,7 @@ const clearAlert = () => {
             required
             :rules="[rules.required]"
             variant="outlined"
-            class="input-field"
+            class="register__input"
           ></v-text-field>
           <v-text-field
             v-model="email"
@@ -85,7 +85,7 @@ const clearAlert = () => {
             required
             :rules="[rules.required, rules.email]"
             variant="outlined"
-            class="input-field"
+            class="register__input"
           ></v-text-field>
           <v-text-field
             v-model="password"
@@ -94,14 +94,14 @@ const clearAlert = () => {
             required
             :rules="[rules.required]"
             variant="outlined"
-            class="input-field"
+            class="register__input"
           ></v-text-field>
-          <v-btn type="submit" block class="register-btn">
+          <v-btn type="submit" block class="register__btn">
             Registrarse
           </v-btn>
-          <p class="text-center mt-4">
+          <p class="register__text">
             ¿Ya tienes cuenta?
-            <router-link to="/login" class="login-link">
+            <router-link to="/login" class="register__link">
               Inicia sesión aquí
             </router-link>
           </p>
@@ -112,20 +112,20 @@ const clearAlert = () => {
 </template>
 
 <style scoped>
-.register-container {
+/* Mobile First */
+.register {
   width: 100%;
   min-height: 100vh;
-  margin: 0;
   padding: 0;
-  background: url('/fotos/login-register.jpg') no-repeat center center;
-  background-size: cover;
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
+  background: url('/fotos/login-register.jpg') no-repeat center center;
+  background-size: cover;
 }
 
-.register-container::before {
+.register::before {
   content: "";
   position: absolute;
   top: 0;
@@ -138,7 +138,7 @@ const clearAlert = () => {
 }
 
 /* Alerta fija en la parte superior */
-.alert-top {
+.register__alert {
   position: fixed;
   top: 100px;
   left: 50%;
@@ -146,7 +146,7 @@ const clearAlert = () => {
   z-index: 9999;
 }
 
-.register-card {
+.register__card {
   position: relative;
   z-index: 1;
   width: 100%;
@@ -157,16 +157,33 @@ const clearAlert = () => {
   padding: 20px;
 }
 
-.input-field {
+.register__title {
+  text-align: center;
+}
+
+.register__input {
   margin-bottom: 16px;
 }
 
-.login-link:hover {
+.register__btn {
+  width: 100%;
+}
+
+.register__text {
+  text-align: center;
+  margin-top: 16px;
+}
+
+.register__link {
+  color: blue;
+}
+
+.register__link:hover {
   text-decoration: underline;
 }
 
 @media (min-width: 768px) {
-  .register-card {
+  .register__card {
     max-width: 400px;
     padding: 40px;
   }
