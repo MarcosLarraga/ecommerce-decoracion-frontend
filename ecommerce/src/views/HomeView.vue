@@ -1,12 +1,24 @@
 <template>
   <div class="home">
-    <!-- Hero Section -->
-    <div class="home__hero">
-      <img src="/fotos/fotoHero1.jpg" alt="Nueva colección" class="home__hero-bg" />
-      <div class="home__hero-overlay">
-        <h1 class="home__hero-title">Descubre los mejores complementos para tu hogar</h1>
-      </div>
-    </div>
+    <!-- Carrusel (reemplaza la hero section) -->
+    <v-carousel
+      height="400"
+      show-arrows="hover"
+      cycle
+      hide-delimiter-background
+    >
+      <v-carousel-item
+        v-for="(slide, i) in slides"
+        :key="i"
+      >
+        <v-sheet height="100%">
+          <img :src="slide.image" class="carousel-image" />
+          <div class="carousel-text">
+            <h2>{{ slide.text }}</h2>
+          </div>
+        </v-sheet>
+      </v-carousel-item>
+    </v-carousel>
 
     <!-- Categorías -->
     <section class="home__categories">
@@ -31,7 +43,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue';
+import { onMounted, ref } from 'vue';
 import { useCategoriesStore } from '@/stores/categoriesStore';
 import { useProductsStore } from '@/stores/productsStore';
 import { useRouter } from 'vue-router';
@@ -40,6 +52,15 @@ import ProductCard from '@/components/ProductCard.vue';
 const categoriesStore = useCategoriesStore();
 const productsStore = useProductsStore();
 const router = useRouter();
+
+// Variables del carrusel con las imágenes intercambiadas y textos inspiradores
+const slides = ref([
+  { image: '/fotos/carrusel3.jpg', text: 'Dale vida a hogar con un toque único' },
+  { image: '/fotos/carrusel1.jpg', text: 'Pequeños detalles con un gran impacto' },
+  { image: '/fotos/carrusel4.jpg', text: 'Confort y elegancia en cada rincón' },
+  { image: '/fotos/carrusel2.jpg', text: 'Transforma tu espacio en un hogar acogedor' },
+  { image: '/fotos/carrusel5.jpg', text: 'Encuentra la inspiración que necesitas' },
+]);
 
 // Cargar categorías y productos destacados
 onMounted(async () => {
@@ -60,41 +81,6 @@ const goToCategory = (categoryName: string) => {
 .home {
   padding: 0;
   margin: 0;
-
-  &__hero {
-    width: 100vw;
-    height: 60vh;
-    position: relative;
-    overflow: hidden;
-    display: flex;
-    justify-content: center;
-
-    &-bg {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    &-overlay {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      padding: $spacing-md;
-      border-radius: $border-radius;
-      text-align: center;
-      width: 90%;
-      max-width: 600px;
-    }
-
-    &-title {
-      font-size: 2rem;
-      font-family: $font-family-primary;
-      color: $text-color;
-      font-weight: bold;
-      text-transform: uppercase;
-    }
-  }
 
   &__categories {
     text-align: center;
@@ -144,9 +130,10 @@ const goToCategory = (categoryName: string) => {
         justify-content: center;
       }
     }
-  }}
+  }
+}
 
-.home__products{
+.home__products {
   padding: 16px;
 }
 
@@ -156,5 +143,24 @@ const goToCategory = (categoryName: string) => {
   font-size: 2.2rem;
   font-weight: bold;
   margin-bottom: 32px;
+}
+
+/* Estilos del carrusel */
+.carousel-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.carousel-text {
+  position: absolute;
+  bottom: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+  color: white;
+  font-size: 1.5rem;
+  text-align: center;
+  font-weight: bold;
+  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.8); /* Agregado sombreado */
 }
 </style>
