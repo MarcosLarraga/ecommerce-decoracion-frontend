@@ -1,3 +1,4 @@
+// src/router/index.ts
 import { createRouter, createWebHistory } from 'vue-router';
 import HomeView from '@/views/HomeView.vue';
 import ProductsView from '@/views/ProductsView.vue';
@@ -7,7 +8,7 @@ import ProductDetailView from '@/views/ProductDetailView.vue';
 import LoginView from '@/views/LoginView.vue';
 import RegisterView from '@/views/RegisterView.vue';
 import ForgotPasswordView from '@/views/ForgotPasswordView.vue';
-import Guia from '@/views/Guia.vue'; // ✅ Importamos la nueva vista
+import ResetPasswordView from '@/views/ResetPasswordView.vue';
 
 const routes = [
   { path: '/', component: HomeView },
@@ -18,7 +19,7 @@ const routes = [
   { path: '/login', component: LoginView },
   { path: '/register', component: RegisterView },
   { path: '/forgot-password', component: ForgotPasswordView },
-  { path: '/guia', component: Guia } // ✅ Agregamos la nueva ruta para la Guía
+  { path: '/reset-password', component: ResetPasswordView }
 ];
 
 const router = createRouter({
@@ -27,9 +28,8 @@ const router = createRouter({
   scrollBehavior(to, from, savedPosition) {
     if (savedPosition) {
       return savedPosition;
-    } else {
-      return { top: 0, behavior: 'smooth' };
     }
+    return { top: 0, behavior: 'smooth' };
   }
 });
 
