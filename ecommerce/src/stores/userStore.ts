@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import axios from 'axios';
-import * as JWTDecodeModule from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode'; // Import nombrado
 
 export const useUserStore = defineStore('user', {
   state: () => ({
@@ -15,12 +15,13 @@ export const useUserStore = defineStore('user', {
   actions: {
     decodeToken(token: string) {
       try {
-        return JWTDecodeModule.default(token);
+        return jwtDecode(token);
       } catch (err) {
         console.warn('Error decodificando el token:', err);
         return null;
       }
     },
+
     async login(email: string, password: string) {
       this.loading = true;
       this.error = '';
@@ -28,8 +29,8 @@ export const useUserStore = defineStore('user', {
         console.log('Enviando login con', { email, password });
         const response = await axios.post('http://localhost:5162/api/auth/login', { email, password });
         console.log('LOGIN response data:', response.data);
-        
-        // Extraemos la propiedad "token" en minúscula
+
+        // Extraemos la propiedad "token" (en minúscula) de la respuesta
         const { token } = response.data;
         if (!token) {
           this.error = 'La API no devolvió un token.';
@@ -37,6 +38,7 @@ export const useUserStore = defineStore('user', {
         }
         this.token = token;
         localStorage.setItem('token', token);
+
         const decoded: any = this.decodeToken(token);
         if (decoded) {
           this.user = {
@@ -45,6 +47,7 @@ export const useUserStore = defineStore('user', {
             nombre: decoded.name || decoded.email,
             role: decoded.role
           };
+          console.log('Usuario asignado:', this.user);
         }
       } catch (err: any) {
         console.error('Error en login:', err);
@@ -53,6 +56,7 @@ export const useUserStore = defineStore('user', {
         this.loading = false;
       }
     },
+
     async register(nombre: string, email: string, password: string) {
       this.loading = true;
       this.error = '';
@@ -67,6 +71,7 @@ export const useUserStore = defineStore('user', {
         this.loading = false;
       }
     },
+
     async forgotPassword(email: string) {
       this.loading = true;
       this.error = '';
@@ -83,6 +88,7 @@ export const useUserStore = defineStore('user', {
         this.loading = false;
       }
     },
+
     async resetPassword(token: string, newPassword: string) {
       this.loading = true;
       this.error = '';
@@ -99,6 +105,7 @@ export const useUserStore = defineStore('user', {
         this.loading = false;
       }
     },
+
     async googleLogin(idToken: string) {
       this.loading = true;
       this.error = '';
@@ -106,8 +113,7 @@ export const useUserStore = defineStore('user', {
         console.log('Enviando googleLogin con', { idToken });
         const response = await axios.post('http://localhost:5162/api/auth/google-login', { idToken });
         console.log('GOOGLE LOGIN response data:', response.data);
-        
-        // Extraemos "token" de la respuesta
+
         const { token } = response.data;
         if (!token) {
           this.error = 'La API no devolvió token en googleLogin.';
@@ -115,6 +121,7 @@ export const useUserStore = defineStore('user', {
         }
         this.token = token;
         localStorage.setItem('token', token);
+
         const decoded: any = this.decodeToken(token);
         if (decoded) {
           this.user = {
@@ -131,12 +138,14 @@ export const useUserStore = defineStore('user', {
         this.loading = false;
       }
     },
+
     logout() {
       console.log('Haciendo logout.');
       this.token = '';
       this.user = null;
       localStorage.removeItem('token');
     },
+
     initialize() {
       if (this.token) {
         console.log('Inicializando store con token:', this.token);
@@ -148,6 +157,7 @@ export const useUserStore = defineStore('user', {
             nombre: decoded.name || decoded.email,
             role: decoded.role
           };
+          console.log('Store inicializado, usuario:', this.user);
         } else {
           this.logout();
         }

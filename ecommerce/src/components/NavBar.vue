@@ -2,22 +2,29 @@
   <v-app-bar app class="navbar">
     <v-container>
       <v-row align="center" justify="space-between" no-gutters>
+        <!-- Logo -->
         <v-col cols="3" md="2">
           <router-link to="/" class="navbar__logo">
             <LogoCanvasBlack class="navbar__logo-img" />
           </router-link>
         </v-col>
+
+        <!-- Menú hamburguesa para móvil -->
         <v-col cols="8" class="d-flex justify-end align-center d-md-none">
           <v-btn icon class="navbar__hamburger" @click="drawer = !drawer">
             <v-icon>mdi-menu</v-icon>
           </v-btn>
         </v-col>
+
+        <!-- Menú de navegación para pantallas grandes -->
         <v-col cols="6" class="d-none d-md-flex navbar__menu justify-center">
           <router-link to="/" class="navbar__menu-item">Home</router-link>
           <router-link to="/shop" class="navbar__menu-item">Tienda</router-link>
-          <router-link to="/guia" class="navbar__menu-item">Guía</router-link>
+          <!-- Ruta "guia" eliminada para evitar el warning -->
           <router-link to="/contacto" class="navbar__menu-item">Contacto</router-link>
         </v-col>
+
+        <!-- Iconos de usuario y carrito en desktop -->
         <v-col cols="3" class="d-none d-md-flex justify-end navbar__icons">
           <template v-if="store.isAuthenticated && store.user">
             <span class="navbar__username">Bienvenido, {{ store.user.nombre }}</span>
@@ -42,28 +49,13 @@
     </v-container>
   </v-app-bar>
 
+  <!-- Drawer para menú móvil -->
   <v-navigation-drawer v-model="drawer" app temporary right class="navbar__drawer">
     <v-list>
-      <v-list-item
-        to="/"
-        class="navbar__drawer-item"
-        @click="drawer = false"
-      >Home</v-list-item>
-      <v-list-item
-        to="/shop"
-        class="navbar__drawer-item"
-        @click="drawer = false"
-      >Shop</v-list-item>
-      <v-list-item
-        to="/guia"
-        class="navbar__drawer-item"
-        @click="drawer = false"
-      >guia</v-list-item>
-      <v-list-item
-        to="/contacto"
-        class="navbar__drawer-item"
-        @click="drawer = false"
-      >Contacto</v-list-item>
+      <v-list-item to="/" class="navbar__drawer-item" @click="drawer = false">Home</v-list-item>
+      <v-list-item to="/shop" class="navbar__drawer-item" @click="drawer = false">Shop</v-list-item>
+      <!-- Ruta "guia" eliminada -->
+      <v-list-item to="/contacto" class="navbar__drawer-item" @click="drawer = false">Contacto</v-list-item>
       <v-divider></v-divider>
       <v-list-item v-if="store.isAuthenticated" class="navbar__drawer-item" @click="handleLogout">
         <v-icon left>mdi-logout</v-icon> Cerrar Sesión
@@ -116,18 +108,87 @@ const handleLogout = () => {
   padding: $spacing-md 0;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   border-bottom: 2px solid $primary-color;
-  &__logo { display: flex; align-items: center; text-decoration: none; color: $text-color; }
-  &__menu { display: flex; gap: 60px; align-items: center; }
-  &__menu-item { text-decoration: none; color: $text-color; font-family: $font-family-primary; font-size: 1.1rem; font-weight: 600; letter-spacing: 0.5px; transition: color 0.3s ease-in-out; &:hover { color: $primary-color; } }
-  &__icons { display: flex; align-items: center; gap: 1rem; .navbar__username { margin-right: $spacing-sm; font-weight: bold; color: $text-color; } }
-  &__icon { position: relative; color: #000 !important; transition: transform 0.2s ease-in-out; &:hover { transform: scale(1.1); color: $primary-color; } }
-  &__login-text { margin-left: 0.5rem; font-size: 0.9rem; color: $text-color; }
-  &__cart { position: relative; }
+
+  &__logo {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: $text-color;
+  }
+
+  &__menu {
+    display: flex;
+    gap: 60px;
+    align-items: center;
+  }
+
+  &__menu-item {
+    text-decoration: none;
+    color: $text-color;
+    font-family: $font-family-primary;
+    font-size: 1.1rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    transition: color 0.3s ease-in-out;
+    &:hover {
+      color: $primary-color;
+    }
+  }
+
+  &__icons {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    .navbar__username {
+      margin-right: $spacing-sm;
+      font-weight: bold;
+      color: $text-color;
+    }
+  }
+
+  &__icon {
+    position: relative;
+    color: #000 !important;
+    transition: transform 0.2s ease-in-out;
+    &:hover {
+      transform: scale(1.1);
+      color: $primary-color;
+    }
+  }
+
+  &__login-text {
+    margin-left: 0.5rem;
+    font-size: 0.9rem;
+    color: $text-color;
+  }
+
+  &__cart {
+    position: relative;
+  }
 }
 
-.v-navigation-drawer .v-list { margin-top: 10%; }
+.v-navigation-drawer .v-list {
+  margin-top: 10%;
+}
 
-.cart-badge { position: absolute; top: -5px; right: -10px; background: red; color: white; font-size: 12px; font-weight: bold; padding: 4px 6px; border-radius: 50%; min-width: 20px; text-align: center; }
+.cart-badge {
+  position: absolute;
+  top: -5px;
+  right: -10px;
+  background: red;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 4px 6px;
+  border-radius: 50%;
+  min-width: 20px;
+  text-align: center;
+}
 
-.navbar__logo-img { height: 85px; margin-right: 8px; border-radius: 8px; margin-top: 15px; }
+.navbar__logo-img {
+  height: 85px;
+  margin-right: 8px;
+  border-radius: 8px;
+  margin-top: 15px;
+}
 </style>
