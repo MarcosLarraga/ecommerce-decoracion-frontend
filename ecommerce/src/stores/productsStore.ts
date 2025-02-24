@@ -113,9 +113,9 @@ export const useProductsStore = defineStore('products', {
         return;
       }
 
-      // Mezcla los productos aleatoriamente y selecciona los primeros 5
+      // Mezcla los productos aleatoriamente y selecciona los primeros 4
       const shuffled = [...this.allProducts].sort(() => 0.5 - Math.random());
-      this.randomProducts = shuffled.slice(0, 5);
+      this.randomProducts = shuffled.slice(0, 4);
 
       console.log("🔀 [getRandomProducts] Productos aleatorios seleccionados:", this.randomProducts);
     }
