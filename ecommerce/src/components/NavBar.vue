@@ -143,7 +143,7 @@ const handleLogout = () => {
     text-decoration: none;
     color: $text-color;
     font-family: $font-family-primary;
-    font-size: 1.1rem;
+    font-size: 25px;
     font-weight: 600;
     letter-spacing: 0.5px;
     transition: color 0.3s ease-in-out;
