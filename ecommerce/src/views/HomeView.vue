@@ -93,6 +93,24 @@ const goToCategory = (categoryName: string) => {
   padding: 0;
   margin: 0;
 
+  /* Carrusel */
+  .carousel-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .carousel-text {
+    position: absolute;
+    top: 20%; /* Posicionado en la parte superior */
+    left: 50%;
+    transform: translateX(-50%);
+    color: white;
+    font-size: 1.5rem;
+    text-align: center;
+    font-weight: bold;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.8);
+  }
+
   /* Sección de categorías */
   &__categories {
     width: 100%;
@@ -109,12 +127,12 @@ const goToCategory = (categoryName: string) => {
     }
 
     .category-card {
+      /* Por defecto, 3 columnas */
       flex: 0 0 calc(100% / 3);
       position: relative;
       overflow: hidden;
       cursor: pointer;
 
-      /* Al estar en estado normal, la imagen aparece oscurecida */
       &__image {
         width: 100%;
         height: 600px; /* Ajusta la altura a tu gusto */
@@ -124,14 +142,13 @@ const goToCategory = (categoryName: string) => {
         transition: filter 0.3s ease;
       }
 
-      /* Al pasar el ratón, la imagen se vuelve brillante */
       &:hover .category-card__image {
         filter: brightness(1);
       }
 
       &__title {
         position: absolute;
-        top: 3rem; /* Se mueve un poco más abajo */
+        top: 3rem;
         left: 50%;
         transform: translateX(-50%);
         background-color: transparent;
@@ -140,42 +157,30 @@ const goToCategory = (categoryName: string) => {
         border-radius: 4px;
         font-weight: bold;
         text-align: center;
-        font-size: 1.4rem; /* Texto un poco más grande */
+        font-size: 1.4rem;
       }
     }
   }
+
+  /* Sección de productos destacados */
+  &__products {
+    padding: 16px;
+  }
 }
 
-/* Productos Destacados */
-.home__products {
-  padding: 16px;
+/* Media query para mobile: se muestran las categorías en columna (100% ancho) */
+@media (max-width: 600px) {
+  .home__categories .category-card {
+    flex: 0 0 100%;
+  }
 }
 
-/* Títulos más grandes (se mantiene para Productos Destacados) */
+/* Títulos generales */
 .section-title {
   text-align: center;
   font-size: 2.2rem;
   font-weight: bold;
   margin-bottom: 32px;
-}
-
-/* Estilos del carrusel */
-.carousel-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.carousel-text {
-  position: absolute;
-  top: 20%; /* Posicionado en la parte superior */
-  left: 50%;
-  transform: translateX(-50%);
-  color: white;
-  font-size: 1.5rem;
-  text-align: center;
-  font-weight: bold;
-  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.8);
 }
 
 /* Grid de productos destacados */
