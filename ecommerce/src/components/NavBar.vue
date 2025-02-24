@@ -20,7 +20,7 @@
         <v-col cols="6" class="d-none d-md-flex navbar__menu justify-center">
           <router-link to="/" class="navbar__menu-item">Home</router-link>
           <router-link to="/shop" class="navbar__menu-item">Tienda</router-link>
-          <!-- Ruta "guia" eliminada para evitar el warning -->
+          <router-link to="/guia" class="navbar__menu-item">Guia</router-link>
           <router-link to="/contacto" class="navbar__menu-item">Contacto</router-link>
         </v-col>
 
@@ -52,10 +52,27 @@
   <!-- Drawer para menú móvil -->
   <v-navigation-drawer v-model="drawer" app temporary right class="navbar__drawer">
     <v-list>
-      <v-list-item to="/" class="navbar__drawer-item" @click="drawer = false">Home</v-list-item>
-      <v-list-item to="/shop" class="navbar__drawer-item" @click="drawer = false">Shop</v-list-item>
-      <!-- Ruta "guia" eliminada -->
-      <v-list-item to="/contacto" class="navbar__drawer-item" @click="drawer = false">Contacto</v-list-item>
+      <!-- Mostramos el nombre del usuario si está autenticado -->
+      <v-list-item v-if="store.isAuthenticated && store.user">
+        <v-list-item-content>
+          <v-list-item-title class="navbar__drawer-username">
+            Bienvenido, {{ store.user.nombre }}
+          </v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
+      <v-list-item to="/" class="navbar__drawer-item" @click="drawer = false">
+        Home
+      </v-list-item>
+      <v-list-item to="/shop" class="navbar__drawer-item" @click="drawer = false">
+        Shop
+      </v-list-item>
+      <!-- Ruta "guia" si la tienes definida; sino, elimínala -->
+      <v-list-item to="/guia" class="navbar__drawer-item" @click="drawer = false">
+        Guia
+      </v-list-item>
+      <v-list-item to="/contacto" class="navbar__drawer-item" @click="drawer = false">
+        Contacto
+      </v-list-item>
       <v-divider></v-divider>
       <v-list-item v-if="store.isAuthenticated" class="navbar__drawer-item" @click="handleLogout">
         <v-icon left>mdi-logout</v-icon> Cerrar Sesión
@@ -165,6 +182,14 @@ const handleLogout = () => {
   &__cart {
     position: relative;
   }
+}
+
+/* Agregamos estilo para el nombre en el drawer */
+.navbar__drawer-username {
+  font-size: 1rem;
+  font-weight: 600;
+  color: $text-color;
+  padding: $spacing-sm 0;
 }
 
 .v-navigation-drawer .v-list {

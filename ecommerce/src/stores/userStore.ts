@@ -29,8 +29,7 @@ export const useUserStore = defineStore('user', {
         console.log('Enviando login con', { email, password });
         const response = await axios.post('http://localhost:5162/api/auth/login', { email, password });
         console.log('LOGIN response data:', response.data);
-
-        // Extraemos la propiedad "token" (en minúscula) de la respuesta
+        
         const { token } = response.data;
         if (!token) {
           this.error = 'La API no devolvió un token.';

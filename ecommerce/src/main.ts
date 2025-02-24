@@ -17,13 +17,11 @@ import { createPinia } from 'pinia';
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate';
 import { useUserStore } from '@/stores/userStore';
 
-// Crear instancia de Vuetify
 const vuetify = createVuetify({
   components,
   directives,
 });
 
-// Crear Pinia y configurar persistencia
 const pinia = createPinia();
 pinia.use(piniaPluginPersistedstate);
 
@@ -33,6 +31,6 @@ app.use(pinia);
 app.use(vuetify);
 app.mount('#app');
 
-// Inicializar el store de usuario para restaurar sesión si existe
+// Inicializa el store de usuario para restaurar la sesión (si existe)
 const userStore = useUserStore();
 userStore.initialize();

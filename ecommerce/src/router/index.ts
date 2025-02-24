@@ -3,6 +3,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 import HomeView from '@/views/HomeView.vue';
 import ProductsView from '@/views/ProductsView.vue';
 import CartView from '@/views/CartView.vue';
+import GuiaView from '@/views/GuiaView.vue';
 import ContactView from '@/views/ContactView.vue';
 import ProductDetailView from '@/views/ProductDetailView.vue';
 import LoginView from '@/views/LoginView.vue';
@@ -14,6 +15,7 @@ const routes = [
   { path: '/', component: HomeView },
   { path: '/shop', component: ProductsView },
   { path: '/cart', component: CartView },
+  { path: '/guia', component: GuiaView },
   { path: '/contacto', component: ContactView },
   { path: '/product/:id', component: ProductDetailView, props: true },
   { path: '/login', component: LoginView },
