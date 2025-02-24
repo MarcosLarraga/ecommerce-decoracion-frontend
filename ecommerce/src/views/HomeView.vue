@@ -123,17 +123,16 @@ const goToCategory = (categoryName: string) => {
 
       &__title {
         position: absolute;
-        top: 1rem; /* Ubicado en la parte superior */
+        top: 3rem; /* Se mueve un poco más abajo */
         left: 50%;
         transform: translateX(-50%);
-        /* Se removió el fondo oscuro */
         background-color: transparent;
         color: #fff;
         padding: 0.5rem 1rem;
         border-radius: 4px;
         font-weight: bold;
         text-align: center;
-        font-size: 1.2rem;
+        font-size: 1.4rem; /* Texto un poco más grande */
       }
     }
   }
@@ -161,7 +160,7 @@ const goToCategory = (categoryName: string) => {
 
 .carousel-text {
   position: absolute;
-  bottom: 20%;
+  top: 20%; /* Posicionado en la parte superior */
   left: 50%;
   transform: translateX(-50%);
   color: white;
