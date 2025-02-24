@@ -1,35 +1,35 @@
 <template>
-  <div class="login">
-    <h1 class="login__title">Iniciar Sesión</h1>
-    <form class="login__form" @submit.prevent="handleLogin">
-      <div class="login__group">
-        <label class="login__label" for="email">Email</label>
-        <input class="login__input" type="email" id="email" v-model="email" required />
+  <div class="auth">
+    <h1 class="auth__title">Iniciar Sesión</h1>
+    <Alerta v-if="error" :mensaje="error" />
+    <form class="auth__form" @submit.prevent="handleLogin">
+      <div class="auth__group">
+        <label for="email" class="auth__label">Email</label>
+        <input type="email" id="email" class="auth__input" v-model="email" required />
       </div>
-      <div class="login__group">
-        <label class="login__label" for="password">Contraseña</label>
-        <input class="login__input" type="password" id="password" v-model="password" required />
+      <div class="auth__group">
+        <label for="password" class="auth__label">Contraseña</label>
+        <input type="password" id="password" class="auth__input" v-model="password" required />
       </div>
-      <button class="login__button" type="submit" :disabled="loading">
+      <button type="submit" class="auth__button" :disabled="loading">
         {{ loading ? 'Iniciando sesión...' : 'Iniciar Sesión' }}
       </button>
-      <p v-if="error" class="login__error">{{ error }}</p>
     </form>
-    <div class="login__links">
-      <router-link class="login__link" to="/register">Registrarse</router-link>
-      <router-link class="login__link" to="/forgot-password">Olvidé mi contraseña</router-link>
+    <div class="auth__links">
+      <router-link class="auth__link" to="/register">Registrarse</router-link>
+      <router-link class="auth__link" to="/forgot-password">Olvidé mi contraseña</router-link>
     </div>
-    <!-- Componente para Google Sign-In -->
-    <div class="login__google">
-      <BotonGoogle />
+    <div class="auth__google">
+      <BotonGoogle v-if="!loading" />
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { useUserStore } from '@/stores/userStore';
 import { useRouter } from 'vue-router';
+import Alerta from '@/components/Alerta.vue';
 import BotonGoogle from '@/components/BotonGoogle.vue';
 
 const email = ref('');
@@ -49,8 +49,83 @@ const handleLogin = async () => {
     router.push('/');
   }
 };
+
+// Opcional: Watch para redirigir cuando el usuario se autentique
+watch(() => userStore.isAuthenticated, (newVal) => {
+  if (newVal) {
+    router.push('/');
+  }
+});
 </script>
 
 <style lang="scss" scoped>
-/* Tus estilos de login */
+.auth {
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 1rem;
+  text-align: center;
+  margin-top: 10%;
+  
+  &__title {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+  }
+  
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  &__group {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+  }
+  
+  &__label {
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+  }
+  
+  &__input {
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  &__button {
+    padding: 0.75rem;
+    background-color: #28a745;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    
+    &:hover {
+      background-color: #218838;
+    }
+    
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+  
+  &__links {
+    margin-top: 1rem;
+    display: flex;
+    justify-content: space-around;
+  }
+  
+  &__link {
+    color: #007bff;
+    text-decoration: none;
+  }
+  
+  &__google {
+    margin-top: 1.5rem;
+  }
+}
 </style>

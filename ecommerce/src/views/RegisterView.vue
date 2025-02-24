@@ -1,26 +1,30 @@
 <template>
-  <div class="register">
-    <h1 class="register__title">Registrarse</h1>
-    <form class="register__form" @submit.prevent="handleRegister">
-      <div class="register__group">
-        <label class="register__label" for="nombre">Nombre</label>
-        <input class="register__input" type="text" id="nombre" v-model="nombre" required />
+  <div class="auth">
+    <h1 class="auth__title">Registrarse</h1>
+    <Alerta v-if="error" :mensaje="error" />
+    <form class="auth__form" @submit.prevent="handleRegister">
+      <div class="auth__group">
+        <label for="nombre" class="auth__label">Nombre</label>
+        <input type="text" id="nombre" class="auth__input" v-model="nombre" required />
       </div>
-      <div class="register__group">
-        <label class="register__label" for="email">Email</label>
-        <input class="register__input" type="email" id="email" v-model="email" required />
+      <div class="auth__group">
+        <label for="email" class="auth__label">Email</label>
+        <input type="email" id="email" class="auth__input" v-model="email" required />
       </div>
-      <div class="register__group">
-        <label class="register__label" for="password">Contraseña</label>
-        <input class="register__input" type="password" id="password" v-model="password" required />
+      <div class="auth__group">
+        <label for="password" class="auth__label">Contraseña</label>
+        <input type="password" id="password" class="auth__input" v-model="password" required />
       </div>
-      <button class="register__button" type="submit" :disabled="loading">
+      <button type="submit" class="auth__button" :disabled="loading">
         {{ loading ? 'Registrando...' : 'Registrarse' }}
       </button>
-      <p v-if="error" class="register__error">{{ error }}</p>
     </form>
-    <div class="register__links">
-      <router-link class="register__link" to="/login">Ya tengo cuenta, iniciar sesión</router-link>
+    <div class="auth__links">
+      <router-link class="auth__link" to="/login">Ya tengo cuenta, iniciar sesión</router-link>
+    </div>
+    <div class="auth__google">
+      <!-- Botón para registrarse con Google (usa el mismo flujo de login) -->
+      <BotonGoogle v-if="!loading" />
     </div>
   </div>
 </template>
@@ -29,6 +33,8 @@
 import { ref } from 'vue';
 import { useUserStore } from '@/stores/userStore';
 import { useRouter } from 'vue-router';
+import Alerta from '@/components/Alerta.vue';
+import BotonGoogle from '@/components/BotonGoogle.vue';
 
 const nombre = ref('');
 const email = ref('');
@@ -51,15 +57,73 @@ const handleRegister = async () => {
 </script>
 
 <style lang="scss" scoped>
-.register {
-  &__title { font-size: 2rem; margin-bottom: 1rem; }
-  &__form { display: flex; flex-direction: column; max-width: 400px; }
-  &__group { margin-bottom: 1rem; }
-  &__label { margin-bottom: 0.5rem; display: block; }
-  &__input { width: 100%; padding: 0.5rem; border: 1px solid #ccc; border-radius: 4px; }
-  &__button { padding: 0.75rem; background-color: #007bff; color: #fff; border: none; border-radius: 4px; cursor: pointer; &:disabled { opacity: 0.6; } }
-  &__error { color: red; margin-top: 1rem; }
-  &__links { margin-top: 1rem; }
-  &__link { color: #007bff; text-decoration: none; }
+.auth {
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 1rem;
+  text-align: center;
+  margin-top: 10%;
+  
+  &__title {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+  }
+  
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  &__group {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+  }
+  
+  &__label {
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+  }
+  
+  &__input {
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  &__button {
+    padding: 0.75rem;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    
+    &:hover {
+      background-color: #0069d9;
+    }
+    
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+  
+  &__links {
+    margin-top: 1rem;
+    display: flex;
+    justify-content: center;
+  }
+  
+  &__link {
+    color: #007bff;
+    text-decoration: none;
+  }
+  
+  &__google {
+    margin-top: 1.5rem;
+  }
 }
 </style>
