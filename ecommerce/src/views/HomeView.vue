@@ -114,11 +114,19 @@ const goToCategory = (categoryName: string) => {
       overflow: hidden;
       cursor: pointer;
 
+      /* Al estar en estado normal, la imagen aparece oscurecida */
       &__image {
         width: 100%;
         height: 600px; /* Ajusta la altura a tu gusto */
         object-fit: cover;
         display: block;
+        filter: brightness(0.7);
+        transition: filter 0.3s ease;
+      }
+
+      /* Al pasar el ratón, la imagen se vuelve brillante */
+      &:hover .category-card__image {
+        filter: brightness(1);
       }
 
       &__title {

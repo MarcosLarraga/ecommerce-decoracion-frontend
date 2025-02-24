@@ -1,3 +1,6 @@
+// Importa la fuente Phudu (puedes colocarlo al inicio de tu archivo de variables)
+@import url('https://fonts.googleapis.com/css2?family=Phudu:wght@300..900&display=swap');
+
 // Colores principales
 $primary-color: #06AA51;
 $primary-color-hover: rgba($primary-color, 0.9);
@@ -14,7 +17,8 @@ $spacing-lg: 24px;
 $spacing-xl: 32px;
 
 // Tipografía
-$font-family-primary: 'Roboto', sans-serif;
+// Ahora utilizamos "Phudu" como fuente primaria
+$font-family-primary: 'Phudu', sans-serif;
 $font-size-base: 16px;
 $font-size-large: 18px;
 $font-size-small: 14px;
