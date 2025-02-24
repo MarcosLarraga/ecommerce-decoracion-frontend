@@ -4,22 +4,27 @@
 
     <!-- Filtro de categorías -->
     <div class="shop__filter">
-      <label for="categorySelect" class="shop__filter-label">Filtrar por categoría:</label>
+      <label for="categorySelect" class="shop__filter-label">
+        Filtrar por categoría:
+      </label>
       <select id="categorySelect" v-model="selectedCategory" class="shop__filter-select">
         <option value="Todas">Todas</option>
-        <option v-for="category in categoriesStore.allCategories" :key="category.id" :value="category.name">
+        <option
+          v-for="category in categoriesStore.allCategories"
+          :key="category.id"
+          :value="category.name"
+        >
           {{ category.name }}
         </option>
       </select>
     </div>
 
     <!-- Lista de productos -->
-    <div class="shop__products">
+    <div class="products-grid">
       <ProductCard
         v-for="product in filteredProducts"
         :key="product.id"
         :producto="product"
-        class="shop__product-card"
       />
     </div>
   </div>
@@ -64,19 +69,16 @@ const shuffleArray = (array: any[]) => {
 // Computed para filtrar productos según la categoría seleccionada y mezclarlos
 const filteredProducts = computed(() => {
   let products = productsStore.allProducts;
-
   if (selectedCategory.value !== 'Todas') {
     const selectedCategoryObject = categoriesStore.allCategories.find(
       (category) => category.name === selectedCategory.value
     );
-
     if (selectedCategoryObject) {
       products = products.filter(
         (product) => product.categoriaId === selectedCategoryObject.id
       );
     }
   }
-
   return shuffleArray(products);
 });
 </script>
@@ -84,11 +86,14 @@ const filteredProducts = computed(() => {
 <style lang="scss" scoped>
 @use '@/styles/variables' as *;
 
+/* Estilos para el bloque principal */
 .shop {
   width: 100%;
   max-width: 1200px;
+  margin: 0 auto;
   padding: $spacing-md;
   text-align: center;
+  margin-top: 10%;
 
   &__title {
     font-size: 2rem;
@@ -119,25 +124,20 @@ const filteredProducts = computed(() => {
       background: white;
     }
   }
-
-  &__products {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: $spacing-md;
-    justify-items: center;
-  }
-
-  &__product-card {
-    width: 100%;
-    max-width: 300px;
-  }
 }
 
+/* Grid de productos */
+.products-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $spacing-md;
+  justify-items: center;
+}
+
+/* Media query para pantallas medianas */
 @media (min-width: 768px) {
-  .shop {
-    &__products {
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    }
+  .products-grid {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   }
 }
 </style>
