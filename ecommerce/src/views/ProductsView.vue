@@ -7,7 +7,11 @@
       <label for="categorySelect" class="shop__filter-label">
         Filtrar por categoría:
       </label>
-      <select id="categorySelect" v-model="selectedCategory" class="shop__filter-select">
+      <select
+        id="categorySelect"
+        v-model="selectedCategory"
+        class="shop__filter-select"
+      >
         <option value="Todas">Todas</option>
         <option
           v-for="category in categoriesStore.allCategories"
@@ -41,22 +45,52 @@ const productsStore = useProductsStore();
 const categoriesStore = useCategoriesStore();
 const route = useRoute();
 
+// Categoría seleccionada
 const selectedCategory = ref<string>('Todas');
 
+// Al montar el componente, cargamos categorías
+// y decidimos si hay que buscar o traer todos los productos
 onMounted(async () => {
-  await productsStore.fetchProducts();
   await categoriesStore.fetchCategories();
 
+  const searchParam = route.query.search ? String(route.query.search) : '';
+  if (searchParam) {
+    // Si existe la query "search", buscamos en el backend
+    await productsStore.searchProducts(searchParam);
+  } else {
+    // Si no hay búsqueda, traemos todos
+    await productsStore.fetchProducts();
+  }
+
+  // Si hay una categoría en la URL, la asignamos
   if (route.query.category) {
     selectedCategory.value = String(route.query.category);
   }
 });
 
-watch(() => route.query.category, (newCategory) => {
-  if (newCategory) {
-    selectedCategory.value = String(newCategory);
+// Cada vez que cambie la query "search", buscamos o recargamos
+watch(
+  () => route.query.search,
+  async (newSearch) => {
+    if (newSearch) {
+      await productsStore.searchProducts(String(newSearch));
+    } else {
+      await productsStore.fetchProducts();
+    }
   }
-});
+);
+
+// Cada vez que cambie la query "category", actualizamos la categoría seleccionada
+watch(
+  () => route.query.category,
+  (newCategory) => {
+    if (newCategory) {
+      selectedCategory.value = String(newCategory);
+    } else {
+      selectedCategory.value = 'Todas';
+    }
+  }
+);
 
 // Función para mezclar productos aleatoriamente
 const shuffleArray = (array: any[]) => {
@@ -66,9 +100,10 @@ const shuffleArray = (array: any[]) => {
     .map(({ value }) => value);
 };
 
-// Computed para filtrar productos según la categoría seleccionada y mezclarlos
+// Computed: filtra los productos según la categoría seleccionada y los mezcla
 const filteredProducts = computed(() => {
   let products = productsStore.allProducts;
+  
   if (selectedCategory.value !== 'Todas') {
     const selectedCategoryObject = categoriesStore.allCategories.find(
       (category) => category.name === selectedCategory.value

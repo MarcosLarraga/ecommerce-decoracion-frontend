@@ -1,13 +1,12 @@
 <template>
   <v-app class="app">
     <NavBar />
-    <div class="layout">
-      <v-main class="main">
-        <v-container fluid class="pa-0">
-          <RouterView />
-        </v-container>
-      </v-main>
-    </div>
+    <v-main class="main">
+      <SearchBar />
+      <v-container fluid class="pa-0 ma-0">
+        <RouterView />
+      </v-container>
+    </v-main>
     <Footer />
   </v-app>
 </template>
@@ -16,6 +15,7 @@
 import { RouterView } from 'vue-router';
 import NavBar from '@/components/NavBar.vue';
 import Footer from '@/components/Footer.vue';
+import SearchBar from '@/components/SearchBar.vue';
 </script>
 
 <style lang="scss">
@@ -26,25 +26,11 @@ import Footer from '@/components/Footer.vue';
   color: $text-color;
 }
 
-.layout {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-}
-
 .main {
-  flex: 1;
   background-color: $background-color !important;
 }
 
 .v-main {
   padding-bottom: 0 !important;
-}
-
-
-.content {
-  flex-grow: 1;
-  display: flex;
-  align-items: center;
 }
 </style>

@@ -105,7 +105,49 @@ export const useProductsStore = defineStore('products', {
     },
 
     /**
-     * Selecciona 5 productos aleatorios de la lista obtenida de la API.
+     * Realiza la búsqueda de productos por nombre.
+     */
+    async searchProducts(query: string) {
+      this.loading = true;
+      this.error = null;
+      console.log(`⏳ [searchProducts] Buscando productos con query: "${query}"...`);
+
+      try {
+        const response = await fetch(`http://localhost:5162/api/Producto/search?query=${encodeURIComponent(query)}`, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error(`❌ Error HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        const data: ProductoDTO[] = await response.json();
+
+        if (!Array.isArray(data)) {
+          throw new Error("❌ Error: La API no devolvió una lista de productos.");
+        }
+
+        console.log("✅ [searchProducts] Productos encontrados:", data);
+
+        this.allProducts = data; // Actualizamos la lista de productos con los resultados de la búsqueda
+        this.getRandomProducts(); // Actualizamos los productos aleatorios si lo necesitas
+
+      } catch (error) {
+        this.error = error instanceof Error ? error.message : '❌ Error desconocido al buscar productos';
+        console.error("⚠️ [searchProducts] Error:", this.error);
+
+      } finally {
+        this.loading = false;
+        console.log("✅ [searchProducts] Proceso finalizado.");
+      }
+    },
+
+    /**
+     * Selecciona 4 productos aleatorios de la lista obtenida de la API.
      */
     getRandomProducts() {
       if (this.allProducts.length === 0) {

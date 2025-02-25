@@ -12,16 +12,16 @@ import ForgotPasswordView from '@/views/ForgotPasswordView.vue';
 import ResetPasswordView from '@/views/ResetPasswordView.vue';
 
 const routes = [
-  { path: '/', component: HomeView },
-  { path: '/shop', component: ProductsView },
-  { path: '/cart', component: CartView },
-  { path: '/guia', component: GuiaView },
-  { path: '/contacto', component: ContactView },
-  { path: '/product/:id', component: ProductDetailView, props: true },
-  { path: '/login', component: LoginView },
-  { path: '/register', component: RegisterView },
-  { path: '/forgot-password', component: ForgotPasswordView },
-  { path: '/reset-password', component: ResetPasswordView }
+  { path: '/', name: 'Home', component: HomeView },
+  { path: '/shop', name: 'Products', component: ProductsView },
+  { path: '/cart', name: 'Cart', component: CartView },
+  { path: '/guia', name: 'Guia', component: GuiaView },
+  { path: '/contacto', name: 'Contact', component: ContactView },
+  { path: '/product/:id', name: 'ProductDetail', component: ProductDetailView, props: true },
+  { path: '/login', name: 'Login', component: LoginView },
+  { path: '/register', name: 'Register', component: RegisterView },
+  { path: '/forgot-password', name: 'ForgotPassword', component: ForgotPasswordView },
+  { path: '/reset-password', name: 'ResetPassword', component: ResetPasswordView }
 ];
 
 const router = createRouter({
