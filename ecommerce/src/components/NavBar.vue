@@ -1,58 +1,86 @@
 <template>
   <v-app-bar app class="navbar">
     <v-container>
-      <v-row align="center" justify="space-between" no-gutters>
+      <!-- Desktop: visible para pantallas md y mayores -->
+      <v-row align="center" justify="space-between" no-gutters class="d-none d-md-flex">
         <!-- Logo -->
-        <v-col cols="3" md="2">
+        <v-col md="2">
           <router-link to="/" class="navbar__logo">
             <LogoCanvasBlack class="navbar__logo-img" />
           </router-link>
         </v-col>
 
-        <!-- Menú hamburguesa para móvil -->
-        <v-col cols="8" class="d-flex justify-end align-center d-md-none">
-          <v-btn icon class="navbar__hamburger" @click="drawer = !drawer">
-            <v-icon>mdi-menu</v-icon>
-          </v-btn>
-        </v-col>
-
-        <!-- Menú de navegación para pantallas grandes -->
-        <v-col cols="6" class="d-none d-md-flex navbar__menu justify-center">
+        <!-- Menú de navegación (Texto) -->
+        <v-col md="6" class="d-flex navbar__menu justify-center">
           <router-link to="/" class="navbar__menu-item">Home</router-link>
           <router-link to="/shop" class="navbar__menu-item">Tienda</router-link>
           <router-link to="/guia" class="navbar__menu-item">Guia</router-link>
           <router-link to="/contacto" class="navbar__menu-item">Contacto</router-link>
         </v-col>
 
-        <!-- Iconos de usuario y carrito en desktop -->
-        <v-col cols="3" class="d-none d-md-flex justify-end navbar__icons">
-          <template v-if="store.isAuthenticated && store.user">
-            <span class="navbar__username">Bienvenido, {{ store.user.nombre }}</span>
-            <v-btn icon class="navbar__icon" @click="logout">
-              <v-icon>mdi-logout</v-icon>
-            </v-btn>
-          </template>
-          <template v-else>
-            <router-link to="/login" class="navbar__icon" @click="redirectToLogin">
-              <v-icon>mdi-account</v-icon>
-              <span class="navbar__login-text">Iniciar Sesión</span>
+        <!-- Sección de SearchBar e Iconos -->
+        <v-col md="4" class="d-flex justify-end align-center">
+          <div class="navbar__search-inline">
+            <SearchBar />
+          </div>
+          <div class="navbar__icons">
+            <template v-if="store.isAuthenticated && store.user">
+              <span class="navbar__username">Bienvenido, {{ store.user.nombre }}</span>
+              <v-btn icon class="navbar__icon" @click="logout">
+                <v-icon>mdi-logout</v-icon>
+              </v-btn>
+            </template>
+            <template v-else>
+              <router-link to="/login" class="navbar__icon" @click="redirectToLogin">
+                <v-icon>mdi-account</v-icon>
+              </router-link>
+            </template>
+            <router-link to="/cart" class="navbar__icon navbar__cart">
+              <v-icon>mdi-cart</v-icon>
+              <span v-if="cartStore.totalItems > 0" class="cart-badge">
+                {{ cartStore.totalItems }}
+              </span>
             </router-link>
-          </template>
-          <router-link to="/cart" class="navbar__icon navbar__cart">
-            <v-icon>mdi-cart</v-icon>
-            <span v-if="cartStore.totalItems > 0" class="cart-badge">
-              {{ cartStore.totalItems }}
-            </span>
+          </div>
+        </v-col>
+      </v-row>
+
+      <!-- Mobile: visible para pantallas menores a md -->
+      <v-row align="center" justify="space-between" no-gutters class="d-md-none">
+        <!-- Logo a la izquierda -->
+        <v-col cols="2" class="d-flex align-center">
+          <router-link to="/" class="navbar__logo">
+            <LogoCanvasBlack class="navbar__logo-img" />
           </router-link>
+        </v-col>
+
+        <!-- Buscador centrado -->
+        <v-col cols="8" class="d-flex align-center justify-center">
+          <div class="navbar__search-inline">
+            <SearchBar />
+          </div>
+        </v-col>
+
+        <!-- Botón hamburguesa a la derecha -->
+        <v-col cols="2" class="d-flex justify-end align-center">
+          <v-btn icon class="navbar__hamburger" @click="drawer = !drawer">
+            <v-icon>mdi-menu</v-icon>
+          </v-btn>
         </v-col>
       </v-row>
     </v-container>
   </v-app-bar>
 
-  <!-- Drawer para menú móvil -->
-  <v-navigation-drawer v-model="drawer" app temporary right class="navbar__drawer">
+  <!-- Drawer para móvil -->
+  <v-navigation-drawer
+    v-model="drawer"
+    app
+    temporary
+    right
+    class="navbar__drawer"
+  >
     <v-list>
-      <!-- Mostramos el nombre del usuario si está autenticado -->
+      <!-- Nombre del usuario si está autenticado -->
       <v-list-item v-if="store.isAuthenticated && store.user">
         <v-list-item-content>
           <v-list-item-title class="navbar__drawer-username">
@@ -66,7 +94,6 @@
       <v-list-item to="/shop" class="navbar__drawer-item" @click="drawer = false">
         Shop
       </v-list-item>
-      <!-- Ruta "guia" si la tienes definida; sino, elimínala -->
       <v-list-item to="/guia" class="navbar__drawer-item" @click="drawer = false">
         Guia
       </v-list-item>
@@ -96,6 +123,7 @@ import { useRouter } from 'vue-router';
 import { useUserStore } from '@/stores/userStore';
 import { useCartStore } from '@/stores/cartStore';
 import LogoCanvasBlack from '@/components/LogoCanvasBlack.vue';
+import SearchBar from '@/components/SearchBar.vue';
 
 const drawer = ref(false);
 const router = useRouter();
@@ -120,17 +148,25 @@ const handleLogout = () => {
 <style lang="scss" scoped>
 @use '@/styles/variables' as *;
 
+/* Mobile-first: estilos base para móvil */
 .navbar {
   background-color: $background-color;
-  padding: $spacing-md 0;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   border-bottom: 2px solid $primary-color;
+  padding: $spacing-md 0;
 
   &__logo {
     display: flex;
     align-items: center;
     text-decoration: none;
     color: $text-color;
+  }
+
+  &__logo-img {
+    height: 85px;
+    margin-right: 8px;
+    border-radius: 8px;
+    margin-top: 15px;
   }
 
   &__menu {
@@ -152,10 +188,17 @@ const handleLogout = () => {
     }
   }
 
+  /* Por defecto para móvil, el SearchBar tiene 150px */
+  &__search-inline {
+    width: 150px;
+    margin-right: $spacing-sm;
+  }
+
   &__icons {
     display: flex;
     align-items: center;
     gap: 1rem;
+    margin-left: 50px;
     .navbar__username {
       margin-right: $spacing-sm;
       font-weight: bold;
@@ -173,27 +216,16 @@ const handleLogout = () => {
     }
   }
 
-  &__login-text {
-    margin-left: 0.5rem;
-    font-size: 0.9rem;
-    color: $text-color;
-  }
-
-  &__cart {
-    position: relative;
+  &__drawer {
+    margin-top: 30px;
   }
 }
 
-/* Agregamos estilo para el nombre en el drawer */
-.navbar__drawer-username {
-  font-size: 1rem;
-  font-weight: 600;
-  color: $text-color;
-  padding: $spacing-sm 0;
-}
-
-.v-navigation-drawer .v-list {
-  margin-top: 10%;
+/* Media Query para desktop: sobreescribe los estilos móviles */
+@media (min-width: 960px) {
+  .navbar__search-inline {
+    width: 200px;
+  }
 }
 
 .cart-badge {
@@ -208,12 +240,5 @@ const handleLogout = () => {
   border-radius: 50%;
   min-width: 20px;
   text-align: center;
-}
-
-.navbar__logo-img {
-  height: 85px;
-  margin-right: 8px;
-  border-radius: 8px;
-  margin-top: 15px;
 }
 </style>
