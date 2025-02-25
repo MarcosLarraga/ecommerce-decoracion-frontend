@@ -123,7 +123,7 @@ const handleForgotPassword = async () => {
     transition: background-color 0.3s;
 
     &:hover {
-      background-color: darken(#ffc107, 10%);
+      background-color: #e0a800; 
     }
 
     &:disabled {

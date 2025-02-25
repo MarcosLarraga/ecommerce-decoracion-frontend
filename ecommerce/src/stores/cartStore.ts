@@ -1,17 +1,25 @@
 import { defineStore } from 'pinia';
 
+interface CartItem {
+  id: number;
+  name: string;
+  price: number;
+  quantity: number;
+  image: string;
+}
+
 export const useCartStore = defineStore('cart', {
   state: () => ({
-    cart: [] as { id: number; name: string; price: number; quantity: number; image: string }[],
+    cart: JSON.parse(localStorage.getItem('cart') || '[]') as CartItem[],
   }),
 
   getters: {
-    totalItems: (state) => state.cart.reduce((total, item) => total + item.quantity, 0),
-    cartTotal: (state) => state.cart.reduce((total, item) => total + item.price * item.quantity, 0),
+    cartTotal: (state) =>
+      state.cart.reduce((total, item) => total + item.price * item.quantity, 0),
   },
 
   actions: {
-    addToCart(product: { id: number; name: string; price: number; image: string }) {
+    addToCart(product: CartItem) {
       const existingItem = this.cart.find((item) => item.id === product.id);
 
       if (existingItem) {
@@ -19,18 +27,22 @@ export const useCartStore = defineStore('cart', {
       } else {
         this.cart.push({ ...product, quantity: 1 });
       }
+
+      this.saveCart();
     },
 
     removeFromCart(productId: number) {
-      const index = this.cart.findIndex((item) => item.id === productId);
+      this.cart = this.cart.filter((item) => item.id !== productId);
+      this.saveCart();
+    },
 
-      if (index !== -1) {
-        if (this.cart[index].quantity > 1) {
-          this.cart[index].quantity -= 1;
-        } else {
-          this.cart.splice(index, 1);
-        }
-      }
+    clearCart() {
+      this.cart = [];
+      localStorage.removeItem('cart');
+    },
+
+    saveCart() {
+      localStorage.setItem('cart', JSON.stringify(this.cart));
     },
   },
 });

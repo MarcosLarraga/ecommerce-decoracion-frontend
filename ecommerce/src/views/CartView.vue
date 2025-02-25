@@ -23,7 +23,9 @@
 
       <div class="cart__total">
         <h2 class="cart__total-price">Total: {{ cartStore.cartTotal.toFixed(2) }} €</h2>
-        <button class="cart__total-checkout-btn">Finalizar Compra</button>
+        <button class="cart__total-checkout-btn" @click="irAConfirmacion">
+          Continuar con el pedido
+        </button>
       </div>
     </div>
   </div>
@@ -31,130 +33,186 @@
 
 <script setup lang="ts">
 import { useCartStore } from '@/stores/cartStore';
+import { useRouter } from 'vue-router';
+
 const cartStore = useCartStore();
+const router = useRouter();
+
+const irAConfirmacion = () => {
+  router.push("/pedido-confirmacion");
+};
 </script>
 
 <style lang="scss" scoped>
+
 @use '@/styles/variables' as *;
 
 .cart {
   width: 90%;
-  max-width: 800px;
-  margin: 100px auto;
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  padding: 20px;
+  max-width: 600px;
+  margin: 80px auto;
+  background-color: $background-color;
+  padding: $spacing-md;
+  border-radius: $border-radius;
+  box-shadow: $box-shadow;
 
   &__title {
-    font-size: 2rem;
-    margin-bottom: 20px;
+    text-align: center;
+    font-size: 1.8rem;
+    margin-bottom: $spacing-lg;
     color: $text-color;
+    font-family: $font-family-primary;
   }
 
   &__empty {
-    font-size: 1.2rem;
+    text-align: center;
+    font-size: $font-size-large;
+    padding: $spacing-md;
     color: $text-color;
   }
 
   &__items {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: $spacing-md;
   }
 
   &__item {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background-color: #f2f2f2;
-    border-radius: 8px;
-    padding: 15px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.06);
+    background: #f8f8f8;
+    padding: $spacing-md;
+    border-radius: $border-radius;
 
     &-image {
-      width: 70px;
-      height: 70px;
+      width: 60px;
+      height: 60px;
       object-fit: cover;
-      border-radius: 5px;
+      border-radius: $border-radius;
     }
 
     &-info {
       flex-grow: 1;
-      text-align: left;
-      padding-left: 15px;
+      padding-left: $spacing-sm;
     }
 
     &-name {
-      margin: 0 0 5px;
+      font-size: $font-size-base;
+      font-weight: bold;
       color: $text-color;
-      font-size: 1.1rem;
+      font-family: $font-family-primary;
     }
 
-    &-price,
+    &-price {
+      font-size: $font-size-small;
+      color: $primary-color;
+    }
+
     &-quantity {
-      margin: 0;
-      color: $text-color;
+      font-size: $font-size-small;
+      color: $secondary-color;
     }
 
     &-remove-btn {
-      background-color: $primary-color;
-      color: #fff;
+      background-color: red;
+      color: white;
+      padding: $spacing-sm $spacing-md;
       border: none;
-      padding: 6px 12px;
+      border-radius: $form-button-radius;
       cursor: pointer;
-      border-radius: 4px;
-      font-weight: 500;
+      font-size: $font-size-small;
       transition: background-color 0.2s ease-in-out;
+      box-shadow: $form-button-shadow;
 
       &:hover {
-        background-color: $primary-color;
+        background-color: darkred;
       }
     }
   }
 
   &__total {
-    margin-top: 30px;
     text-align: right;
+    margin-top: $spacing-lg;
 
     &-price {
       font-size: 1.5rem;
-      margin-bottom: 10px;
+      font-weight: bold;
       color: $text-color;
+      font-family: $font-family-primary;
     }
 
     &-checkout-btn {
+      display: block;
+      width: 100%;
       background-color: $primary-color;
-      color: #fff;
-      border: none;
-      padding: 10px 20px;
-      font-size: 1rem;
+      color: white;
+      padding: $spacing-md;
+      border-radius: $form-button-radius;
+      font-size: $font-size-base;
+      font-weight: bold;
       cursor: pointer;
-      border-radius: 4px;
-      font-weight: 600;
+      border: none;
       transition: background-color 0.2s ease-in-out;
+      box-shadow: $form-button-shadow;
 
       &:hover {
-        background-color: $primary-color;
+        background-color: $primary-color-hover;
       }
     }
   }
 }
 
-@media (min-width: 768px) {
+/* 🔹 Media Queries */
+@media (min-width: $breakpoint-sm) {
   .cart {
-    &__items {
-      flex-direction: column;
-    }
+    max-width: 700px;
+    padding: $spacing-lg;
 
     &__item {
-      padding: 20px;
+      padding: $spacing-lg;
 
       &-image {
-        width: 80px;
-        height: 80px;
+        width: 70px;
+        height: 70px;
+      }
+
+      &-name {
+        font-size: 1.2rem;
+      }
+
+      &-price,
+      &-quantity {
+        font-size: 1rem;
+      }
+
+      &-remove-btn {
+        font-size: 1rem;
       }
     }
   }
 }
+
+@media (min-width: $breakpoint-md) {
+  .cart {
+    max-width: 800px;
+
+    &__total {
+      &-price {
+        font-size: 1.8rem;
+      }
+
+      &-checkout-btn {
+        font-size: 1.2rem;
+      }
+    }
+  }
+}
+
+@media (min-width: $breakpoint-lg) {
+  .cart {
+    max-width: 900px;
+  }
+}
+
 </style>

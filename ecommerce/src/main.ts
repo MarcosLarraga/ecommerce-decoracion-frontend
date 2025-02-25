@@ -8,6 +8,10 @@ import * as directives from 'vuetify/directives';
 import 'vuetify/styles';
 import '@mdi/font/css/materialdesignicons.css';
 
+//Notificaciones
+import Toast from 'vue-toastification';
+import 'vue-toastification/dist/index.css';
+
 // Estilos globales
 import '@/styles/main.scss';
 
@@ -30,6 +34,7 @@ app.use(router);
 app.use(pinia);
 app.use(vuetify);
 app.mount('#app');
+app.use(Toast);
 
 // Inicializa el store de usuario para restaurar la sesión (si existe)
 const userStore = useUserStore();

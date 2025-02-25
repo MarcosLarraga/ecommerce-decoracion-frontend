@@ -1,17 +1,20 @@
 import { defineStore } from 'pinia';
 import axios from 'axios';
-import { jwtDecode } from 'jwt-decode'; // Import nombrado
+import { jwtDecode } from 'jwt-decode';
+import { useCartStore } from '@/stores/cartStore';
 
 export const useUserStore = defineStore('user', {
   state: () => ({
     token: localStorage.getItem('token') || '',
-    user: null as any,
+    user: JSON.parse(localStorage.getItem('user') || 'null'),
     loading: false,
     error: ''
   }),
+
   getters: {
     isAuthenticated: (state) => !!state.token
   },
+
   actions: {
     decodeToken(token: string) {
       try {
@@ -22,6 +25,79 @@ export const useUserStore = defineStore('user', {
       }
     },
 
+    /// 🔹 **Obtener datos del usuario autenticado**
+    async fetchUserData() {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          console.error('No hay token disponible.');
+          return;
+        }
+
+        // Decodificar el token para obtener el ID del usuario
+        const decoded: any = this.decodeToken(token);
+        if (!decoded?.sub) {
+          console.error('No se pudo obtener el ID del usuario desde el token.');
+          return;
+        }
+
+        const userId = decoded.sub;
+
+        const response = await axios.get(`http://localhost:5162/api/usuario/${userId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+
+        this.user = response.data;
+        localStorage.setItem('user', JSON.stringify(this.user));
+      } catch (error) {
+        console.error('Error obteniendo datos del usuario:', error);
+      }
+    },
+
+    /// 🔹 **Modificar solo el teléfono y la dirección del usuario autenticado**
+async updateUserPhoneAndAddress(telefono: string, direccion: string) {
+  try {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.error('No hay token disponible.');
+      return;
+    }
+
+    // Decodificar el token para obtener el ID del usuario
+    const decoded: any = this.decodeToken(token);
+    if (!decoded?.sub) {
+      console.error('No se pudo obtener el ID del usuario desde el token.');
+      return;
+    }
+
+    const userId = decoded.sub;
+
+    await axios.put(`http://localhost:5162/api/usuario/${userId}`, {
+      telefono,
+      direccion
+    }, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json"
+      }
+    });
+
+    // Actualizar solo el teléfono y la dirección en el store
+    if (this.user) {
+      this.user.telefono = telefono;
+      this.user.direccion = direccion;
+      localStorage.setItem('user', JSON.stringify(this.user));
+    }
+    
+    console.log('✅ Teléfono y dirección actualizados correctamente.');
+  } catch (error) {
+    console.error('❌ Error actualizando teléfono y dirección:', error);
+  }
+},
+
+    /// 🔹 **Login del usuario**
     async login(email: string, password: string) {
       this.loading = true;
       this.error = '';
@@ -29,12 +105,13 @@ export const useUserStore = defineStore('user', {
         console.log('Enviando login con', { email, password });
         const response = await axios.post('http://localhost:5162/api/auth/login', { email, password });
         console.log('LOGIN response data:', response.data);
-        
+
         const { token } = response.data;
         if (!token) {
           this.error = 'La API no devolvió un token.';
           return;
         }
+
         this.token = token;
         localStorage.setItem('token', token);
 
@@ -46,7 +123,10 @@ export const useUserStore = defineStore('user', {
             nombre: decoded.name || decoded.email,
             role: decoded.role
           };
-          console.log('Usuario asignado:', this.user);
+          localStorage.setItem('user', JSON.stringify(this.user));
+
+          // Cargar datos completos del usuario después del login
+          await this.fetchUserData();
         }
       } catch (err: any) {
         console.error('Error en login:', err);
@@ -56,6 +136,7 @@ export const useUserStore = defineStore('user', {
       }
     },
 
+    /// 🔹 **Registro de usuario**
     async register(nombre: string, email: string, password: string) {
       this.loading = true;
       this.error = '';
@@ -71,40 +152,7 @@ export const useUserStore = defineStore('user', {
       }
     },
 
-    async forgotPassword(email: string) {
-      this.loading = true;
-      this.error = '';
-      try {
-        console.log('Enviando forgotPassword con', { email });
-        const response = await axios.post('http://localhost:5162/api/auth/forgot-password', { email });
-        console.log('FORGOT PASSWORD response:', response.data);
-        return response.data;
-      } catch (err: any) {
-        console.error('Error en forgotPassword:', err);
-        this.error = err.response?.data || 'Error al enviar correo de reseteo';
-        throw new Error(this.error);
-      } finally {
-        this.loading = false;
-      }
-    },
-
-    async resetPassword(token: string, newPassword: string) {
-      this.loading = true;
-      this.error = '';
-      try {
-        console.log('Enviando resetPassword con', { token, newPassword });
-        const response = await axios.post('http://localhost:5162/api/auth/reset-password', { token, newPassword });
-        console.log('RESET PASSWORD response:', response.data);
-        return response.data;
-      } catch (err: any) {
-        console.error('Error en resetPassword:', err);
-        this.error = err.response?.data || 'Error al restablecer la contraseña';
-        throw new Error(this.error);
-      } finally {
-        this.loading = false;
-      }
-    },
-
+    /// 🔹 **Login con Google**
     async googleLogin(idToken: string) {
       this.loading = true;
       this.error = '';
@@ -118,6 +166,7 @@ export const useUserStore = defineStore('user', {
           this.error = 'La API no devolvió token en googleLogin.';
           return;
         }
+
         this.token = token;
         localStorage.setItem('token', token);
 
@@ -129,6 +178,10 @@ export const useUserStore = defineStore('user', {
             nombre: decoded.name || decoded.email,
             role: decoded.role
           };
+          localStorage.setItem('user', JSON.stringify(this.user));
+
+          // Cargar datos completos del usuario después del login
+          await this.fetchUserData();
         }
       } catch (err: any) {
         console.error('Error en googleLogin:', err);
@@ -138,13 +191,20 @@ export const useUserStore = defineStore('user', {
       }
     },
 
+    /// 🔹 **Cerrar sesión**
     logout() {
       console.log('Haciendo logout.');
       this.token = '';
       this.user = null;
       localStorage.removeItem('token');
+      localStorage.removeItem('user');
+
+      // 🛒 Limpiar carrito al cerrar sesión
+      const cartStore = useCartStore();
+      cartStore.clearCart();
     },
 
+    /// 🔹 **Inicializar usuario al cargar la página**
     initialize() {
       if (this.token) {
         console.log('Inicializando store con token:', this.token);
@@ -157,6 +217,9 @@ export const useUserStore = defineStore('user', {
             role: decoded.role
           };
           console.log('Store inicializado, usuario:', this.user);
+
+          // Cargar datos completos del usuario al iniciar
+          this.fetchUserData();
         } else {
           this.logout();
         }

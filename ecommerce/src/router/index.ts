@@ -10,11 +10,13 @@ import LoginView from '@/views/LoginView.vue';
 import RegisterView from '@/views/RegisterView.vue';
 import ForgotPasswordView from '@/views/ForgotPasswordView.vue';
 import ResetPasswordView from '@/views/ResetPasswordView.vue';
+import PedidoConfirmacion from '@/views/PedidoConfirmacion.vue';
 
 const routes = [
   { path: '/', component: HomeView },
   { path: '/shop', component: ProductsView },
   { path: '/cart', component: CartView },
+  { path: '/pedido-confirmacion', component: PedidoConfirmacion },
   { path: '/guia', component: GuiaView },
   { path: '/contacto', component: ContactView },
   { path: '/product/:id', component: ProductDetailView, props: true },

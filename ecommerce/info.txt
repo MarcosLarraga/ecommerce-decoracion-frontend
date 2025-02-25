@@ -7,3 +7,6 @@ npm install pinia-plugin-persistedstate
 JWT
 npm install jwt-decode
 npm install --save-dev @types/jwt-decode
+
+notificaciones
+npm install vue-toastification@next
