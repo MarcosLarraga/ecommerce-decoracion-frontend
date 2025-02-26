@@ -156,9 +156,8 @@ const handleLogout = () => {
   }
 
   &__menu {
-    display: none; // Oculto por defecto en móviles
-    flex-direction: column;
-    gap: 20px;
+    display: flex;
+    gap: 60px;
     align-items: center;
   }
 
