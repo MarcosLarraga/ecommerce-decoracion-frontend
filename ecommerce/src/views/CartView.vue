@@ -13,18 +13,16 @@
           <div class="cart__item-info">
             <h3 class="cart__item-name">{{ item.name }}</h3>
             <p class="cart__item-price">{{ item.price.toFixed(2) }} €</p>
-            <div class="cart__quantity">
-              <button class="cart__quantity-btn" @click="decreaseQuantity(item)">-</button>
-              <span class="cart__quantity-number">{{ item.quantity }}</span>
-              <button class="cart__quantity-btn" @click="increaseQuantity(item)">+</button>
-            </div>
+            <p class="cart__item-quantity">Cantidad: {{ item.quantity }}</p>
           </div>
-          <button class="cart__remove-btn" @click="cartStore.removeFromCart(item.id)">Quitar</button>
+          <button class="cart__remove-btn" @click="cartStore.removeFromCart(item.id)">
+            Quitar
+          </button>
         </div>
       </div>
 
       <div class="cart__total">
-        <h2 class="cart__total-title">Total: {{ cartStore.cartTotal.toFixed(2) }} €</h2>
+        <h2>Total: {{ cartStore.cartTotal.toFixed(2) }} €</h2>
         <button class="cart__checkout-btn">Finalizar Compra</button>
       </div>
     </div>
@@ -33,40 +31,29 @@
 
 <script setup lang="ts">
 import { useCartStore } from '@/stores/cartStore';
-
 const cartStore = useCartStore();
-
-const increaseQuantity = (item: any) => {
-  cartStore.increaseQuantity(item.id);
-};
-
-const decreaseQuantity = (item: any) => {
-  cartStore.decreaseQuantity(item.id);
-};
-
 </script>
 
 <style lang="scss" scoped>
+
 @use '@/styles/variables' as *;
 
 .cart {
   width: 90%;
   max-width: 800px;
-  margin: 140px auto;
-  padding: $spacing-md;
-  background-color: $background-color;
-  border-radius: $border-radius;
-  box-shadow: $box-shadow;
+  margin: 100px auto;
+  background-color: #fff; // Fondo claro para el contenedor principal
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  padding: 20px;
 
   &__title {
     font-size: 2rem;
-    margin-bottom: $spacing-md;
+    margin-bottom: 20px;
     color: $text-color;
-    text-align: center;
   }
 
   &__empty {
-    text-align: center;
     font-size: 1.2rem;
     color: $text-color;
   }
@@ -86,9 +73,9 @@ const decreaseQuantity = (item: any) => {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background-color: #f2f2f2;
-    border-radius: $border-radius;
-    padding: $spacing-sm;
+    background-color: #f2f2f2; // Color gris claro en vez de lighten()
+    border-radius: 8px;
+    padding: 15px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.06);
   }
 
@@ -96,31 +83,27 @@ const decreaseQuantity = (item: any) => {
     width: 70px;
     height: 70px;
     object-fit: cover;
-    border-radius: $border-radius;
+    border-radius: 5px;
   }
 
   &__item-info {
     flex-grow: 1;
-    padding-left: $spacing-sm;
+    text-align: left;
+    padding-left: 15px;
 
-    &-name {
-      font-size: $font-size-base;
-      font-weight: bold;
+    h3 {
+      margin: 0 0 5px;
+      color: $text-color;
+      font-size: 1.1rem;
     }
 
-    &-price {
-      font-size: $font-size-small;
+    p {
+      margin: 0;
       color: $text-color;
     }
   }
 
-  &__quantity {
-    display: flex;
-    align-items: center;
-    gap: $spacing-xs;
-  }
-
-  &__quantity-btn {
+  &__remove-btn {
     background-color: $primary-color;
     color: #fff;
     border: none;
@@ -131,35 +114,17 @@ const decreaseQuantity = (item: any) => {
     transition: background-color 0.2s ease-in-out;
 
     &:hover {
-      background-color: #04893e; // Color manualmente más oscuro
-    }
-  }
-
-  &__quantity-number {
-    font-size: $font-size-base;
-    font-weight: bold;
-  }
-
-  &__remove-btn {
-    background-color: red;
-    color: white;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 4px;
-    cursor: pointer;
-
-    &:hover {
-      background-color: #c10000; // Color manualmente más oscuro
+      background-color: $primary-color;
     }
   }
 
   &__total {
     text-align: right;
-    margin-top: $spacing-md;
 
-    &-title {
+    h2 {
       font-size: 1.5rem;
-      font-weight: bold;
+      margin-bottom: 10px;
+      color: $text-color;
     }
   }
 
@@ -169,12 +134,13 @@ const decreaseQuantity = (item: any) => {
     border: none;
     padding: 10px 20px;
     font-size: 1rem;
-    border-radius: $border-radius;
     cursor: pointer;
-    font-weight: bold;
+    border-radius: 4px;
+    font-weight: 600;
+    transition: background-color 0.2s ease-in-out;
 
     &:hover {
-      background-color: #04893e; // Color manualmente más oscuro
+      background-color: $primary-color;
     }
   }
 }

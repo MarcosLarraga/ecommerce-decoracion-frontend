@@ -4,10 +4,16 @@
 
     <!-- Filtro de categorías -->
     <div class="shop__filter">
-      <label for="categorySelect" class="shop__filter-label">Filtrar por categoría:</label>
+      <label for="categorySelect" class="shop__filter-label">
+        Filtrar por categoría:
+      </label>
       <select id="categorySelect" v-model="selectedCategory" class="shop__filter-select">
         <option value="Todas">Todas</option>
-        <option v-for="category in categoriesStore.allCategories" :key="category.id" :value="category.name">
+        <option
+          v-for="category in categoriesStore.allCategories"
+          :key="category.id"
+          :value="category.name"
+        >
           {{ category.name }}
         </option>
       </select>
@@ -15,7 +21,11 @@
 
     <!-- Lista de productos -->
     <div class="products-grid">
-      <ProductCard v-for="product in filteredProducts" :key="product.id" :producto="product" />
+      <ProductCard
+        v-for="product in filteredProducts"
+        :key="product.id"
+        :producto="product"
+      />
     </div>
   </div>
 </template>
@@ -31,21 +41,17 @@ const productsStore = useProductsStore();
 const categoriesStore = useCategoriesStore();
 const route = useRoute();
 
-// Estado para la categoría seleccionada
 const selectedCategory = ref<string>('Todas');
 
-// Cargar productos y categorías al montar la vista
 onMounted(async () => {
   await productsStore.fetchProducts();
   await categoriesStore.fetchCategories();
 
-  // Si la URL tiene una categoría en la query, seleccionarla automáticamente
   if (route.query.category) {
     selectedCategory.value = String(route.query.category);
   }
 });
 
-// Escuchar cambios en la URL y actualizar el filtro si la categoría cambia
 watch(() => route.query.category, (newCategory) => {
   if (newCategory) {
     selectedCategory.value = String(newCategory);
@@ -63,19 +69,16 @@ const shuffleArray = (array: any[]) => {
 // Computed para filtrar productos según la categoría seleccionada y mezclarlos
 const filteredProducts = computed(() => {
   let products = productsStore.allProducts;
-
   if (selectedCategory.value !== 'Todas') {
     const selectedCategoryObject = categoriesStore.allCategories.find(
       (category) => category.name === selectedCategory.value
     );
-
     if (selectedCategoryObject) {
       products = products.filter(
         (product) => product.categoriaId === selectedCategoryObject.id
       );
     }
   }
-
   return shuffleArray(products);
 });
 </script>
@@ -83,12 +86,14 @@ const filteredProducts = computed(() => {
 <style lang="scss" scoped>
 @use '@/styles/variables' as *;
 
-/* 📌 Diseño General */
+/* Estilos para el bloque principal */
 .shop {
   width: 100%;
   max-width: 1200px;
+  margin: 0 auto;
   padding: $spacing-md;
   text-align: center;
+  margin-top: 10%;
 
   &__title {
     font-size: 2rem;
@@ -96,7 +101,6 @@ const filteredProducts = computed(() => {
     margin-bottom: $spacing-md;
   }
 
-  /* 📌 Filtro de categorías */
   &__filter {
     margin-bottom: $spacing-md;
     display: flex;
@@ -115,16 +119,25 @@ const filteredProducts = computed(() => {
       border: 1px solid $border-color;
       border-radius: $border-radius;
       cursor: pointer;
-      width: 250px;
+      width: 100%;
+      max-width: 250px;
       background: white;
     }
   }
 }
-/* 📌 **Títulos más grandes** */
-.section-title {
-  text-align: center;
-  font-size: 2.2rem;
-  font-weight: bold;
-  margin-bottom: 32px;
+
+/* Grid de productos */
+.products-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $spacing-md;
+  justify-items: center;
+}
+
+/* Media query para pantallas medianas */
+@media (min-width: 768px) {
+  .products-grid {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  }
 }
 </style>

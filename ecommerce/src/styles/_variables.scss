@@ -1,32 +1,105 @@
-// Colores principales
+// 📌 Importa las fuentes utilizadas
+@import url('https://fonts.googleapis.com/css2?family=Phudu:wght@300..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300..900&display=swap');
+
+// 🎨 **Paleta de colores principal**
 $primary-color: #06AA51;
-$primary-color-hover: rgba($primary-color, 0.9);
+$primary-color-hover: #059447;
 $secondary-color: #000000;
+$tertiary-color: #F4F4F4;
 $background-color: #ffffff;
 $text-color: #000000;
+$text-color-secondary: #555555;
+$highlight-color: #06AA51;
 $border-color: #333333;
+$color-borde: $border-color;
+$color-borde-icono: #666666;
+$color-fondo-menu: rgba(27, 27, 27, 0.79);
+$color-fondo-asientos: #101010;
+$color-pantalla: #d6d6c2;
 
-// Espaciados
+// ⚠️ **Estados de alerta**
+$error-color: #E63946;
+$success-color: #2A9D8F;
+$warning-color: #E9C46A;
+$info-color: #457B9D;
+
+// 💡 **Colores interactivos (botones, enlaces, etc.)**
+$color-boton-reserva: $primary-color;
+$color-boton-reserva-disabled: #555555;
+$color-hover-boton: #04893F;
+$button-text-color: #ffffff;
+$button-remove-color: red;
+$button-remove-hover: darkred;
+
+// 📏 **Espaciados y tamaños**
 $spacing-xs: 4px;
 $spacing-sm: 8px;
 $spacing-md: 16px;
 $spacing-lg: 24px;
 $spacing-xl: 32px;
+$spacing-xxl: 48px;
+$padding-xs: $spacing-xs;
+$padding-sm: $spacing-sm;
+$padding-md: $spacing-md;
+$padding-lg: $spacing-lg;
+$padding-xl: $spacing-xl;
 
-// Tipografía
-$font-family-primary: 'Roboto', sans-serif;
+// 🖋 **Tipografía**
+$font-family-primary: 'Phudu', sans-serif;
+$font-family-secondary: 'Roboto', sans-serif;
+$font-size-small: 14px;
 $font-size-base: 16px;
 $font-size-large: 18px;
-$font-size-small: 14px;
+$font-size-xl: 24px;
+$font-size-xxl: 32px;
+$font-size-h1: 2rem;
+$font-size-h1-large: 2.5rem;
+$line-height-base: 1.6;
+$line-height-tight: 1.3;
+$letter-spacing: 0.5px;
 
-// Breakpoints para responsive
+// 📱 **Breakpoints Responsive**
+$breakpoint-xs: 480px;
 $breakpoint-sm: 600px;
 $breakpoint-md: 960px;
 $breakpoint-lg: 1280px;
 $breakpoint-xl: 1920px;
 
-// Estilos de botones en formularios
-$form-button-radius: 8px;
+// 🎨 **Sombras y Bordes**
 $border-radius: 8px;
-$form-button-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+$border-radius-lg: 12px;
+$border-radius-circle: 50%;
 $box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+$box-shadow-lg: 0 4px 10px rgba(0, 0, 0, 0.15);
+$form-button-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+$button-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+$button-hover-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+
+// 🎛 **Botones**
+$form-button-radius: 8px;  // ✅ **Variable añadida**
+$button-padding: 10px 20px;
+$button-radius: 8px;
+$button-font-size: $font-size-base;
+
+// 🛒 **Carrito y Pedidos**
+$cart-item-background: #F4F4F4;
+$cart-item-border: #CCCCCC;
+$cart-total-price-size: 1.5rem;
+$cart-total-checkout-size: 1.2rem;
+$order-confirmed-color: #06AA51;
+$order-pending-color: #E9C46A;
+$order-cancelled-color: #E63946;
+
+// 🏁 **Animaciones**
+$transition-fast: 0.2s ease-in-out;
+$transition-normal: 0.3s ease-in-out;
+$transition-slow: 0.5s ease-in-out;
+
+// 🖼 **Estilos generales**
+$container-width: 1200px;
+$max-width: 100%;
+$input-border-radius: 5px;
+$input-padding: 10px;
+$input-border: 1px solid $border-color;
+$input-focus-border: 1px solid #078C52;

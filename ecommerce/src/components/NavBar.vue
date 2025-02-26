@@ -5,7 +5,7 @@
         <!-- Logo -->
         <v-col cols="3" md="2">
           <router-link to="/" class="navbar__logo">
-            <img src="/fotos/logoLMDecoracion.png" alt="Logo" class="navbar__logo-img" />
+            <LogoCanvasBlack class="navbar__logo-img" />
           </router-link>
         </v-col>
 
@@ -19,29 +19,30 @@
         <!-- Menú de navegación para pantallas grandes -->
         <v-col cols="6" class="d-none d-md-flex navbar__menu justify-center">
           <router-link to="/" class="navbar__menu-item">Home</router-link>
-          <router-link to="/shop" class="navbar__menu-item">Shop</router-link>
-          <router-link to="/about" class="navbar__menu-item">About</router-link>
+          <router-link to="/shop" class="navbar__menu-item">Tienda</router-link>
+          <router-link to="/guia" class="navbar__menu-item">Guia</router-link>
           <router-link to="/contacto" class="navbar__menu-item">Contacto</router-link>
         </v-col>
 
         <!-- Iconos de usuario y carrito en desktop -->
         <v-col cols="3" class="d-none d-md-flex justify-end navbar__icons">
-          <template v-if="store.isAuthenticated">
-            <!-- Mostrar solo el nombre del usuario -->
-            <span class="navbar__username">{{ store.user.nombre }}</span>
+          <template v-if="store.isAuthenticated && store.user">
+            <span class="navbar__username">Bienvenido, {{ store.user.nombre }}</span>
             <v-btn icon class="navbar__icon" @click="logout">
               <v-icon>mdi-logout</v-icon>
             </v-btn>
           </template>
           <template v-else>
-            <router-link to="/account" class="navbar__icon" @click="redirectToLogin">
+            <router-link to="/login" class="navbar__icon" @click="redirectToLogin">
               <v-icon>mdi-account</v-icon>
+              <span class="navbar__login-text">Iniciar Sesión</span>
             </router-link>
           </template>
-          <!-- Ícono del carrito siempre visible -->
           <router-link to="/cart" class="navbar__icon navbar__cart">
             <v-icon>mdi-cart</v-icon>
-            <span v-if="cartStore.totalItems > 0" class="cart-badge">{{ cartStore.totalItems }}</span>
+            <span v-if="cartStore.totalItems > 0" class="cart-badge">
+              {{ cartStore.totalItems }}
+            </span>
           </router-link>
         </v-col>
       </v-row>
@@ -51,50 +52,61 @@
   <!-- Drawer para menú móvil -->
   <v-navigation-drawer v-model="drawer" app temporary right class="navbar__drawer">
     <v-list>
-      <v-list-item to="/" class="navbar__drawer-item" @click="drawer = false">Home</v-list-item>
-      <v-list-item to="/shop" class="navbar__drawer-item" @click="drawer = false">Shop</v-list-item>
-      <v-list-item to="/about" class="navbar__drawer-item" @click="drawer = false">About</v-list-item>
-      <v-list-item to="/contacto" class="navbar__drawer-item" @click="drawer = false">Contacto</v-list-item>
+      <!-- Mostramos el nombre del usuario si está autenticado -->
+      <v-list-item v-if="store.isAuthenticated && store.user">
+        <v-list-item-content>
+          <v-list-item-title class="navbar__drawer-username">
+            Bienvenido, {{ store.user.nombre }}
+          </v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
+      <v-list-item to="/" class="navbar__drawer-item" @click="drawer = false">
+        Home
+      </v-list-item>
+      <v-list-item to="/shop" class="navbar__drawer-item" @click="drawer = false">
+        Shop
+      </v-list-item>
+      <!-- Ruta "guia" si la tienes definida; sino, elimínala -->
+      <v-list-item to="/guia" class="navbar__drawer-item" @click="drawer = false">
+        Guia
+      </v-list-item>
+      <v-list-item to="/contacto" class="navbar__drawer-item" @click="drawer = false">
+        Contacto
+      </v-list-item>
       <v-divider></v-divider>
-      <v-list-item
-        v-if="store.isAuthenticated"
-        class="navbar__drawer-item"
-        @click="handleLogout"
-      >
+      <v-list-item v-if="store.isAuthenticated" class="navbar__drawer-item" @click="handleLogout">
         <v-icon left>mdi-logout</v-icon> Cerrar Sesión
       </v-list-item>
       <v-list-item v-else class="navbar__drawer-item" @click="redirectToLogin">
-        <v-icon left>mdi-account</v-icon> Mi Cuenta
+        <v-icon left>mdi-account</v-icon> Iniciar Sesión
       </v-list-item>
       <v-list-item to="/cart" class="navbar__drawer-item" @click="drawer = false">
         <v-icon left>mdi-cart</v-icon> Carrito
-        <span v-if="cartStore.totalItems > 0" class="cart-badge">{{ cartStore.totalItems }}</span>
+        <span v-if="cartStore.totalItems > 0" class="cart-badge">
+          {{ cartStore.totalItems }}
+        </span>
       </v-list-item>
     </v-list>
   </v-navigation-drawer>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useUserStore } from '@/stores/userStore';
 import { useCartStore } from '@/stores/cartStore';
+import LogoCanvasBlack from '@/components/LogoCanvasBlack.vue';
 
 const drawer = ref(false);
 const router = useRouter();
 const store = useUserStore();
 const cartStore = useCartStore();
 
-onMounted(() => {
-  console.log('User en Navbar:', store.user);
-});
-
 const redirectToLogin = () => {
   router.push('/login');
 };
 
 const logout = () => {
-  console.log('Cerrando sesión para:', store.user);
   store.logout();
   router.push('/login');
 };
@@ -122,12 +134,6 @@ const handleLogout = () => {
     align-items: center;
     text-decoration: none;
     color: $text-color;
-
-    &-img {
-      height: 45px;
-      margin-right: $spacing-sm;
-      border-radius: $border-radius;
-    }
   }
 
   &__menu {
@@ -135,19 +141,18 @@ const handleLogout = () => {
     flex-direction: column;
     gap: 20px;
     align-items: center;
+  }
 
-    &-item {
-      text-decoration: none;
-      color: $text-color;
-      font-family: $font-family-primary;
-      font-size: 1rem;
-      font-weight: 600;
-      letter-spacing: 0.5px;
-      transition: color 0.3s ease-in-out;
-
-      &:hover {
-        color: $primary-color;
-      }
+  &__menu-item {
+    text-decoration: none;
+    color: $text-color;
+    font-family: $font-family-primary;
+    font-size: 25px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    transition: color 0.3s ease-in-out;
+    &:hover {
+      color: $primary-color;
     }
   }
 
@@ -156,7 +161,7 @@ const handleLogout = () => {
     align-items: center;
     gap: 1rem;
 
-    &-username {
+    .navbar__username {
       margin-right: $spacing-sm;
       font-weight: bold;
       color: $text-color;
@@ -167,84 +172,38 @@ const handleLogout = () => {
     position: relative;
     color: #000 !important;
     transition: transform 0.2s ease-in-out;
-
     &:hover {
       transform: scale(1.1);
       color: $primary-color;
     }
   }
 
+  &__login-text {
+    margin-left: 0.5rem;
+    font-size: 0.9rem;
+    color: $text-color;
+  }
+
   &__cart {
     position: relative;
-    display: flex;
-    align-items: center;
-
-    &-badge {
-      position: absolute;
-      top: -5px;
-      right: -10px;
-      background: red;
-      color: white;
-      font-size: 12px;
-      font-weight: bold;
-      padding: 4px 6px;
-      border-radius: 50%;
-      min-width: 20px;
-      text-align: center;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
   }
-
-  &__drawer {
-    &-menu {
-      display: flex;
-      flex-direction: column;
-      gap: $spacing-md;
-      padding: $spacing-md;
-
-      &-item {
-        text-decoration: none;
-        color: $text-color;
-        font-size: $font-size-base;
-        font-weight: bold;
-        padding: $spacing-sm;
-        transition: background-color 0.3s ease-in-out;
-
-        &:hover {
-          background-color: rgba(0, 0, 0, 0.05);
-        }
-      }
-    }
-  }
-  
 }
 
-:deep(.v-navigation-drawer__content) {
+.v-navigation-drawer .v-list {
   margin-top: 10%;
 }
 
-/* 📱 Mobile First: se ajusta para escritorio */
-@media (min-width: 768px) {
-  .navbar {
-    flex-direction: row;
-    padding: $spacing-md 0;
-
-    &__menu {
-      display: flex;
-      flex-direction: row;
-      gap: 60px;
-    }
-
-    &__cart-badge {
-      top: -8px;
-      right: -12px;
-      font-size: 12px;
-      padding: 3px 6px;
-      min-width: 18px;
-    }
-  }
+.cart-badge {
+  position: absolute;
+  top: -5px;
+  right: -10px;
+  background: red;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 4px 6px;
+  border-radius: 50%;
+  min-width: 20px;
+  text-align: center;
 }
-
 </style>
