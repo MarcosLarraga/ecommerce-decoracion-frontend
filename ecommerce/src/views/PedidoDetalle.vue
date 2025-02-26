@@ -2,20 +2,26 @@
   <div class="pedido-detalle">
     <h1 class="pedido-detalle__title">Detalles del Pedido</h1>
 
-    <div class="pedido-detalle__info">
-      <p><strong>ID del Pedido:</strong> {{ pedidoStore.pedido?.id }}</p>
-      <p><strong>Fecha:</strong> {{ new Date(pedidoStore.pedido?.fechaPedido).toLocaleString() }}</p>
-      <p><strong>Total:</strong> {{ pedidoStore.pedido?.total.toFixed(2) }} €</p>
-      <p><strong>Usuario:</strong> {{ pedidoStore.pedido?.usuario?.nombre }}</p>
-      <p><strong>Correo:</strong> {{ pedidoStore.pedido?.usuario?.email }}</p>
-      <p><strong>Teléfono:</strong> {{ pedidoStore.pedido?.usuario?.telefono }}</p>
-      <p><strong>Dirección:</strong> {{ pedidoStore.pedido?.usuario?.direccion }}</p>
+    <!-- Datos del Pedido -->
+    <div class="pedido-detalle__info" v-if="detallePedidoStore.detallesPedido.length > 0 && detallePedidoStore.usuario">
+      <p><strong>ID del Pedido:</strong> {{ detallePedidoStore.detallesPedido[0].pedido.id }}</p>
+      <p><strong>Fecha:</strong> {{ new Date(detallePedidoStore.detallesPedido[0].pedido.fechaPedido).toLocaleString() }}</p>
+      <p><strong>Total:</strong> {{ detallePedidoStore.detallesPedido[0].pedido.total.toFixed(2) }} €</p>
+
+      <!-- Datos del Usuario -->
+      <h2 class="pedido-detalle__subtitle">Datos del Usuario</h2>
+      <p><strong>Nombre:</strong> {{ detallePedidoStore.usuario.nombre }}</p>
+      <p><strong>Correo:</strong> {{ detallePedidoStore.usuario.email }}</p>
+      <p><strong>Teléfono:</strong> {{ detallePedidoStore.usuario.telefono }}</p>
+      <p><strong>Dirección:</strong> {{ detallePedidoStore.usuario.direccion }}</p>
     </div>
 
+    <!-- Lista de Productos -->
     <h2 class="pedido-detalle__subtitle">Productos</h2>
     <div class="pedido-detalle__items" v-if="detallePedidoStore.detallesPedido.length > 0">
       <div class="pedido-detalle__item" v-for="item in detallePedidoStore.detallesPedido" :key="item.id">
-        <p><strong>Producto:</strong> {{ item.productoId }}</p>
+        <p><strong>Producto:</strong> {{ item.producto.nombre }}</p>
+        <p><strong>Categoría:</strong> {{ item.producto.categoria.nombre }}</p>
         <p><strong>Cantidad:</strong> {{ item.cantidad }}</p>
         <p><strong>Precio Unitario:</strong> {{ item.precioUnitario.toFixed(2) }} €</p>
       </div>
@@ -23,115 +29,23 @@
   </div>
 </template>
 
-
 <script setup lang="ts">
 import { onMounted } from 'vue';
-import { usePedidoStore } from '@/stores/pedidoStore';
 import { useDetallePedidoStore } from '@/stores/detallePedidoStore';
 import { useRoute } from 'vue-router';
 
-const pedidoStore = usePedidoStore();
 const detallePedidoStore = useDetallePedidoStore();
 const route = useRoute();
 const pedidoId = Number(route.params.id);
 
 onMounted(async () => {
-  await pedidoStore.fetchPedidoById(pedidoId);
   await detallePedidoStore.fetchDetallesPedido(pedidoId);
 });
 </script>
+
 <style lang="scss" scoped>
 @use '@/styles/variables' as *;
 
-.pedido {
-  width: 90%;
-  max-width: 700px;
-  margin: 50px auto;
-  background-color: $background-color;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: $box-shadow;
-  color: $text-color;
-  font-family: $font-family-secondary;
-
-  &__title {
-    text-align: center;
-    font-size: 2rem;
-    margin-bottom: 20px;
-    color: $primary-color;
-    font-family: $font-family-primary;
-  }
-
-  &__form {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-  }
-
-  label {
-    font-weight: bold;
-  }
-
-  input {
-    padding: 10px;
-    border: 1px solid $color-borde;
-    border-radius: 5px;
-    font-size: 1rem;
-  }
-
-  &__items {
-    margin-top: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  &__item {
-    display: flex;
-    align-items: center;
-    background: #f8f8f8;
-    padding: 10px;
-    border-radius: 8px;
-
-    &-image {
-      width: 60px;
-      height: 60px;
-      object-fit: cover;
-      border-radius: 8px;
-    }
-
-    &-info {
-      padding-left: 10px;
-    }
-  }
-
-  &__total {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: $primary-color;
-    margin-top: 15px;
-    text-align: right;
-  }
-
-  &__confirm-btn {
-    margin-top: 20px;
-    padding: 10px;
-    font-size: 1.2rem;
-    font-weight: bold;
-    background: $primary-color;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background 0.3s ease-in-out;
-
-    &:hover {
-      background: $color-hover-boton;
-    }
-  }
-}
-
-/* 🔹 Detalle del Pedido */
 .pedido-detalle {
   width: 90%;
   max-width: 800px;
@@ -155,6 +69,13 @@ onMounted(async () => {
     background: #222;
     border-radius: 8px;
     margin-bottom: 20px;
+    color: white;
+  }
+
+  &__subtitle {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-top: 20px;
   }
 
   &__items {
@@ -164,22 +85,10 @@ onMounted(async () => {
   }
 
   &__item {
-    display: flex;
-    align-items: center;
     background: #f8f8f8;
     padding: 10px;
     border-radius: 8px;
-
-    &-image {
-      width: 60px;
-      height: 60px;
-      object-fit: cover;
-      border-radius: 8px;
-    }
-
-    &-info {
-      padding-left: 10px;
-    }
+    border: 1px solid $color-borde;
   }
 }
 </style>

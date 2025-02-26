@@ -54,7 +54,17 @@ const confirmarPedido = async () => {
   }
 
   try {
-    const pedidoId = await pedidoStore.crearPedidoConDetalles(userStore.user.id, cartStore.cart, cartStore.cartTotal);
+    // 🔹 Primero actualizamos el teléfono y la dirección
+    await userStore.updateUserPhoneAndAddress(telefono.value, direccion.value);
+
+    // 🔹 Luego creamos el pedido
+    const pedidoId = await pedidoStore.crearPedidoConDetalles(
+      userStore.user.id, 
+      cartStore.cart, 
+      cartStore.cartTotal
+    );
+
+    // 🔹 Después de crear el pedido, agregamos los detalles
     await detallePedidoStore.agregarDetallesPedido(pedidoId, cartStore.cart);
 
     cartStore.clearCart();

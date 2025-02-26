@@ -33,12 +33,20 @@
 
 <script setup lang="ts">
 import { useCartStore } from '@/stores/cartStore';
+import { useUserStore } from '@/stores/userStore'; // 🔹 Importamos el store de usuario
 import { useRouter } from 'vue-router';
 
 const cartStore = useCartStore();
+const userStore = useUserStore(); // 🔹 Obtenemos el estado del usuario
 const router = useRouter();
 
 const irAConfirmacion = () => {
+  if (!userStore.isAuthenticated) { // 🔹 Verificamos si el usuario está autenticado
+    alert("Debes iniciar sesión para continuar con el pedido.");
+    router.push("/login"); // 🔹 Redirigir a la página de login si no ha iniciado sesión
+    return;
+  }
+
   router.push("/pedido-confirmacion");
 };
 </script>
