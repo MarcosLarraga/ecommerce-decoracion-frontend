@@ -94,7 +94,7 @@ const goToCategory = (categoryName: string) => {
 
   /* Carrusel */
   &__carousel {
-    /* Puedes agregar estilos adicionales aquí */
+    
   }
   
   &__carousel-sheet {
