@@ -7,7 +7,11 @@
       <label for="categorySelect" class="shop__filter-label">
         Filtrar por categoría:
       </label>
-      <select id="categorySelect" v-model="selectedCategory" class="shop__filter-select">
+      <select
+        id="categorySelect"
+        v-model="selectedCategory"
+        class="shop__filter-select"
+      >
         <option value="Todas">Todas</option>
         <option
           v-for="category in categoriesStore.allCategories"
@@ -19,8 +23,13 @@
       </select>
     </div>
 
+    <!-- si no hay productos encontrados -->
+    <p v-if="filteredProducts.length === 0" class="no-results">
+      No se encontraron productos de "<strong>{{ route.query.search }}</strong>"
+    </p>
+
     <!-- Lista de productos -->
-    <div class="products-grid">
+    <div v-else class="products-grid">
       <ProductCard
         v-for="product in filteredProducts"
         :key="product.id"
@@ -41,34 +50,52 @@ const productsStore = useProductsStore();
 const categoriesStore = useCategoriesStore();
 const route = useRoute();
 
+// Categoría seleccionada
 const selectedCategory = ref<string>('Todas');
 
+// Al montar el componente, cargamos categorías y verificamos búsqueda
 onMounted(async () => {
-  await productsStore.fetchProducts();
   await categoriesStore.fetchCategories();
+
+  const searchParam = route.query.search ? String(route.query.search) : '';
+  if (searchParam) {
+    await productsStore.searchProducts(searchParam);
+  } else {
+    await productsStore.fetchProducts();
+  }
 
   if (route.query.category) {
     selectedCategory.value = String(route.query.category);
   }
 });
 
-watch(() => route.query.category, (newCategory) => {
-  if (newCategory) {
-    selectedCategory.value = String(newCategory);
+// Detectar cambios en la URL para actualizar la búsqueda y categoría
+watch(
+  () => route.query.search,
+  async (newSearch) => {
+    if (newSearch) {
+      await productsStore.searchProducts(String(newSearch));
+    } else {
+      await productsStore.fetchProducts();
+    }
   }
-});
+);
 
-// Función para mezclar productos aleatoriamente
-const shuffleArray = (array: any[]) => {
-  return array
-    .map((value) => ({ value, sort: Math.random() }))
-    .sort((a, b) => a.sort - b.sort)
-    .map(({ value }) => value);
-};
+watch(
+  () => route.query.category,
+  (newCategory) => {
+    if (newCategory) {
+      selectedCategory.value = String(newCategory);
+    } else {
+      selectedCategory.value = 'Todas';
+    }
+  }
+);
 
-// Computed para filtrar productos según la categoría seleccionada y mezclarlos
+// Computed: filtra los productos según la categoría seleccionada y los mezcla
 const filteredProducts = computed(() => {
   let products = productsStore.allProducts;
+  
   if (selectedCategory.value !== 'Todas') {
     const selectedCategoryObject = categoriesStore.allCategories.find(
       (category) => category.name === selectedCategory.value
@@ -79,50 +106,61 @@ const filteredProducts = computed(() => {
       );
     }
   }
-  return shuffleArray(products);
+  return products;
 });
 </script>
 
 <style lang="scss" scoped>
 @use '@/styles/variables' as *;
 
-/* Estilos para el bloque principal */
+/* Ajuste del espacio superior */
 .shop {
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
   padding: $spacing-md;
   text-align: center;
-  margin-top: 10%;
+  margin-top: 50px; /* ✅ Separación equilibrada */
+}
 
-  &__title {
-    font-size: 2rem;
+/* ✅ Estilos del mensaje de "sin resultados" */
+.no-results {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #ff0000; /* Rojo para destacar */
+  margin-top: 20px;
+}
+
+/* Estilo del título */
+.shop__title {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: $spacing-md;
+  margin-top: 0 !important;
+}
+
+/* Estilos para el filtro de categorías */
+.shop__filter {
+  margin-bottom: $spacing-md;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-sm;
+
+  &-label {
+    font-size: $font-size-base;
     font-weight: bold;
-    margin-bottom: $spacing-md;
   }
 
-  &__filter {
-    margin-bottom: $spacing-md;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: $spacing-sm;
-
-    &-label {
-      font-size: $font-size-base;
-      font-weight: bold;
-    }
-
-    &-select {
-      padding: $spacing-xs;
-      font-size: $font-size-base;
-      border: 1px solid $border-color;
-      border-radius: $border-radius;
-      cursor: pointer;
-      width: 100%;
-      max-width: 250px;
-      background: white;
-    }
+  &-select {
+    padding: $spacing-xs;
+    font-size: $font-size-base;
+    border: 1px solid $border-color;
+    border-radius: $border-radius;
+    cursor: pointer;
+    width: 100%;
+    max-width: 250px;
+    background: white;
   }
 }
 

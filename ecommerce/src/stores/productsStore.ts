@@ -7,7 +7,7 @@ interface ProductoDTO {
   precio: number;
   descripcion: string;
   urlImagen: string;
-  categoriaId: number; // Agregado para filtrar por categoría
+  categoriaId: number; // Para filtrar por categoría
 }
 
 export const useProductsStore = defineStore('products', {
@@ -29,7 +29,6 @@ export const useProductsStore = defineStore('products', {
       console.log("⏳ [fetchProducts] Cargando productos...");
 
       try {
-        // Nueva URL del endpoint sin "/dto"
         const response = await fetch('http://localhost:5162/api/Producto', {
           method: 'GET',
           headers: {
@@ -50,8 +49,8 @@ export const useProductsStore = defineStore('products', {
 
         console.log("✅ [fetchProducts] Productos obtenidos correctamente:", data);
 
-        this.allProducts = data; // Guardamos los productos en el estado
-        this.getRandomProducts(); // Seleccionamos productos aleatorios
+        this.allProducts = data;
+        this.getRandomProducts(); // Selecciona productos aleatorios
 
       } catch (error) {
         this.error = error instanceof Error ? error.message : '❌ Error desconocido al obtener productos';
@@ -59,7 +58,6 @@ export const useProductsStore = defineStore('products', {
 
       } finally {
         this.loading = false;
-        console.log("✅ [fetchProducts] Proceso finalizado.");
       }
     },
 
@@ -92,7 +90,7 @@ export const useProductsStore = defineStore('products', {
 
         console.log(`✅ [fetchProductsByCategory] Productos de la categoría ${categoriaId} obtenidos:`, data);
 
-        this.filteredProducts = data; // Guardamos los productos filtrados en el estado
+        this.filteredProducts = data;
 
       } catch (error) {
         this.error = error instanceof Error ? error.message : '❌ Error desconocido al obtener productos';
@@ -100,12 +98,54 @@ export const useProductsStore = defineStore('products', {
 
       } finally {
         this.loading = false;
-        console.log("✅ [fetchProductsByCategory] Proceso finalizado.");
       }
     },
 
     /**
-     * Selecciona 5 productos aleatorios de la lista obtenida de la API.
+     * Realiza la búsqueda de productos por nombre.
+     */
+    async searchProducts(query: string) {
+      this.loading = true;
+      this.error = null;
+      console.log(`⏳ [searchProducts] Buscando productos con query: "${query}"...`);
+
+      try {
+        const response = await fetch(`http://localhost:5162/api/Producto/search?query=${encodeURIComponent(query)}`, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error(`❌ Error HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        const data: ProductoDTO[] = await response.json();
+
+        if (!Array.isArray(data) || data.length === 0) {
+          console.warn(`🔍 No se encontraron productos para: "${query}"`);
+          this.allProducts = []; // ❌ Vacía la lista para que el mensaje "No hay productos" se muestre
+          return;
+        }
+
+        console.log("✅ [searchProducts] Productos encontrados:", data);
+
+        this.allProducts = data;
+        this.getRandomProducts(); // Actualiza los productos aleatorios si lo necesitas
+
+      } catch (error) {
+        this.error = error instanceof Error ? error.message : '❌ Error desconocido al buscar productos';
+        console.error("⚠️ [searchProducts] Error:", this.error);
+
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    /**
+     * Selecciona 4 productos aleatorios de la lista obtenida de la API.
      */
     getRandomProducts() {
       if (this.allProducts.length === 0) {

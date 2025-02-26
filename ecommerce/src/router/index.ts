@@ -11,22 +11,24 @@ import LoginView from '@/views/LoginView.vue';
 import RegisterView from '@/views/RegisterView.vue';
 import ForgotPasswordView from '@/views/ForgotPasswordView.vue';
 import ResetPasswordView from '@/views/ResetPasswordView.vue';
+import SobreNosotrosView from '@/views/SobreNosotrosView.vue'; // Importa la nueva vista
 import ConfirmarPedido from '@/views/ConfirmarPedido.vue';
 import PedidoDetalle from '@/views/PedidoDetalle.vue';
 
 const routes = [
-  { path: '/', component: HomeView },
-  { path: '/shop', component: ProductsView },
-  { path: '/cart', component: CartView },
+  { path: '/', name: 'Home', component: HomeView },
+  { path: '/shop', name: 'Products', component: ProductsView },
+  { path: '/cart', name: 'Cart', component: CartView },
   { path: '/pedido-confirmacion', component: ConfirmarPedido },
   { path: '/pedido-detalle/:id', component: PedidoDetalle, props: true }, // Se añade la ruta de detalle de pedido
-  { path: '/guia', component: GuiaView },
-  { path: '/contacto', component: ContactView },
-  { path: '/product/:id', component: ProductDetailView, props: true },
-  { path: '/login', component: LoginView },
-  { path: '/register', component: RegisterView },
-  { path: '/forgot-password', component: ForgotPasswordView },
-  { path: '/reset-password', component: ResetPasswordView }
+  { path: '/guia', name: 'Guia', component: GuiaView },
+  { path: '/contacto', name: 'Contact', component: ContactView },
+  { path: '/sobre-nosotros', name: 'SobreNosotros', component: SobreNosotrosView }, // Nueva ruta añadida
+  { path: '/product/:id', name: 'ProductDetail', component: ProductDetailView, props: true },
+  { path: '/login', name: 'Login', component: LoginView },
+  { path: '/register', name: 'Register', component: RegisterView },
+  { path: '/forgot-password', name: 'ForgotPassword', component: ForgotPasswordView },
+  { path: '/reset-password', name: 'ResetPassword', component: ResetPasswordView }
 ];
 
 const router = createRouter({
