@@ -5,7 +5,6 @@ import SoporteInfo from '@/components/SoporteInfo.vue';
 
 <template>
   <v-container fluid class="pa-0">
-    <!-- Hero de la página -->
     <PageHero title="Sobre Nosotros" imageSrc="/fotos/PageHero.jpg" />
 
     <v-container class="about__container">
@@ -13,8 +12,8 @@ import SoporteInfo from '@/components/SoporteInfo.vue';
         <v-col cols="12" md="10" lg="6">
           <h2 class="about__title">Nuestra Historia</h2>
           <p class="about__text">
-            En nuestra tienda, nos apasiona la decoración y el diseño de interiores. Desde nuestros inicios, hemos trabajado 
-            para ofrecer productos únicos que reflejen la personalidad y el estilo de nuestros clientes.
+            Desde nuestros inicios, nos hemos dedicado a ofrecer productos de decoración únicos y de alta calidad. Nuestra 
+            pasión por el diseño de interiores nos llevó a crear una tienda donde cada pieza tiene una historia y un propósito.
           </p>
           
           <h2 class="about__title">Nuestra Misión</h2>
@@ -22,13 +21,29 @@ import SoporteInfo from '@/components/SoporteInfo.vue';
             Buscamos transformar cada hogar en un espacio acogedor y con estilo. Creemos que los pequeños detalles marcan la 
             diferencia y queremos ayudarte a encontrar esos complementos que harán de tu casa un hogar.
           </p>
-
+          
+          <h2 class="about__title">Nuestros Valores</h2>
+          <p class="about__text">
+            - Calidad: Seleccionamos productos cuidadosamente para garantizar que sean duraderos y de buen gusto.<br>
+            - Sostenibilidad: Nos comprometemos con materiales ecológicos y procesos responsables con el medio ambiente.<br>
+            - Innovación: Siempre buscamos tendencias y diseños que aporten un toque único a tu hogar.<br>
+            - Atención al Cliente: Nos preocupamos por cada detalle de tu compra y brindamos una atención personalizada.<br>
+          </p>
+          
+          <h2 class="about__title">Nuestro Equipo</h2>
+          <p class="about__text">
+            Contamos con un equipo de expertos en diseño de interiores y decoración que trabajan cada día para ofrecerte 
+            los mejores productos y asesoramiento personalizado. Nos enorgullece formar parte de tu hogar a través de 
+            nuestros productos.
+          </p>
+          
           <h2 class="about__title">¿Por qué elegirnos?</h2>
           <p class="about__text">
-            Productos seleccionados cuidadosamente <br>
-            Envíos rápidos y seguros <br>
-            Atención al cliente personalizada <br>
-            Materiales sostenibles y ecológicos <br>
+            - Productos seleccionados cuidadosamente <br>
+            - Envíos rápidos y seguros <br>
+            - Atención al cliente personalizada <br>
+            - Materiales sostenibles y ecológicos <br>
+            - Diseños exclusivos y en tendencia <br>
           </p>
         </v-col>
       </v-row>
