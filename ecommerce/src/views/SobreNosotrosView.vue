@@ -6,7 +6,7 @@ import SoporteInfo from '@/components/SoporteInfo.vue';
 <template>
   <v-container fluid class="pa-0">
     <!-- Hero de la página -->
-    <PageHero title="Sobre Nosotros" :imageSrc="heroImage" />
+    <PageHero title="Sobre Nosotros" imageSrc="/fotos/PageHero.jpg" />
 
     <v-container class="about__container">
       <v-row justify="center">
