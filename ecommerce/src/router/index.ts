@@ -1,5 +1,6 @@
-// src/router/index.ts
 import { createRouter, createWebHistory } from 'vue-router';
+
+// Importación de vistas
 import HomeView from '@/views/HomeView.vue';
 import ProductsView from '@/views/ProductsView.vue';
 import CartView from '@/views/CartView.vue';
@@ -10,13 +11,15 @@ import LoginView from '@/views/LoginView.vue';
 import RegisterView from '@/views/RegisterView.vue';
 import ForgotPasswordView from '@/views/ForgotPasswordView.vue';
 import ResetPasswordView from '@/views/ResetPasswordView.vue';
-import PedidoConfirmacion from '@/views/PedidoConfirmacion.vue';
+import ConfirmarPedido from '@/views/ConfirmarPedido.vue';
+import PedidoDetalle from '@/views/PedidoDetalle.vue';
 
 const routes = [
   { path: '/', component: HomeView },
   { path: '/shop', component: ProductsView },
   { path: '/cart', component: CartView },
-  { path: '/pedido-confirmacion', component: PedidoConfirmacion },
+  { path: '/pedido-confirmacion', component: ConfirmarPedido },
+  { path: '/pedido-detalle/:id', component: PedidoDetalle, props: true }, // Se añade la ruta de detalle de pedido
   { path: '/guia', component: GuiaView },
   { path: '/contacto', component: ContactView },
   { path: '/product/:id', component: ProductDetailView, props: true },

@@ -1,45 +1,71 @@
 <template>
-  <div class="pedido-detalle">
-    <h1 class="pedido-detalle__title">Detalles del Pedido</h1>
+  <div class="pedido">
+    <h1 class="pedido__title">Confirmar Pedido</h1>
 
-    <div class="pedido-detalle__info">
-      <p><strong>ID del Pedido:</strong> {{ pedidoStore.pedido?.id }}</p>
-      <p><strong>Fecha:</strong> {{ new Date(pedidoStore.pedido?.fechaPedido).toLocaleString() }}</p>
-      <p><strong>Total:</strong> {{ pedidoStore.pedido?.total.toFixed(2) }} €</p>
-      <p><strong>Usuario:</strong> {{ pedidoStore.pedido?.usuario?.nombre }}</p>
-      <p><strong>Correo:</strong> {{ pedidoStore.pedido?.usuario?.email }}</p>
-      <p><strong>Teléfono:</strong> {{ pedidoStore.pedido?.usuario?.telefono }}</p>
-      <p><strong>Dirección:</strong> {{ pedidoStore.pedido?.usuario?.direccion }}</p>
-    </div>
+    <p><strong>Correo:</strong> {{ userStore.user.email }}</p>
 
-    <h2 class="pedido-detalle__subtitle">Productos</h2>
-    <div class="pedido-detalle__items" v-if="detallePedidoStore.detallesPedido.length > 0">
-      <div class="pedido-detalle__item" v-for="item in detallePedidoStore.detallesPedido" :key="item.id">
-        <p><strong>Producto:</strong> {{ item.productoId }}</p>
-        <p><strong>Cantidad:</strong> {{ item.cantidad }}</p>
-        <p><strong>Precio Unitario:</strong> {{ item.precioUnitario.toFixed(2) }} €</p>
+    <form class="pedido__form" @submit.prevent="confirmarPedido">
+      <label>Dirección:</label>
+      <input v-model="direccion" type="text" required />
+
+      <label>Teléfono:</label>
+      <input v-model="telefono" type="tel" required />
+
+      <h2 class="pedido__subtitle">Productos en el pedido</h2>
+      <div class="pedido__items" v-if="cartStore.cart.length > 0">
+        <div class="pedido__item" v-for="item in cartStore.cart" :key="item.id">
+          <img :src="item.image" :alt="item.name" class="pedido__item-image" />
+          <div class="pedido__item-info">
+            <h3>{{ item.name }}</h3>
+            <p>{{ item.price.toFixed(2) }} €</p>
+            <p>Cantidad: {{ item.quantity }}</p>
+          </div>
+        </div>
       </div>
-    </div>
+
+      <h2 class="pedido__total">Total: {{ cartStore.cartTotal.toFixed(2) }} €</h2>
+
+      <button type="submit" class="pedido__confirm-btn">Confirmar Pedido</button>
+    </form>
   </div>
 </template>
 
-
 <script setup lang="ts">
-import { onMounted } from 'vue';
+import { ref } from 'vue';
+import { useUserStore } from '@/stores/userStore';
 import { usePedidoStore } from '@/stores/pedidoStore';
 import { useDetallePedidoStore } from '@/stores/detallePedidoStore';
-import { useRoute } from 'vue-router';
+import { useCartStore } from '@/stores/cartStore';
+import { useRouter } from 'vue-router';
 
+const userStore = useUserStore();
 const pedidoStore = usePedidoStore();
 const detallePedidoStore = useDetallePedidoStore();
-const route = useRoute();
-const pedidoId = Number(route.params.id);
+const cartStore = useCartStore();
+const router = useRouter();
 
-onMounted(async () => {
-  await pedidoStore.fetchPedidoById(pedidoId);
-  await detallePedidoStore.fetchDetallesPedido(pedidoId);
-});
+const direccion = ref(userStore.user.direccion || '');
+const telefono = ref(userStore.user.telefono || '');
+
+const confirmarPedido = async () => {
+  if (cartStore.cart.length === 0) {
+    alert("No puedes realizar un pedido sin productos en el carrito.");
+    return;
+  }
+
+  try {
+    const pedidoId = await pedidoStore.crearPedidoConDetalles(userStore.user.id, cartStore.cart, cartStore.cartTotal);
+    await detallePedidoStore.agregarDetallesPedido(pedidoId, cartStore.cart);
+
+    cartStore.clearCart();
+    router.push(`/pedido-detalle/${pedidoId}`);
+  } catch (error) {
+    console.error("Error al confirmar el pedido:", error);
+    alert(error.message);
+  }
+};
 </script>
+
 <style lang="scss" scoped>
 @use '@/styles/variables' as *;
 
