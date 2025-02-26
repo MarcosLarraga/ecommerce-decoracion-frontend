@@ -10,6 +10,7 @@ import LoginView from '@/views/LoginView.vue';
 import RegisterView from '@/views/RegisterView.vue';
 import ForgotPasswordView from '@/views/ForgotPasswordView.vue';
 import ResetPasswordView from '@/views/ResetPasswordView.vue';
+import SobreNosotrosView from '@/views/SobreNosotrosView.vue'; // Importa la nueva vista
 
 const routes = [
   { path: '/', name: 'Home', component: HomeView },
@@ -17,6 +18,7 @@ const routes = [
   { path: '/cart', name: 'Cart', component: CartView },
   { path: '/guia', name: 'Guia', component: GuiaView },
   { path: '/contacto', name: 'Contact', component: ContactView },
+  { path: '/sobre-nosotros', name: 'SobreNosotros', component: SobreNosotrosView }, // Nueva ruta añadida
   { path: '/product/:id', name: 'ProductDetail', component: ProductDetailView, props: true },
   { path: '/login', name: 'Login', component: LoginView },
   { path: '/register', name: 'Register', component: RegisterView },

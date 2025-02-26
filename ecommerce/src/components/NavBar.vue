@@ -11,15 +11,16 @@
         </v-col>
 
         <!-- Menú de navegación (Texto) -->
-        <v-col md="6" class="d-flex navbar__menu justify-center">
+        <v-col md="7" class="d-flex navbar__menu justify-center">
           <router-link to="/" class="navbar__menu-item">Home</router-link>
           <router-link to="/shop" class="navbar__menu-item">Tienda</router-link>
-          <router-link to="/guia" class="navbar__menu-item">Guia</router-link>
+          <router-link to="/guia" class="navbar__menu-item">Guía</router-link>
           <router-link to="/contacto" class="navbar__menu-item">Contacto</router-link>
+          <router-link to="/sobre-nosotros" class="navbar__menu-item">Sobre Nosotros</router-link>
         </v-col>
 
         <!-- Sección de SearchBar e Iconos -->
-        <v-col md="4" class="d-flex justify-end align-center">
+        <v-col md="3" class="d-flex justify-end align-center">
           <div class="navbar__search-inline">
             <SearchBar />
           </div>
@@ -72,15 +73,8 @@
   </v-app-bar>
 
   <!-- Drawer para móvil -->
-  <v-navigation-drawer
-    v-model="drawer"
-    app
-    temporary
-    right
-    class="navbar__drawer"
-  >
+  <v-navigation-drawer v-model="drawer" app temporary right class="navbar__drawer">
     <v-list>
-      <!-- Nombre del usuario si está autenticado -->
       <v-list-item v-if="store.isAuthenticated && store.user">
         <v-list-item-content>
           <v-list-item-title class="navbar__drawer-username">
@@ -88,18 +82,11 @@
           </v-list-item-title>
         </v-list-item-content>
       </v-list-item>
-      <v-list-item to="/" class="navbar__drawer-item" @click="drawer = false">
-        Home
-      </v-list-item>
-      <v-list-item to="/shop" class="navbar__drawer-item" @click="drawer = false">
-        Shop
-      </v-list-item>
-      <v-list-item to="/guia" class="navbar__drawer-item" @click="drawer = false">
-        Guia
-      </v-list-item>
-      <v-list-item to="/contacto" class="navbar__drawer-item" @click="drawer = false">
-        Contacto
-      </v-list-item>
+      <v-list-item to="/" class="navbar__drawer-item" @click="drawer = false">Home</v-list-item>
+      <v-list-item to="/shop" class="navbar__drawer-item" @click="drawer = false">Shop</v-list-item>
+      <v-list-item to="/guia" class="navbar__drawer-item" @click="drawer = false">Guía</v-list-item>
+      <v-list-item to="/contacto" class="navbar__drawer-item" @click="drawer = false">Contacto</v-list-item>
+      <v-list-item to="/sobre-nosotros" class="navbar__drawer-item" @click="drawer = false">Sobre Nosotros</v-list-item>
       <v-divider></v-divider>
       <v-list-item v-if="store.isAuthenticated" class="navbar__drawer-item" @click="handleLogout">
         <v-icon left>mdi-logout</v-icon> Cerrar Sesión
@@ -148,7 +135,6 @@ const handleLogout = () => {
 <style lang="scss" scoped>
 @use '@/styles/variables' as *;
 
-/* Mobile-first: estilos base para móvil */
 .navbar {
   background-color: $background-color;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -183,15 +169,10 @@ const handleLogout = () => {
     font-weight: 600;
     letter-spacing: 0.5px;
     transition: color 0.3s ease-in-out;
+
     &:hover {
       color: $primary-color;
     }
-  }
-
-  /* Por defecto para móvil, el SearchBar tiene 150px */
-  &__search-inline {
-    width: 150px;
-    margin-right: $spacing-sm;
   }
 
   &__icons {
@@ -199,6 +180,7 @@ const handleLogout = () => {
     align-items: center;
     gap: 1rem;
     margin-left: 50px;
+
     .navbar__username {
       margin-right: $spacing-sm;
       font-weight: bold;
@@ -210,21 +192,11 @@ const handleLogout = () => {
     position: relative;
     color: #000 !important;
     transition: transform 0.2s ease-in-out;
+
     &:hover {
       transform: scale(1.1);
       color: $primary-color;
     }
-  }
-
-  &__drawer {
-    margin-top: 30px;
-  }
-}
-
-/* Media Query para desktop: sobreescribe los estilos móviles */
-@media (min-width: 960px) {
-  .navbar__search-inline {
-    width: 200px;
   }
 }
 
