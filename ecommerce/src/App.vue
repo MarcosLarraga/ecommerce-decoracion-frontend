@@ -2,9 +2,11 @@
   <v-app class="app">
     <NavBar />
     <div class="layout">
-      <section class="content">
-        <RouterView />
-      </section>
+      <v-main class="main">
+        <v-container fluid class="pa-0">
+          <RouterView />
+        </v-container>
+      </v-main>
     </div>
     <Footer />
   </v-app>
@@ -17,7 +19,6 @@ import Footer from '@/components/Footer.vue';
 </script>
 
 <style lang="scss">
-@use '@/styles/main.scss';
 @use '@/styles/variables' as *;
 
 .app {
