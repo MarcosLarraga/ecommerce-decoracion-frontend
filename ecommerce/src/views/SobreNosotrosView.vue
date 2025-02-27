@@ -24,10 +24,10 @@ import SoporteInfo from '@/components/SoporteInfo.vue';
           
           <h2 class="about__title">Nuestros Valores</h2>
           <p class="about__text">
-            - Calidad: Seleccionamos productos cuidadosamente para garantizar que sean duraderos y de buen gusto.<br>
-            - Sostenibilidad: Nos comprometemos con materiales ecológicos y procesos responsables con el medio ambiente.<br>
-            - Innovación: Siempre buscamos tendencias y diseños que aporten un toque único a tu hogar.<br>
-            - Atención al Cliente: Nos preocupamos por cada detalle de tu compra y brindamos una atención personalizada.<br>
+            Calidad: Seleccionamos productos cuidadosamente para garantizar que sean duraderos y de buen gusto.<br>
+            Sostenibilidad: Nos comprometemos con materiales ecológicos y procesos responsables con el medio ambiente.<br>
+            Innovación: Siempre buscamos tendencias y diseños que aporten un toque único a tu hogar.<br>
+            Atención al Cliente: Nos preocupamos por cada detalle de tu compra y brindamos una atención personalizada.<br>
           </p>
           
           <h2 class="about__title">Nuestro Equipo</h2>
@@ -39,11 +39,11 @@ import SoporteInfo from '@/components/SoporteInfo.vue';
           
           <h2 class="about__title">¿Por qué elegirnos?</h2>
           <p class="about__text">
-            - Productos seleccionados cuidadosamente <br>
-            - Envíos rápidos y seguros <br>
-            - Atención al cliente personalizada <br>
-            - Materiales sostenibles y ecológicos <br>
-            - Diseños exclusivos y en tendencia <br>
+            Productos seleccionados cuidadosamente <br>
+            Envíos rápidos y seguros <br>
+            Atención al cliente personalizada <br>
+            Materiales sostenibles y ecológicos <br>
+            Diseños exclusivos y en tendencia <br>
           </p>
         </v-col>
       </v-row>
