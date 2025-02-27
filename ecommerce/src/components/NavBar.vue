@@ -5,7 +5,7 @@
       <div class="navbar__top">
         <!-- Buscador (izquierda) -->
         <div class="navbar__search">
-          <input type="text" placeholder="Buscar producto" class="navbar__search-input">
+          <input type="text" placeholder="Buscar..." class="navbar__search-input">
         </div>
         
         <!-- Logo (centro) -->
@@ -59,11 +59,10 @@
       
       <!-- Menú inferior -->
       <nav class="navbar__menu">
-        <router-link to="/" class="navbar__menu-item">Home</router-link>
         <router-link to="/shop" class="navbar__menu-item">Tienda</router-link>
         <router-link to="/guia" class="navbar__menu-item">Guía</router-link>
         <router-link to="/contacto" class="navbar__menu-item">Contacto</router-link>
-        <router-link to="/sobre-nosotros" class="navbar__menu-item">Sobre Nosotros</router-link>
+        <router-link to="/sobre-nosotros" class="navbar__menu-item">Sobre LM</router-link>
       </nav>
     </div>
   </header>
