@@ -5,7 +5,7 @@
       <div class="navbar__top">
         <!-- Buscador (izquierda) -->
         <div class="navbar__search">
-          <input type="text" placeholder="Buscar..." class="navbar__search-input">
+          <SearchBar />
         </div>
         
         <!-- Logo (centro) -->
@@ -59,10 +59,10 @@
       
       <!-- Menú inferior -->
       <nav class="navbar__menu">
-        <router-link to="/shop" class="navbar__menu-item">Tienda</router-link>
-        <router-link to="/guia" class="navbar__menu-item">Guía</router-link>
-        <router-link to="/contacto" class="navbar__menu-item">Contacto</router-link>
-        <router-link to="/sobre-nosotros" class="navbar__menu-item">Sobre LM</router-link>
+        <router-link to="/shop" class="navbar__menu-item" :class="{ 'active': $route.path.startsWith('/shop') }">Tienda</router-link>
+        <router-link to="/guia" class="navbar__menu-item" :class="{ 'active': $route.path.startsWith('/guia') }">Guía</router-link>
+        <router-link to="/contacto" class="navbar__menu-item" :class="{ 'active': $route.path.startsWith('/contacto') }">Contacto</router-link>
+        <router-link to="/sobre-nosotros" class="navbar__menu-item" :class="{ 'active': $route.path.startsWith('/sobre-nosotros') }">Sobre LM</router-link>
       </nav>
     </div>
   </header>
@@ -70,12 +70,14 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 import { useUserStore } from '@/stores/userStore';
 import { useCartStore } from '@/stores/cartStore';
 import LogoCanvasBlack from '@/components/LogoCanvasBlack.vue';
+import SearchBar from '@/components/SearchBar.vue';
 
 const router = useRouter();
+const route = useRoute();
 const store = useUserStore();
 const cartStore = useCartStore();
 const isUserMenuOpen = ref(false);
@@ -156,20 +158,6 @@ onBeforeUnmount(() => {
   &__search {
     flex: 1;
     max-width: 300px;
-    
-    &-input {
-      width: 100%;
-      padding: 12px 16px;
-      border: 1px solid #e0e0e0;
-      background-color: #f5f5f5;
-      border-radius: 4px;
-      font-size: 15px;
-      font-family: $font-family-primary;
-      
-      &::placeholder {
-        color: #333;
-      }
-    }
   }
   
   &__logo {
@@ -303,6 +291,10 @@ onBeforeUnmount(() => {
       &:hover {
         color: $primary-color;
       }
+      
+      &.active {
+        color: $primary-color;
+      }
     }
   }
 }
@@ -358,7 +350,7 @@ onBeforeUnmount(() => {
     }
     
     &__user-menu {
-      right: -50px; // Ajustar posición en móviles
+      right: -50px; 
     }
   }
 }
