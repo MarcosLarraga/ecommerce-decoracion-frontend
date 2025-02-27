@@ -14,6 +14,7 @@ import ResetPasswordView from '@/views/ResetPasswordView.vue';
 import SobreNosotrosView from '@/views/SobreNosotrosView.vue'; // Importa la nueva vista
 import ConfirmarPedido from '@/views/ConfirmarPedido.vue';
 import PedidoDetalle from '@/views/PedidoDetalle.vue';
+import MiCuenta from '@/views/MiCuenta.vue';
 
 const routes = [
   { path: '/', name: 'Home', component: HomeView },
@@ -26,6 +27,7 @@ const routes = [
   { path: '/sobre-nosotros', name: 'SobreNosotros', component: SobreNosotrosView }, // Nueva ruta añadida
   { path: '/product/:id', name: 'ProductDetail', component: ProductDetailView, props: true },
   { path: '/login', name: 'Login', component: LoginView },
+  { path: '/mi-cuenta', name: 'MiCuenta', component: MiCuenta },
   { path: '/register', name: 'Register', component: RegisterView },
   { path: '/forgot-password', name: 'ForgotPassword', component: ForgotPasswordView },
   { path: '/reset-password', name: 'ResetPassword', component: ResetPasswordView }

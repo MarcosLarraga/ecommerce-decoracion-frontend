@@ -2,14 +2,20 @@
   <div class="pedido">
     <h1 class="pedido__title">Confirmar Pedido</h1>
 
-    <p><strong>Correo:</strong> {{ userStore.user.email }}</p>
+    <div class="pedido__user-info">
+      <p><strong>Correo:</strong> {{ userStore.user.email }}</p>
+    </div>
 
     <form class="pedido__form" @submit.prevent="confirmarPedido">
-      <label>Dirección:</label>
-      <input v-model="direccion" type="text" required />
+      <div class="pedido__form-group">
+        <label class="pedido__label">Dirección:</label>
+        <input v-model="direccion" type="text" required class="pedido__input" />
+      </div>
 
-      <label>Teléfono:</label>
-      <input v-model="telefono" type="tel" required />
+      <div class="pedido__form-group">
+        <label class="pedido__label">Teléfono:</label>
+        <input v-model="telefono" type="tel" required class="pedido__input" />
+      </div>
 
       <h2 class="pedido__subtitle">Productos en el pedido</h2>
       <div class="pedido__items" v-if="cartStore.cart.length > 0">
@@ -25,10 +31,13 @@
 
       <h2 class="pedido__total">Total: {{ cartStore.cartTotal.toFixed(2) }} €</h2>
 
-      <button type="submit" class="pedido__confirm-btn">Confirmar Pedido</button>
+      <button type="submit" class="pedido__confirm-btn" :disabled="isSubmitting">
+        {{ isSubmitting ? 'Procesando...' : 'Confirmar Pedido' }}
+      </button>
     </form>
   </div>
 </template>
+
 
 <script setup lang="ts">
 import { ref } from 'vue';
@@ -37,185 +46,242 @@ import { usePedidoStore } from '@/stores/pedidoStore';
 import { useDetallePedidoStore } from '@/stores/detallePedidoStore';
 import { useCartStore } from '@/stores/cartStore';
 import { useRouter } from 'vue-router';
+import { useToast } from 'vue-toastification';
 
 const userStore = useUserStore();
 const pedidoStore = usePedidoStore();
 const detallePedidoStore = useDetallePedidoStore();
 const cartStore = useCartStore();
 const router = useRouter();
+const toast = useToast();
 
 const direccion = ref(userStore.user.direccion || '');
 const telefono = ref(userStore.user.telefono || '');
+const isSubmitting = ref(false);
 
 const confirmarPedido = async () => {
   if (cartStore.cart.length === 0) {
-    alert("No puedes realizar un pedido sin productos en el carrito.");
+    toast.error("No puedes realizar un pedido sin productos en el carrito.");
     return;
   }
 
-  try {
-    // 🔹 Primero actualizamos el teléfono y la dirección
-    await userStore.updateUserPhoneAndAddress(telefono.value, direccion.value);
+  isSubmitting.value = true;
 
-    // 🔹 Luego creamos el pedido
+  try {
+    // Actualizamos el teléfono y la dirección
+    await userStore.updateUserPhoneAndAddress(telefono.value, direccion.value);
+    console.log("Datos de contacto actualizados");
+
+    // Luego creamos el pedido
     const pedidoId = await pedidoStore.crearPedidoConDetalles(
       userStore.user.id, 
       cartStore.cart, 
       cartStore.cartTotal
     );
 
-    // 🔹 Después de crear el pedido, agregamos los detalles
+    // Después de crear el pedido, agregamos los detalles
     await detallePedidoStore.agregarDetallesPedido(pedidoId, cartStore.cart);
 
-    cartStore.clearCart();
+    toast.success("¡Pedido realizado con éxito!");
     router.push(`/pedido-detalle/${pedidoId}`);
   } catch (error) {
     console.error("Error al confirmar el pedido:", error);
-    alert(error.message);
+    toast.error(error.message || "Error al procesar el pedido");
+  } finally {
+    isSubmitting.value = false;
   }
 };
+
 </script>
 
 <style lang="scss" scoped>
 @use '@/styles/variables' as *;
 
 .pedido {
-  width: 90%;
-  max-width: 700px;
-  margin: 50px auto;
+  width: 100%;
+  max-width: 1000px;
+  margin: 2rem auto;
+  padding: $spacing-md;
   background-color: $background-color;
-  padding: 20px;
-  border-radius: 8px;
+  border-radius: $border-radius;
   box-shadow: $box-shadow;
   color: $text-color;
   font-family: $font-family-secondary;
 
+  @media (min-width: $breakpoint-sm) {
+    padding: $spacing-lg;
+    margin: 3rem auto;
+  }
+
+  @media (min-width: $breakpoint-md) {
+    padding: $spacing-xl;
+    margin: 4rem auto;
+  }
+
   &__title {
-    text-align: center;
-    font-size: 2rem;
-    margin-bottom: 20px;
-    color: $primary-color;
     font-family: $font-family-primary;
+    font-size: $font-size-xl;
+    margin-bottom: $spacing-lg;
+    color: $primary-color;
+    text-align: center;
+    font-weight: 700;
+    
+    @media (min-width: $breakpoint-md) {
+      font-size: $font-size-xxl;
+      margin-bottom: $spacing-xl;
+    }
+  }
+
+  &__user-info {
+    background-color: $tertiary-color;
+    padding: $spacing-md;
+    border-radius: $border-radius;
+    margin-bottom: $spacing-lg;
+    
+    p {
+      margin: 0;
+      font-size: $font-size-base;
+      
+      strong {
+        color: $primary-color;
+      }
+    }
   }
 
   &__form {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: $spacing-md;
   }
 
-  label {
-    font-weight: bold;
+  &__form-group {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
   }
 
-  input {
-    padding: 10px;
-    border: 1px solid $color-borde;
-    border-radius: 5px;
-    font-size: 1rem;
+  &__label {
+    font-weight: 600;
+    font-size: $font-size-base;
+    color: $text-color;
+  }
+
+  &__input {
+    padding: $input-padding;
+    border: $input-border;
+    border-radius: $input-border-radius;
+    font-size: $font-size-base;
+    font-family: $font-family-secondary;
+    transition: border $transition-fast;
+    
+    &:focus {
+      outline: none;
+      border: $input-focus-border;
+    }
+  }
+
+  &__subtitle {
+    font-family: $font-family-primary;
+    font-size: $font-size-large;
+    margin: $spacing-lg 0 $spacing-md;
+    color: $primary-color;
+    font-weight: 600;
+    border-bottom: 2px solid $tertiary-color;
+    padding-bottom: $spacing-xs;
   }
 
   &__items {
-    margin-top: 20px;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: $spacing-md;
+    margin-bottom: $spacing-lg;
   }
 
   &__item {
     display: flex;
     align-items: center;
-    background: #f8f8f8;
-    padding: 10px;
-    border-radius: 8px;
-
-    &-image {
-      width: 60px;
-      height: 60px;
-      object-fit: cover;
-      border-radius: 8px;
+    background-color: $tertiary-color;
+    padding: $spacing-md;
+    border-radius: $border-radius;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    
+    @media (max-width: $breakpoint-sm - 1) {
+      flex-direction: column;
+      align-items: flex-start;
     }
-
+    
+    &-image {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: $border-radius;
+      
+      @media (max-width: $breakpoint-sm - 1) {
+        margin-bottom: $spacing-sm;
+      }
+    }
+    
     &-info {
-      padding-left: 10px;
+      flex: 1;
+      padding: 0 $spacing-md;
+      
+      h3 {
+        font-family: $font-family-primary;
+        font-size: $font-size-base;
+        margin: 0 0 $spacing-xs;
+        color: $text-color;
+      }
+      
+      p {
+        margin: 0;
+        font-size: $font-size-small;
+        color: $text-color-secondary;
+        
+        &:first-of-type {
+          color: $primary-color;
+          font-weight: 600;
+        }
+      }
     }
   }
 
   &__total {
-    font-size: 1.5rem;
-    font-weight: bold;
+    font-family: $font-family-primary;
+    font-size: $cart-total-price-size;
     color: $primary-color;
-    margin-top: 15px;
     text-align: right;
+    margin: $spacing-lg 0;
+    font-weight: 700;
   }
 
   &__confirm-btn {
-    margin-top: 20px;
-    padding: 10px;
-    font-size: 1.2rem;
-    font-weight: bold;
-    background: $primary-color;
-    color: white;
+    background-color: $primary-color;
+    color: $button-text-color;
     border: none;
-    border-radius: 5px;
+    padding: $spacing-md;
+    font-size: $font-size-large;
+    font-weight: 600;
+    border-radius: $button-radius;
     cursor: pointer;
-    transition: background 0.3s ease-in-out;
-
-    &:hover {
-      background: $color-hover-boton;
+    transition: background-color $transition-normal, transform $transition-fast;
+    box-shadow: $button-shadow;
+    margin-top: $spacing-lg;
+    
+    &:hover:not(:disabled) {
+      background-color: $primary-color-hover;
+      transform: translateY(-2px);
+      box-shadow: $button-hover-shadow;
+    }
+    
+    &:active:not(:disabled) {
+      transform: translateY(0);
+    }
+    
+    &:disabled {
+      background-color: $text-color-secondary;
+      cursor: not-allowed;
     }
   }
 }
 
-/* 🔹 Detalle del Pedido */
-.pedido-detalle {
-  width: 90%;
-  max-width: 800px;
-  margin: 50px auto;
-  background-color: $background-color;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: $box-shadow;
-  color: $text-color;
-
-  &__title {
-    text-align: center;
-    font-size: 2rem;
-    margin-bottom: 20px;
-    color: $primary-color;
-  }
-
-  &__info {
-    font-size: 1rem;
-    padding: 10px;
-    background: #222;
-    border-radius: 8px;
-    margin-bottom: 20px;
-  }
-
-  &__items {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  &__item {
-    display: flex;
-    align-items: center;
-    background: #f8f8f8;
-    padding: 10px;
-    border-radius: 8px;
-
-    &-image {
-      width: 60px;
-      height: 60px;
-      object-fit: cover;
-      border-radius: 8px;
-    }
-
-    &-info {
-      padding-left: 10px;
-    }
-  }
-}
 </style>

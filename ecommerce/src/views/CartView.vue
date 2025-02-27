@@ -4,6 +4,7 @@
 
     <div v-if="cartStore.cart.length === 0" class="cart__empty">
       <p class="cart__empty-message">Tu carrito está vacío.</p>
+      <router-link to="/" class="cart__continue-shopping">Continuar comprando</router-link>
     </div>
 
     <div v-else class="cart__container">
@@ -13,9 +14,13 @@
           <div class="cart__item-info">
             <h3 class="cart__item-name">{{ item.name }}</h3>
             <p class="cart__item-price">{{ item.price.toFixed(2) }} €</p>
-            <p class="cart__item-quantity">Cantidad: {{ item.quantity }}</p>
+            <div class="cart__item-quantity-controls">
+              <button class="cart__quantity-btn" @click="decreaseQuantity(item)" :disabled="item.quantity <= 1">-</button>
+              <p class="cart__item-quantity">{{ item.quantity }}</p>
+              <button class="cart__quantity-btn" @click="increaseQuantity(item)">+</button>
+            </div>
           </div>
-          <button class="cart__remove-btn" @click="cartStore.removeFromCart(item.id)">
+          <button class="cart__remove-btn" @click="removeItem(item)">
             Quitar
           </button>
         </div>
@@ -23,7 +28,10 @@
 
       <div class="cart__total">
         <h2>Total: {{ cartStore.cartTotal.toFixed(2) }} €</h2>
-        <button class="cart__checkout-btn">Finalizar Compra</button>
+        <div class="cart__actions">
+          <button class="cart__clear-btn" @click="clearCart">Vaciar Carrito</button>
+          <router-link to="/pedido-confirmacion" class="cart__checkout-btn">Finalizar Compra</router-link>
+        </div>
       </div>
     </div>
   </div>
@@ -31,31 +39,105 @@
 
 <script setup lang="ts">
 import { useCartStore } from '@/stores/cartStore';
+import { useToast } from 'vue-toastification';
+
 const cartStore = useCartStore();
+const toast = useToast();
+
+const removeItem = (item) => {
+  cartStore.removeFromCart(item.id);
+};
+
+const clearCart = () => {
+  if (confirm("¿Estás seguro de que deseas vaciar el carrito?")) {
+    cartStore.clearCart();
+  }
+};
+
+const increaseQuantity = (item) => {
+  cartStore.addToCart(item);
+};
+
+const decreaseQuantity = (item) => {
+  if (item.quantity > 1) {
+    cartStore.decreaseQuantity(item.id);
+    toast.info(`Cantidad de ${item.name} reducida`);
+  }
+};
 </script>
 
 <style lang="scss" scoped>
-
 @use '@/styles/variables' as *;
 
 .cart {
-  width: 90%;
-  max-width: 800px;
-  margin: 100px auto;
-  background-color: #fff; // Fondo claro para el contenedor principal
-  border-radius: 8px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  padding: 20px;
+  width: 100%;
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: $spacing-md;
+  background-color: $background-color;
+  border-radius: $border-radius;
+  box-shadow: $box-shadow;
+  font-family: $font-family-secondary;
+
+  @media (min-width: $breakpoint-sm) {
+    padding: $spacing-lg;
+    margin: 3rem auto;
+  }
+
+  @media (min-width: $breakpoint-md) {
+    padding: $spacing-xl;
+    margin: 4rem auto;
+  }
 
   &__title {
-    font-size: 2rem;
-    margin-bottom: 20px;
+    font-family: $font-family-primary;
+    font-size: $font-size-xl;
+    margin-bottom: $spacing-lg;
     color: $text-color;
+    text-align: center;
+    font-weight: 700;
+    
+    @media (min-width: $breakpoint-md) {
+      font-size: $font-size-xxl;
+      margin-bottom: $spacing-xl;
+    }
   }
 
   &__empty {
-    font-size: 1.2rem;
-    color: $text-color;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: $spacing-xl 0;
+    text-align: center;
+    
+    &-message {
+      font-size: $font-size-large;
+      color: $text-color-secondary;
+      margin-bottom: $spacing-lg;
+    }
+  }
+
+  &__continue-shopping {
+    display: inline-block;
+    background-color: $primary-color;
+    color: $button-text-color;
+    text-decoration: none;
+    padding: $button-padding;
+    border-radius: $button-radius;
+    font-weight: 600;
+    font-size: $font-size-base;
+    transition: background-color $transition-normal, transform $transition-fast;
+    box-shadow: $button-shadow;
+    
+    &:hover {
+      background-color: $primary-color-hover;
+      transform: translateY(-2px);
+      box-shadow: $button-hover-shadow;
+    }
+    
+    &:active {
+      transform: translateY(0);
+    }
   }
 
   &__container {
@@ -67,81 +149,215 @@ const cartStore = useCartStore();
     display: flex;
     flex-direction: column;
     gap: $spacing-md;
+    margin-bottom: $spacing-lg;
   }
 
   &__item {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background-color: #f2f2f2; // Color gris claro en vez de lighten()
-    border-radius: 8px;
-    padding: 15px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.06);
+    flex-direction: column;
+    background-color: $cart-item-background;
+    border-radius: $border-radius;
+    padding: $spacing-md;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: transform $transition-fast, box-shadow $transition-fast;
+    
+    @media (min-width: $breakpoint-sm) {
+      flex-direction: row;
+      align-items: center;
+      padding: $spacing-md;
+    }
+    
+    &:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
   }
 
   &__item-image {
-    width: 70px;
-    height: 70px;
+    width: 100%;
+    height: 180px;
     object-fit: cover;
-    border-radius: 5px;
+    border-radius: $border-radius;
+    margin-bottom: $spacing-sm;
+    
+    @media (min-width: $breakpoint-sm) {
+      width: 100px;
+      height: 100px;
+      margin-bottom: 0;
+    }
+    
+    @media (min-width: $breakpoint-md) {
+      width: 120px;
+      height: 120px;
+    }
   }
 
   &__item-info {
     flex-grow: 1;
-    text-align: left;
-    padding-left: 15px;
-
-    h3 {
-      margin: 0 0 5px;
-      color: $text-color;
-      font-size: 1.1rem;
-    }
-
-    p {
-      margin: 0;
-      color: $text-color;
+    margin-bottom: $spacing-sm;
+    
+    @media (min-width: $breakpoint-sm) {
+      padding-left: $spacing-md;
+      margin-bottom: 0;
     }
   }
 
-  &__remove-btn {
-    background-color: $primary-color;
-    color: #fff;
-    border: none;
-    padding: 6px 12px;
-    cursor: pointer;
-    border-radius: 4px;
-    font-weight: 500;
-    transition: background-color 0.2s ease-in-out;
+  &__item-name {
+    font-family: $font-family-primary;
+    font-size: $font-size-large;
+    margin: 0 0 $spacing-xs;
+    color: $text-color;
+  }
 
+  &__item-price {
+    font-size: $font-size-base;
+    font-weight: 600;
+    color: $primary-color;
+    margin: 0 0 $spacing-sm;
+  }
+
+  &__item-quantity-controls {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    margin-top: $spacing-xs;
+  }
+
+  &__quantity-btn {
+    background-color: $primary-color;
+    color: $button-text-color;
+    border: none;
+    width: 30px;
+    height: 30px;
+    border-radius: $border-radius-circle;
+    font-weight: bold;
+    font-size: $font-size-large;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color $transition-normal;
+    
+    &:disabled {
+      background-color: $text-color-secondary;
+      cursor: not-allowed;
+    }
+    
+    &:hover:not(:disabled) {
+      background-color: $primary-color-hover;
+    }
+  }
+
+  &__item-quantity {
+    font-size: $font-size-base;
+    font-weight: 600;
+    margin: 0;
+    min-width: 30px;
+    text-align: center;
+  }
+
+  &__remove-btn {
+    background-color: $button-remove-color;
+    color: $button-text-color;
+    border: none;
+    padding: $spacing-xs $spacing-md;
+    cursor: pointer;
+    border-radius: $button-radius;
+    font-weight: 500;
+    font-size: $font-size-small;
+    transition: background-color $transition-normal;
+    align-self: flex-end;
+    
+    @media (min-width: $breakpoint-sm) {
+      align-self: center;
+    }
+    
     &:hover {
-      background-color: $primary-color;
+      background-color: $button-remove-hover;
     }
   }
 
   &__total {
-    text-align: right;
-
+    margin-top: $spacing-lg;
+    padding-top: $spacing-md;
+    border-top: 1px solid $cart-item-border;
+    
     h2 {
-      font-size: 1.5rem;
-      margin-bottom: 10px;
+      font-family: $font-family-primary;
+      font-size: $cart-total-price-size;
+      margin-bottom: $spacing-md;
       color: $text-color;
+      text-align: center;
+      
+      @media (min-width: $breakpoint-md) {
+        text-align: right;
+      }
+    }
+  }
+
+  &__actions {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+    
+    @media (min-width: $breakpoint-sm) {
+      flex-direction: row;
+      justify-content: space-between;
+    }
+    
+    @media (min-width: $breakpoint-md) {
+      justify-content: flex-end;
+      gap: $spacing-lg;
+    }
+  }
+
+  &__clear-btn {
+    background-color: $error-color;
+    color: $button-text-color;
+    border: none;
+    padding: $button-padding;
+    font-size: $font-size-base;
+    cursor: pointer;
+    border-radius: $button-radius;
+    font-weight: 600;
+    transition: background-color $transition-normal, transform $transition-fast;
+    box-shadow: $button-shadow;
+    
+    &:hover {
+      background-color: darken($error-color, 10%);
+      transform: translateY(-2px);
+      box-shadow: $button-hover-shadow;
+    }
+    
+    &:active {
+      transform: translateY(0);
     }
   }
 
   &__checkout-btn {
+    display: inline-block;
     background-color: $primary-color;
-    color: #fff;
-    border: none;
-    padding: 10px 20px;
-    font-size: 1rem;
+    color: $button-text-color;
+    text-decoration: none;
+    padding: $button-padding;
+    font-size: $cart-total-checkout-size;
     cursor: pointer;
-    border-radius: 4px;
+    border-radius: $button-radius;
     font-weight: 600;
-    transition: background-color 0.2s ease-in-out;
-
+    text-align: center;
+    transition: background-color $transition-normal, transform $transition-fast;
+    box-shadow: $button-shadow;
+    
     &:hover {
-      background-color: $primary-color;
+      background-color: $primary-color-hover;
+      transform: translateY(-2px);
+      box-shadow: $button-hover-shadow;
+    }
+    
+    &:active {
+      transform: translateY(0);
     }
   }
 }
+
 </style>
