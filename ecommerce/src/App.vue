@@ -24,6 +24,7 @@ import Footer from '@/components/Footer.vue';
 .app {
   background-color: $background-color !important;
   color: $text-color;
+  font-family: $font-family-primary;
 }
 
 .layout {
