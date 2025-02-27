@@ -169,12 +169,14 @@ const goToCategory = (categoryName: string) => {
   /* Productos Destacados */
   &__products {
     padding: $spacing-md;
+    margin-top: 60px;
+    margin-bottom: 60px;
 
     &-title {
       text-align: center;
       font-size: 2.2rem;
       font-weight: bold;
-      margin-bottom: 32px;
+      margin-bottom: 40px;
     }
 
     &-grid {

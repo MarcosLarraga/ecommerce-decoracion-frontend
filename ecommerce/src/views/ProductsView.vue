@@ -141,7 +141,7 @@ const filteredProducts = computed(() => {
 
 /* Estilos para el filtro de categorías */
 .shop__filter {
-  margin-bottom: $spacing-md;
+  margin-bottom: 60px;
   display: flex;
   flex-direction: column;
   align-items: center;

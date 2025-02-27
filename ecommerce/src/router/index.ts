@@ -12,9 +12,9 @@ import RegisterView from '@/views/RegisterView.vue';
 import ForgotPasswordView from '@/views/ForgotPasswordView.vue';
 import ResetPasswordView from '@/views/ResetPasswordView.vue';
 import SobreNosotrosView from '@/views/SobreNosotrosView.vue'; // Importa la nueva vista
-import ConfirmarPedido from '@/views/ConfirmarPedido.vue';
-import PedidoDetalle from '@/views/PedidoDetalle.vue';
-import MiCuenta from '@/views/MiCuenta.vue';
+import ConfirmarPedido from '@/views/ConfirmarPedidoView.vue';
+import PedidoDetalle from '@/views/PedidoDetalleView.vue';
+import MiCuenta from '@/views/MiCuentaView.vue';
 
 const routes = [
   { path: '/', name: 'Home', component: HomeView },
