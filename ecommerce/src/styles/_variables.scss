@@ -65,16 +65,96 @@ $breakpoint-sm: 600px;
 $breakpoint-md: 960px;
 $breakpoint-lg: 1280px;
 $breakpoint-xl: 1920px;
-
-// 🎨 **Sombras y Bordes**
-$border-radius: 8px;
+// 🎨 **Sombras y Bordes** (Ampliado)
+$border-radius-xs: 2px;
+$border-radius-sm: 4px;
+$border-radius-md: 6px;
+// $border-radius: 8px; (ya lo tienes)
 $border-radius-lg: 12px;
+$border-radius-xl: 16px;
+$border-radius-2xl: 24px;
+$border-radius-3xl: 32px;
 $border-radius-circle: 50%;
+$border-radius-pill: 9999px;
+$border-radius: 8px;
+
+
+// 🎨 **Sombras adicionales**
+$box-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+$box-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+// $box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); (ya lo tienes)
+// $box-shadow-lg: 0 4px 10px rgba(0, 0, 0, 0.15); (ya lo tienes)
+$box-shadow-xl: 0 10px 15px rgba(0, 0, 0, 0.2);
+$box-shadow-2xl: 0 20px 25px rgba(0, 0, 0, 0.25);
+$box-shadow-inner: inset 0 2px 4px rgba(0, 0, 0, 0.1);
 $box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+
+// 🎨 **Sombras y Bordes** (Complementos)
 $box-shadow-lg: 0 4px 10px rgba(0, 0, 0, 0.15);
-$form-button-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+$border-width: 1px;
+$border-width-md: 2px;
+$border-width-lg: 3px;
+$border-style: solid;
+
+// 🎨 **Sombras para botones**
 $button-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 $button-hover-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+
+
+// 🖼 **Z-index** (Sistema de capas)
+$z-index-deepdive: -99999;
+$z-index-dive: -1;
+$z-index-default: 1;
+$z-index-docked: 4;
+$z-index-sticky: 100;
+$z-index-popup: 5000;
+$z-index-dialog: 6000;
+$z-index-dropdown: 7000;
+$z-index-overlay: 8000;
+$z-index-modal: 9000;
+$z-index-spinner: 9050;
+$z-index-toast: 10000;
+
+// 🔄 **Transiciones y Animaciones** (Duración)
+$duration-instant: 0.1s;
+$duration-quick: 0.2s;
+$duration-normal: 0.3s;
+$duration-slow: 0.5s;
+$duration-slower: 0.8s;
+
+// 🎨 **Opacidad**
+$opacity-light: 0.2;
+$opacity-medium: 0.5;
+$opacity-heavy: 0.8;
+$opacity-full: 1;
+
+// 📊 **Grid y Layout**
+$grid-gutter-width: 24px;
+$grid-columns: 12;
+$container-padding: $spacing-lg;
+$section-spacing: $spacing-xl;
+
+
+// 🖋 **Tipografía adicional**
+$font-weight-light: 300;
+$font-weight-regular: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+$font-weight-black: 900;
+
+// 🎛 **Botones adicionales**
+$button-radius-sm: 4px;
+// $button-radius: 8px; (ya lo tienes)
+$button-radius-lg: 12px;
+$button-radius-xl: 16px;
+$button-radius-pill: 9999px;
+
+// 🏁 **Animaciones adicionales**
+$transition-bounce: 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+$transition-ease-in: 0.3s ease-in;
+$transition-ease-out: 0.3s ease-out;
+
 
 // 🎛 **Botones**
 $form-button-radius: 8px;  // ✅ **Variable añadida**

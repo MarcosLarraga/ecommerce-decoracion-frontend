@@ -17,9 +17,28 @@ export const useProductsStore = defineStore('products', {
     filteredProducts: [] as ProductoDTO[], // Productos filtrados por categoría
     loading: false, // Estado de carga
     error: null as string | null, // Mensaje de error si ocurre algún problema
+    minProductPrice: 0, // Precio mínimo de los productos
+    maxProductPrice: 1000, // Precio máximo de los productos
   }),
 
   actions: {
+    /**
+     * Calcula el precio mínimo y máximo de los productos disponibles
+     */
+    calculatePriceRange() {
+      if (this.allProducts.length === 0) return;
+      
+      this.minProductPrice = Math.floor(
+        Math.min(...this.allProducts.map(product => product.precio))
+      );
+      
+      this.maxProductPrice = Math.ceil(
+        Math.max(...this.allProducts.map(product => product.precio))
+      );
+      
+      console.log(`✅ [calculatePriceRange] Rango de precios calculado: ${this.minProductPrice}€ - ${this.maxProductPrice}€`);
+    },
+
     /**
      * Obtiene todos los productos desde la API y los almacena en el estado.
      */
@@ -50,6 +69,7 @@ export const useProductsStore = defineStore('products', {
         console.log("✅ [fetchProducts] Productos obtenidos correctamente:", data);
 
         this.allProducts = data;
+        this.calculatePriceRange(); // Calcular el rango de precios
         this.getRandomProducts(); // Selecciona productos aleatorios
 
       } catch (error) {
@@ -91,6 +111,7 @@ export const useProductsStore = defineStore('products', {
         console.log(`✅ [fetchProductsByCategory] Productos de la categoría ${categoriaId} obtenidos:`, data);
 
         this.filteredProducts = data;
+        this.calculatePriceRange(); // Calcular el rango de precios
 
       } catch (error) {
         this.error = error instanceof Error ? error.message : '❌ Error desconocido al obtener productos';
@@ -133,6 +154,7 @@ export const useProductsStore = defineStore('products', {
         console.log("✅ [searchProducts] Productos encontrados:", data);
 
         this.allProducts = data;
+        this.calculatePriceRange(); // Calcular el rango de precios
         this.getRandomProducts(); // Actualiza los productos aleatorios si lo necesitas
 
       } catch (error) {

@@ -167,6 +167,7 @@ const eliminarReseña = async (reseñaId: number) => {
   &__description {
     font-size: 1.1rem;
     margin-top: $spacing-md;
+    margin-bottom: $spacing-md;
   }
 
   &__cart-btn {

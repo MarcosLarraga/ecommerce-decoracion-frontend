@@ -1,17 +1,8 @@
 <template>
   <div class="home">
     <!-- Carrusel -->
-    <v-carousel
-      height="600"
-      show-arrows="hover"
-      cycle
-      hide-delimiter-background
-      class="home__carousel"
-    >
-      <v-carousel-item
-        v-for="(slide, i) in slides"
-        :key="i"
-      >
+    <v-carousel height="600" show-arrows="hover" cycle hide-delimiter-background class="home__carousel">
+      <v-carousel-item v-for="(slide, i) in slides" :key="i">
         <v-sheet height="100%" class="home__carousel-sheet">
           <img :src="slide.image" class="home__carousel-image" alt="Carrusel" />
           <div class="home__carousel-text">
@@ -24,17 +15,9 @@
     <!-- Categorías -->
     <section class="home__categories">
       <div class="home__categories-grid">
-        <div
-          class="home__category-card"
-          v-for="category in categoriesStore.allCategories"
-          :key="category.id"
-          @click="goToCategory(category.name)"
-        >
-          <img
-            :src="category.image || '/fotos/default.jpg'"
-            :alt="category.name"
-            class="home__category-card__image"
-          />
+        <div class="home__category-card" v-for="category in categoriesStore.allCategories" :key="category.id"
+          @click="goToCategory(category.name)">
+          <img :src="category.image || '/fotos/default.jpg'" :alt="category.name" class="home__category-card__image" />
           <div class="home__category-card__title">{{ category.name }}</div>
         </div>
       </div>
@@ -42,17 +25,17 @@
 
     <!-- Productos Destacados -->
     <section class="home__products">
-      <h2 class="home__products-title">Productos Destacados</h2>
+      <div class="home__products-header">
+        <h2 class="home__products-title">Productos Destacados</h2>
+        <p class="home__products-description">Descubre nuestra selección de artículos de decoración que transformarán tu hogar con estilo y elegancia.</p>
+      </div>
       <div class="home__products-grid">
-        <ProductCard
-          v-for="product in productsStore.randomProducts"
-          :key="product.id"
-          :producto="product"
-        />
+        <ProductCard v-for="product in productsStore.randomProducts" :key="product.id" :producto="product" />
       </div>
     </section>
   </div>
 </template>
+
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
@@ -93,20 +76,18 @@ const goToCategory = (categoryName: string) => {
   padding: 0;
 
   /* Carrusel */
-  &__carousel {
-    
-  }
-  
+  &__carousel {}
+
   &__carousel-sheet {
     position: relative;
   }
-  
+
   &__carousel-image {
     width: 100%;
     height: 100%;
     object-fit: cover;
   }
-  
+
   &__carousel-text {
     position: absolute;
     top: 20%;
@@ -118,7 +99,7 @@ const goToCategory = (categoryName: string) => {
     font-weight: bold;
     text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.8);
   }
-  
+
   /* Categorías */
   &__categories {
     width: 100%;
@@ -131,7 +112,7 @@ const goToCategory = (categoryName: string) => {
       gap: 0;
     }
   }
-  
+
   &__category-card {
     flex: 0 0 calc(100% / 3);
     position: relative;
@@ -165,40 +146,57 @@ const goToCategory = (categoryName: string) => {
       font-size: 1.4rem;
     }
   }
-  
+
   /* Productos Destacados */
-  &__products {
-    padding: $spacing-md;
-    margin-top: 60px;
-    margin-bottom: 60px;
+  /* Productos Destacados */
+&__products {
+  padding: $spacing-xl;
+  margin: 60px auto;
+  max-width: 1200px;
+  background-color: #f9f9f9; // Fondo sutil
+  border-radius: $border-radius-lg;
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.03);
 
-    &-title {
-      text-align: center;
-      font-size: 2.2rem;
-      font-weight: bold;
-      margin-bottom: 40px;
+  &-header {
+    margin-bottom: $spacing-xl;
+    text-align: center;
+  }
+
+  &-title {
+    text-align: center;
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: $spacing-md;
+    color: $text-color;
+    font-family: $font-family-primary;
+    position: relative;
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 3px;
+      background-color: $primary-color;
     }
+  }
 
-    &-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: $spacing-md;
-      justify-items: center;
-    }
+  &-description {
+    max-width: 600px;
+    margin: $spacing-lg auto 0;
+    color: $text-color-secondary;
+    font-size: $font-size-base;
+    line-height: 1.6;
+  }
+
+  &-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: $spacing-lg;
+    justify-items: center;
   }
 }
-
-/* Responsive para móviles: las categorías se muestran en columna */
-@media (max-width: 600px) {
-  .home__category-card {
-    flex: 0 0 100%;
-  }
 }
-
-/* Media query para pantallas medianas: ajustar grid de productos */
-@media (min-width: 768px) {
-  .home__products-grid {
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  }
-}
-</style>
+  </style>
