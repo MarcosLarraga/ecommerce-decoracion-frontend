@@ -17,12 +17,34 @@
         
         <!-- Iconos (derecha) -->
         <div class="navbar__icons">
+          <!-- Usuario no autenticado -->
           <router-link to="/login" class="navbar__icon" v-if="!store.isAuthenticated">
             <v-icon size="28">mdi-account</v-icon>
+            <span class="navbar__icon-text">Iniciar sesión</span>
           </router-link>
-          <div class="navbar__icon" v-else @click="logout">
-            <v-icon size="28">mdi-account</v-icon>
+          
+          <!-- Usuario autenticado -->
+          <div class="navbar__user" v-else>
+            <div class="navbar__user-dropdown" @click="toggleUserMenu">
+              <v-icon size="28">mdi-account</v-icon>
+              <span class="navbar__user-name">{{ getUserName }}</span>
+              <v-icon size="20">{{ isUserMenuOpen ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
+            </div>
+            
+            <!-- Menú desplegable del usuario -->
+            <div class="navbar__user-menu" v-if="isUserMenuOpen">
+              <router-link to="/mi-cuenta" class="navbar__user-menu-item">
+                <v-icon size="20">mdi-account-details</v-icon>
+                Mi cuenta
+              </router-link>
+              <div class="navbar__user-menu-item" @click="logout">
+                <v-icon size="20">mdi-logout</v-icon>
+                Cerrar sesión
+              </div>
+            </div>
           </div>
+          
+          <!-- Carrito -->
           <router-link to="/cart" class="navbar__icon navbar__cart">
             <v-icon size="28">mdi-cart</v-icon>
             <span v-if="cartStore.totalItems > 0" class="cart-badge">
@@ -48,6 +70,7 @@
 </template>
 
 <script setup lang="ts">
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import { useRouter } from 'vue-router';
 import { useUserStore } from '@/stores/userStore';
 import { useCartStore } from '@/stores/cartStore';
@@ -56,11 +79,59 @@ import LogoCanvasBlack from '@/components/LogoCanvasBlack.vue';
 const router = useRouter();
 const store = useUserStore();
 const cartStore = useCartStore();
+const isUserMenuOpen = ref(false);
 
+// Obtener el nombre de usuario para mostrar
+const getUserName = computed(() => {
+  if (!store.user) return '';
+  
+  // Si hay un nombre, mostrar el primer nombre
+  if (store.user.nombre) {
+    return store.user.nombre.split(' ')[0];
+  }
+  
+  // Si no hay nombre pero hay email, mostrar la parte antes del @
+  if (store.user.email) {
+    return store.user.email.split('@')[0];
+  }
+  
+  return 'Usuario';
+});
+
+// Alternar el menú de usuario
+const toggleUserMenu = () => {
+  isUserMenuOpen.value = !isUserMenuOpen.value;
+};
+
+// Cerrar el menú cuando se hace clic fuera
+const closeUserMenu = (event: MouseEvent) => {
+  const target = event.target as HTMLElement;
+  const userDropdown = document.querySelector('.navbar__user-dropdown');
+  const userMenu = document.querySelector('.navbar__user-menu');
+  
+  if (userDropdown && userMenu && 
+      !userDropdown.contains(target) && 
+      !userMenu.contains(target)) {
+    isUserMenuOpen.value = false;
+  }
+};
+
+// Cerrar sesión
 const logout = (): void => {
   store.logout();
   router.push('/login');
+  isUserMenuOpen.value = false;
 };
+
+// Agregar listener para cerrar el menú al hacer clic fuera
+onMounted(() => {
+  document.addEventListener('click', closeUserMenu);
+});
+
+// Limpiar listener al desmontar
+onBeforeUnmount(() => {
+  document.removeEventListener('click', closeUserMenu);
+});
 </script>
 
 <style lang="scss" scoped>
@@ -128,10 +199,80 @@ const logout = (): void => {
     cursor: pointer;
     position: relative;
     transition: transform 0.2s ease-in-out;
+    display: flex;
+    align-items: center;
+    text-decoration: none;
     
     &:hover {
-      transform: scale(1.1);
+      transform: scale(1.05);
       color: $primary-color !important;
+    }
+    
+    &-text {
+      margin-left: 5px;
+      font-size: 14px;
+      display: none;
+      
+      @media (min-width: 768px) {
+        display: inline;
+      }
+    }
+  }
+  
+  &__user {
+    position: relative;
+    
+    &-dropdown {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      color: #000;
+      transition: color 0.2s ease-in-out;
+      
+      &:hover {
+        color: $primary-color;
+      }
+    }
+    
+    &-name {
+      margin: 0 5px;
+      font-weight: 500;
+      display: none;
+      
+      @media (min-width: 768px) {
+        display: inline;
+      }
+    }
+    
+    &-menu {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      width: 180px;
+      z-index: 100;
+      overflow: hidden;
+      margin-top: 10px;
+      
+      &-item {
+        display: flex;
+        align-items: center;
+        padding: 12px 16px;
+        color: $text-color;
+        text-decoration: none;
+        transition: background-color 0.2s ease-in-out;
+        
+        i {
+          margin-right: 10px;
+        }
+        
+        &:hover {
+          background-color: $tertiary-color;
+          color: $primary-color;
+        }
+      }
     }
   }
   
@@ -215,6 +356,10 @@ const logout = (): void => {
       &-item {
         font-size: 20px;
       }
+    }
+    
+    &__user-menu {
+      right: -50px; // Ajustar posición en móviles
     }
   }
 }
