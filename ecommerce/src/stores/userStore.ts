@@ -57,45 +57,45 @@ export const useUserStore = defineStore('user', {
     },
 
     /// 🔹 **Modificar solo el teléfono y la dirección del usuario autenticado**
-async updateUserPhoneAndAddress(telefono: string, direccion: string) {
-  try {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      console.error('No hay token disponible.');
-      return;
-    }
+    async updateUserPhoneAndAddress(telefono: string, direccion: string) {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          console.error('No hay token disponible.');
+          return;
+        }
 
-    // Decodificar el token para obtener el ID del usuario
-    const decoded: any = this.decodeToken(token);
-    if (!decoded?.sub) {
-      console.error('No se pudo obtener el ID del usuario desde el token.');
-      return;
-    }
+        // Decodificar el token para obtener el ID del usuario
+        const decoded: any = this.decodeToken(token);
+        if (!decoded?.sub) {
+          console.error('No se pudo obtener el ID del usuario desde el token.');
+          return;
+        }
 
-    const userId = decoded.sub;
+        const userId = decoded.sub;
 
-    await axios.put(`http://localhost:5162/api/usuario/${userId}`, {
-      telefono,
-      direccion
-    }, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json"
+        await axios.put(`http://localhost:5162/api/usuario/${userId}`, {
+          telefono,
+          direccion
+        }, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json"
+          }
+        });
+
+        // Actualizar solo el teléfono y la dirección en el store
+        if (this.user) {
+          this.user.telefono = telefono;
+          this.user.direccion = direccion;
+          localStorage.setItem('user', JSON.stringify(this.user));
+        }
+
+        console.log('✅ Teléfono y dirección actualizados correctamente.');
+      } catch (error) {
+        console.error('❌ Error actualizando teléfono y dirección:', error);
       }
-    });
-
-    // Actualizar solo el teléfono y la dirección en el store
-    if (this.user) {
-      this.user.telefono = telefono;
-      this.user.direccion = direccion;
-      localStorage.setItem('user', JSON.stringify(this.user));
-    }
-    
-    console.log('✅ Teléfono y dirección actualizados correctamente.');
-  } catch (error) {
-    console.error('❌ Error actualizando teléfono y dirección:', error);
-  }
-},
+    },
 
     /// 🔹 **Login del usuario**
     async login(email: string, password: string) {
@@ -190,6 +190,45 @@ async updateUserPhoneAndAddress(telefono: string, direccion: string) {
         this.loading = false;
       }
     },
+
+    /// 🔹 **Recuperar contraseña**
+    async forgotPassword(email: string) {
+      this.loading = true;
+      this.error = '';
+      try {
+        console.log('Enviando solicitud de recuperación para', { email });
+        const response = await axios.post('http://localhost:5162/api/auth/forgot-password', { email });
+        console.log('FORGOT PASSWORD response:', response.data);
+        return response.data;
+      } catch (err: any) {
+        console.error('Error en recuperación de contraseña:', err);
+        this.error = err.response?.data || 'Error al procesar la solicitud de recuperación';
+        throw err;
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    /// 🔹 **Restablecer contraseña**
+async resetPassword(token: string, newPassword: string) {
+  this.loading = true;
+  this.error = '';
+  try {
+    console.log('Enviando solicitud de restablecimiento con token');
+    const response = await axios.post('http://localhost:5162/api/auth/reset-password', { 
+      token, 
+      newPassword 
+    });
+    console.log('RESET PASSWORD response:', response.data);
+    return response.data.mensaje || 'Contraseña restablecida exitosamente';
+  } catch (err: any) {
+    console.error('Error en restablecimiento de contraseña:', err);
+    this.error = err.response?.data?.error || 'Error al restablecer la contraseña';
+    throw new Error(this.error);
+  } finally {
+    this.loading = false;
+  }
+},
 
     /// 🔹 **Cerrar sesión**
     logout() {
