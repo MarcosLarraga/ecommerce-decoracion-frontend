@@ -1,20 +1,19 @@
 <template>
   <div class="admin-panel">
     <h1 class="admin-panel__title">Panel de Administración</h1>
-
     <div class="admin-panel__tabs">
-      <button 
-        v-for="tab in tabs" 
+      <button
+        v-for="tab in tabs"
         :key="tab.id"
-        class="admin-panel__tab-btn" 
-        :class="{ 'admin-panel__tab-btn--active': activeTab === tab.id }" 
+        class="admin-panel__tab-btn"
+        :class="{ 'admin-panel__tab-btn--active': activeTab === tab.id }"
         @click="activeTab = tab.id"
       >
         {{ tab.name }}
       </button>
     </div>
 
-    <!-- Usuarios -->
+    <!-- Gestión de Usuarios -->
     <div v-if="activeTab === 'users'" class="admin-panel__section">
       <h2 class="admin-panel__subtitle">Gestión de Usuarios</h2>
       <table class="admin-panel__table">
@@ -35,14 +34,19 @@
             <td>{{ user.role }}</td>
             <td>
               <button @click="editUser(user)" class="admin-panel__action-btn">Editar</button>
-              <button @click="deleteUser(user.id)" class="admin-panel__action-btn admin-panel__action-btn--danger">Eliminar</button>
+              <button
+                @click="deleteUser(user.id)"
+                class="admin-panel__action-btn admin-panel__action-btn--danger"
+              >
+                Eliminar
+              </button>
             </td>
           </tr>
         </tbody>
       </table>
     </div>
 
-    <!-- Productos -->
+    <!-- Gestión de Productos -->
     <div v-if="activeTab === 'products'" class="admin-panel__section">
       <h2 class="admin-panel__subtitle">Gestión de Productos</h2>
       <button @click="showAddProductForm = true" class="admin-panel__add-btn">Añadir Producto</button>
@@ -60,55 +64,75 @@
           <tr v-for="product in products" :key="product.id">
             <td>{{ product.id }}</td>
             <td>{{ product.nombre }}</td>
-            <td>{{ product.precio }}€</td>
-            <td>{{ product.categoria }}</td>
+            <td>{{ product.precio.toFixed(2) }}€</td> <!-- Formato adecuado -->
+            <td>{{ product.categoria }}</td> <!-- Asegúrate de que categoría sea un string -->
             <td>
               <button @click="editProduct(product)" class="admin-panel__action-btn">Editar</button>
-              <button @click="deleteProduct(product.id)" class="admin-panel__action-btn admin-panel__action-btn--danger">Eliminar</button>
+              <button
+                @click="deleteProduct(product.id)"
+                class="admin-panel__action-btn admin-panel__action-btn--danger"
+              >
+                Eliminar
+              </button>
             </td>
           </tr>
         </tbody>
       </table>
     </div>
 
-    <!-- Pedidos -->
+    <!-- Gestión de Pedidos -->
     <div v-if="activeTab === 'orders'" class="admin-panel__section">
       <h2 class="admin-panel__subtitle">Gestión de Pedidos</h2>
       <table class="admin-panel__table">
         <thead>
           <tr>
             <th>ID</th>
-            <th>Usuario</th>
-            <th>Fecha</th>
-            <th>Total</th>
-            <th>Estado</th>
-            <th>Acciones</th>
+            <th>Usuario ID</th> <!-- O Nombre del Usuario si está disponible -->
+            <th>Fecha</th> <!-- Fecha formateada correctamente -->
+            <th>Total</th> <!-- Total del pedido -->
+            <th>Acciones</th> <!-- Acciones disponibles -->
           </tr>
         </thead>
         <tbody>
+          <!-- Renderizado dinámico de pedidos -->
           <tr v-for="order in orders" :key="order.id">
+            <!-- ID del pedido -->
             <td>{{ order.id }}</td>
-            <td>{{ order.usuario }}</td>
-            <td>{{ new Date(order.fecha).toLocaleString() }}</td>
-            <td>{{ order.total }}€</td>
-            <td>{{ order.estado }}</td>
+
+            <!-- Usuario relacionado (puedes usar order.usuario si está disponible) -->
+            <td>{{ order.usuarioId }}</td>
+
+            <!-- Fecha formateada correctamente -->
+            <!-- Usa toLocaleDateString para mostrar la fecha en formato local -->
+            <!-- Asegúrate de que order.fecha sea una fecha válida -->
+            <td>{{ formatDate(order.fecha) }}</td>
+
+            <!-- Total del pedido (formateado como moneda) -->
+            <!-- Asegúrate de que order.total sea un número válido -->
+            <td>{{ order.total ? `${order.total.toFixed(2)}€` : '0€' }}</td>
+
+
+            <!-- Botones de acciones -->
             <td>
+              <!-- Ver detalles del pedido -->
               <button @click="viewOrderDetails(order.id)" class="admin-panel__action-btn">Ver Detalles</button>
-              <button @click="updateOrderStatus(order.id)" class="admin-panel__action-btn">Actualizar Estado</button>
             </td>
           </tr>
         </tbody>
       </table>
     </div>
+
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { useUserStore } from '@/stores/userStore';
-import axios from 'axios';
+import { useAdminStore } from '@/stores/adminStore';
+import { useRouter } from 'vue-router';
 
-const userStore = useUserStore();
+const router = useRouter();
+const adminStore = useAdminStore();
+
 const activeTab = ref('users');
 const users = ref([]);
 const products = ref([]);
@@ -121,74 +145,35 @@ const tabs = [
   { id: 'orders', name: 'Pedidos' }
 ];
 
+// Formatea una fecha en formato local
+function formatDate(dateString: string): string {
+  if (!dateString) return 'Sin fecha';
+  const date = new Date(dateString);
+  return isNaN(date.getTime()) ? 'Fecha inválida' : date.toLocaleDateString('es-ES');
+}
+
 onMounted(async () => {
-  if (!userStore.user?.role || userStore.user.role !== 'admin') {
-    // Redirigir si no es admin
-    router.push('/');
-    return;
+  try {
+    // Obtén los datos desde el store
+    await adminStore.fetchAllUsers();
+    await adminStore.fetchAllProducts();
+    await adminStore.fetchAllOrders();
+
+    // Asigna los datos a las referencias locales
+    users.value = adminStore.users;
+    products.value = adminStore.products;
+    orders.value = adminStore.orders;
+  } catch (error) {
+    console.error('Error al cargar datos:', error);
   }
-  await fetchUsers();
-  await fetchProducts();
-  await fetchOrders();
 });
 
-async function fetchUsers() {
-  try {
-    const response = await axios.get('http://localhost:5162/api/usuarios', {
-      headers: { Authorization: `Bearer ${userStore.token}` }
-    });
-    users.value = response.data;
-  } catch (error) {
-    console.error('Error fetching users:', error);
-  }
-}
-
-async function fetchProducts() {
-  try {
-    const response = await axios.get('http://localhost:5162/api/productos', {
-      headers: { Authorization: `Bearer ${userStore.token}` }
-    });
-    products.value = response.data;
-  } catch (error) {
-    console.error('Error fetching products:', error);
-  }
-}
-
-async function fetchOrders() {
-  try {
-    const response = await axios.get('http://localhost:5162/api/pedidos', {
-      headers: { Authorization: `Bearer ${userStore.token}` }
-    });
-    orders.value = response.data;
-  } catch (error) {
-    console.error('Error fetching orders:', error);
-  }
-}
-
-// Implementar funciones para editar, eliminar usuarios, productos y gestionar pedidos
-function editUser(user) {
-  // Lógica para editar usuario
-}
-
-function deleteUser(userId) {
-  // Lógica para eliminar usuario
-}
-
-function editProduct(product) {
-  // Lógica para editar producto
-}
-
-function deleteProduct(productId) {
-  // Lógica para eliminar producto
-}
-
-function viewOrderDetails(orderId) {
-  // Lógica para ver detalles del pedido
-}
-
-function updateOrderStatus(orderId) {
-  // Lógica para actualizar estado del pedido
-}
+function editUser(user: any) {}
+function deleteUser(userId: number) {}
+function editProduct(product: any) {}
+function deleteProduct(productId: number) {}
+function viewOrderDetails(orderId: number) {}
+function updateOrderStatus(orderId: number) {}
 </script>
 
 <style lang="scss" scoped>
@@ -272,7 +257,8 @@ function updateOrderStatus(orderId) {
     border-collapse: collapse;
     margin-top: $spacing-md;
 
-    th, td {
+    th,
+    td {
       border: 1px solid $tertiary-color;
       padding: $spacing-sm;
       text-align: left;

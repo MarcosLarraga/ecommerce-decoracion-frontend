@@ -15,23 +15,23 @@ import SobreNosotrosView from '@/views/SobreNosotrosView.vue';
 import ConfirmarPedido from '@/views/ConfirmarPedidoView.vue';
 import PedidoDetalle from '@/views/PedidoDetalleView.vue';
 import MiCuenta from '@/views/MiCuentaView.vue';
-import Admin from '@/views/AdminView.vue';
+import AdminView from '@/views/AdminView.vue';
 
 const routes = [
   { path: '/', name: 'Home', component: HomeView },
   { path: '/shop', name: 'Products', component: ProductsView },
   { path: '/cart', name: 'Cart', component: CartView },
   { path: '/pedido-confirmacion', component: ConfirmarPedido },
-  { path: '/pedido-detalle/:id', component: PedidoDetalle, props: true }, 
+  { path: '/pedido-detalle/:id', component: PedidoDetalle, props: true },
   { path: '/guia', name: 'Guia', component: GuiaView },
   { path: '/contacto', name: 'Contact', component: ContactView },
-  { path: '/sobre-nosotros', name: 'SobreNosotros', component: SobreNosotrosView }, 
+  { path: '/sobre-nosotros', name: 'SobreNosotros', component: SobreNosotrosView },
   { path: '/product/:id', name: 'ProductDetail', component: ProductDetailView, props: true },
   { path: '/login', name: 'Login', component: LoginView },
   { path: '/mi-cuenta', name: 'MiCuenta', component: MiCuenta },
   { path: '/register', name: 'Register', component: RegisterView },
   { path: '/forgot-password', name: 'ForgotPassword', component: ForgotPasswordView },
-  { path: '/admin', name: 'Admin', component: Admin },
+  { path: '/admin', name: 'Admin', component: AdminView },
   { path: '/reset-password', name: 'ResetPassword', component: ResetPasswordView }
 ];
 

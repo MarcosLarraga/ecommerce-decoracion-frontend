@@ -67,7 +67,7 @@ const handleLogin = async () => {
       console.log("Usuario autenticado:", userStore.user);
       console.log("Rol del usuario:", userStore.user?.role);
       console.log("¿Es admin?:", userStore.user?.role === 'admin' || userStore.user?.role === 'Admin');
-      
+
       if (userStore.user?.role === 'Admin' || userStore.user?.role === 'admin') {
         console.log("Mostrando modal de admin");
         showAdminModal.value = true;
@@ -136,17 +136,24 @@ const redirectToAdmin = () => {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0,0,0,0.5);
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 1000; // Asegura que esté por encima de otros elementos
 }
+
 
 .modal {
   background-color: #fff;
   padding: $spacing-lg;
   border-radius: $border-radius-lg;
   text-align: center;
+  max-width: 90%;
+  width: 400px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+
 
   h2 {
     font-size: $font-size-xl;
@@ -167,35 +174,36 @@ const redirectToAdmin = () => {
   .modal-actions {
     display: flex;
     justify-content: space-around;
+    margin-top: $spacing-md;
 
     .modal-button {
       padding: $spacing-sm $spacing-md;
       border-radius: $border-radius-sm;
       font-size: $font-size-base;
+      cursor: pointer;
+      transition: all $transition-fast;
 
       &--admin {
         background-color: $primary-color;
         color: white;
         border: none;
         font-weight: bold;
-        transition: background-color $transition-fast, transform $transition-fast;
-        
+
         &:hover {
           background-color: $primary-color-hover;
           transform: translateY(-2px);
         }
-        
+
         &:active {
           transform: translateY(0);
         }
       }
-      
+
       &:not(&--admin) {
         background-color: $tertiary-color;
         color: $text-color;
         border: 1px solid $border-color;
-        transition: background-color $transition-fast;
-        
+
         &:hover {
           background-color: darken($tertiary-color, 5%);
         }
@@ -204,102 +212,101 @@ const redirectToAdmin = () => {
   }
 }
 
-/* Resto de estilos del formulario */
-.auth {
-  &__title {
-    font-size: 2rem;
-    margin-bottom: 1rem;
-    color: $primary-color;
-    font-weight: bold;
-  }
-  
-  &__form {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
-  
-  &__group {
-    display: flex;
-    flex-direction: column;
-    text-align: left;
-  }
-  
-  &__label {
-    margin-bottom: 0.5rem;
-    font-weight: 600;
-    color: $text-color;
-  }
-  
-  &__input {
-    padding: 0.5rem;
-    border: 1px solid $border-color;
-    border-radius: $border-radius;
-    font-size: $font-size-base;
-    
-    &:focus {
-      outline: none;
-      border-color: $primary-color;
-    }
-  }
-  
-  &__button {
-    padding: 0.75rem;
-    background-color: $primary-color;
-    color: white;
-    border: none;
-    border-radius: $border-radius;
-    cursor: pointer;
-    transition: background-color $transition-fast;
-    font-weight: bold;
-    
-    &:hover {
-      background-color: $primary-color-hover;
-    }
-    
-    &:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-  }
-  
-  &__links {
-    margin-top: 1rem;
-    display: flex;
-    justify-content: space-around;
-  }
-  
-  &__link {
-    color: $primary-color;
-    text-decoration: none;
-    
-    &:hover {
-      text-decoration: underline;
-    }
-  }
-  
-  &__google {
-    margin-top: 1.5rem;
-  }
-}
-
-/* Media queries para pantallas más grandes */
-@media (min-width: 768px) {
+  /* Resto de estilos del formulario */
   .auth {
-    padding: 2rem;
-    max-width: 400px;
-  }
-  
-  .modal {
-    max-width: 500px;
-    
-    .modal-actions {
-      gap: $spacing-lg;
-      
-      .modal-button {
-        min-width: 150px;
+    &__title {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      color: $primary-color;
+      font-weight: bold;
+    }
+
+    &__form {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    &__group {
+      display: flex;
+      flex-direction: column;
+      text-align: left;
+    }
+
+    &__label {
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: $text-color;
+    }
+
+    &__input {
+      padding: 0.5rem;
+      border: 1px solid $border-color;
+      border-radius: $border-radius;
+      font-size: $font-size-base;
+
+      &:focus {
+        outline: none;
+        border-color: $primary-color;
       }
     }
+
+    &__button {
+      padding: 0.75rem;
+      background-color: $primary-color;
+      color: white;
+      border: none;
+      border-radius: $border-radius;
+      cursor: pointer;
+      transition: background-color $transition-fast;
+      font-weight: bold;
+
+      &:hover {
+        background-color: $primary-color-hover;
+      }
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+    }
+
+    &__links {
+      margin-top: 1rem;
+      display: flex;
+      justify-content: space-around;
+    }
+
+    &__link {
+      color: $primary-color;
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+
+    &__google {
+      margin-top: 1.5rem;
+    }
   }
-}
-</style>
+
+  /* Media queries para pantallas más grandes */
+  @media (min-width: 768px) {
+    .auth {
+      padding: 2rem;
+      max-width: 400px;
+    }
+
+    .modal {
+      max-width: 500px;
+
+      .modal-actions {
+        gap: $spacing-lg;
+
+        .modal-button {
+          min-width: 150px;
+        }
+      }
+    }
+  }</style>
