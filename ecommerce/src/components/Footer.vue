@@ -4,10 +4,10 @@
       <v-row justify="center" class="footer__content">
         <v-col cols="12" md="3" class="footer__section">
           <nav class="footer__nav">
-            <router-link to="/" class="footer__link">Home</router-link>
-            <router-link to="/shop" class="footer__link">Shop</router-link>
+            <router-link to="/shop" class="footer__link">Tienda</router-link>
+            <router-link to="/guia" class="footer__link">Guía</router-link>
             <router-link to="/contacto" class="footer__link">Contacto</router-link>
-            <router-link to="/blog" class="footer__link">Blog</router-link>
+            <router-link to="/sobre-nosotros" class="footer__link">Sobre LM</router-link>
           </nav>
         </v-col>
 
@@ -43,7 +43,6 @@
 </template>
 
 <script setup>
-// Importamos el componente blanco
 import LogoCanvasWhite from '@/components/LogoCanvasWhite.vue'
 </script>
 
@@ -87,11 +86,16 @@ import LogoCanvasWhite from '@/components/LogoCanvasWhite.vue'
     &:hover {
       color: $primary-color;
     }
+    &--admin {
+      font-size: $font-size-small;
+      opacity: 0.7;
+      &:hover {
+        opacity: 1;
+      }
+    }
   }
 
   &__logo-img {
-    /* Mantiene la misma altura forzada que antes (50px). 
-       El canvas se escalará visualmente a este tamaño */
     height: 50px;
     margin-bottom: $spacing-sm;
   }
@@ -126,5 +130,6 @@ import LogoCanvasWhite from '@/components/LogoCanvasWhite.vue'
   &__copyright {
     font-size: $font-size-small;
   }
+
 }
 </style>

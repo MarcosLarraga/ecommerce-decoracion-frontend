@@ -3,12 +3,10 @@
     <h1 class="mi-cuenta__title">Mi Cuenta</h1>
 
     <div class="mi-cuenta__tabs">
-      <button class="mi-cuenta__tab-btn" :class="{ 'mi-cuenta__tab-btn--active': activeTab === 'perfil' }"
-        @click="activeTab = 'perfil'">
+      <button class="mi-cuenta__tab-btn" :class="{ 'mi-cuenta__tab-btn--active': activeTab === 'perfil' }" @click="activeTab = 'perfil'">
         Mis Datos
       </button>
-      <button class="mi-cuenta__tab-btn" :class="{ 'mi-cuenta__tab-btn--active': activeTab === 'pedidos' }"
-        @click="activeTab = 'pedidos'">
+      <button class="mi-cuenta__tab-btn" :class="{ 'mi-cuenta__tab-btn--active': activeTab === 'pedidos' }" @click="activeTab = 'pedidos'">
         Mis Pedidos
       </button>
     </div>
@@ -16,56 +14,26 @@
     <!-- Sección de Perfil -->
     <div v-if="activeTab === 'perfil'" class="mi-cuenta__section">
       <h2 class="mi-cuenta__subtitle">Datos Personales</h2>
-
       <form class="mi-cuenta__form" @submit.prevent="actualizarPerfil">
         <div class="mi-cuenta__form-group">
           <label class="mi-cuenta__label">Nombre:</label>
           <input v-model="perfil.nombre" type="text" class="mi-cuenta__input" required />
         </div>
-
         <div class="mi-cuenta__form-group">
           <label class="mi-cuenta__label">Email:</label>
           <input v-model="perfil.email" type="email" class="mi-cuenta__input" required disabled />
           <small class="mi-cuenta__input-help">El email no se puede modificar</small>
         </div>
-
         <div class="mi-cuenta__form-group">
           <label class="mi-cuenta__label">Teléfono:</label>
           <input v-model="perfil.telefono" type="tel" class="mi-cuenta__input" required />
         </div>
-
         <div class="mi-cuenta__form-group">
           <label class="mi-cuenta__label">Dirección:</label>
           <input v-model="perfil.direccion" type="text" class="mi-cuenta__input" required />
         </div>
-
         <button type="submit" class="mi-cuenta__submit-btn" :disabled="isUpdating">
           {{ isUpdating ? 'Actualizando...' : 'Guardar Cambios' }}
-        </button>
-      </form>
-
-      <div class="mi-cuenta__separator"></div>
-
-      <h2 class="mi-cuenta__subtitle">Cambiar Contraseña</h2>
-
-      <form class="mi-cuenta__form" @submit.prevent="cambiarPassword">
-        <div class="mi-cuenta__form-group">
-          <label class="mi-cuenta__label">Contraseña Actual:</label>
-          <input v-model="passwords.actual" type="password" class="mi-cuenta__input" required />
-        </div>
-
-        <div class="mi-cuenta__form-group">
-          <label class="mi-cuenta__label">Nueva Contraseña:</label>
-          <input v-model="passwords.nueva" type="password" class="mi-cuenta__input" required />
-        </div>
-
-        <div class="mi-cuenta__form-group">
-          <label class="mi-cuenta__label">Confirmar Contraseña:</label>
-          <input v-model="passwords.confirmar" type="password" class="mi-cuenta__input" required />
-        </div>
-
-        <button type="submit" class="mi-cuenta__submit-btn" :disabled="isChangingPassword">
-          {{ isChangingPassword ? 'Actualizando...' : 'Cambiar Contraseña' }}
         </button>
       </form>
     </div>
@@ -73,17 +41,14 @@
     <!-- Sección de Pedidos -->
     <div v-else-if="activeTab === 'pedidos'" class="mi-cuenta__section">
       <h2 class="mi-cuenta__subtitle">Historial de Pedidos</h2>
-
       <div v-if="loading" class="mi-cuenta__loading">
         <div class="spinner"></div>
         <p>Cargando tus pedidos...</p>
       </div>
-
       <div v-else-if="pedidos.length === 0" class="mi-cuenta__empty">
         <p>No tienes pedidos realizados todavía.</p>
         <router-link to="/" class="mi-cuenta__shop-btn">Ir a la tienda</router-link>
       </div>
-
       <div v-else class="mi-cuenta__pedidos">
         <div v-for="pedido in pedidos" :key="pedido.id" class="mi-cuenta__pedido">
           <div class="mi-cuenta__pedido-header">
@@ -95,11 +60,9 @@
               {{ pedido.estado || 'Pendiente' }}
             </div>
           </div>
-
           <div class="mi-cuenta__pedido-total">
             <p>Total: <strong>{{ pedido.total.toFixed(2) }} €</strong></p>
           </div>
-
           <div class="mi-cuenta__pedido-actions">
             <router-link :to="`/pedido-detalle/${pedido.id}`" class="mi-cuenta__view-btn">
               Ver detalles
@@ -114,7 +77,6 @@
 <script setup lang="ts">
 import { ref, onMounted, reactive, watch } from 'vue';
 import { useUserStore } from '@/stores/userStore';
-
 import { usePedidoStore } from '@/stores/pedidoStore';
 import { useToast } from 'vue-toastification';
 
@@ -125,40 +87,14 @@ const toast = useToast();
 const activeTab = ref('perfil');
 const loading = ref(false);
 const isUpdating = ref(false);
-const isChangingPassword = ref(false);
 const pedidos = ref([]);
 
 const perfil = reactive({
-  nombre: userStore.user.nombre || '',
-  email: userStore.user.email || '',
-  telefono: userStore.user.telefono || '',
-  direccion: userStore.user.direccion || ''
+  nombre: userStore.user?.nombre || '',
+  email: userStore.user?.email || '',
+  telefono: userStore.user?.telefono || '',
+  direccion: userStore.user?.direccion || ''
 });
-
-const passwords = reactive({
-  actual: '',
-  nueva: '',
-  confirmar: ''
-});
-
-onMounted(async () => {
-  if (activeTab.value === 'pedidos') {
-    await cargarPedidos();
-  }
-});
-
-const cargarPedidos = async () => {
-  loading.value = true;
-  try {
-    await pedidoStore.fetchPedidosByUser(userStore.user.id);
-    pedidos.value = pedidoStore.pedidos;
-  } catch (error) {
-    console.error("Error al cargar pedidos:", error);
-    toast.error("No se pudieron cargar tus pedidos");
-  } finally {
-    loading.value = false;
-  }
-};
 
 const actualizarPerfil = async () => {
   isUpdating.value = true;
@@ -178,24 +114,16 @@ const actualizarPerfil = async () => {
   }
 };
 
-const cambiarPassword = async () => {
-  if (passwords.nueva !== passwords.confirmar) {
-    toast.error("Las contraseñas no coinciden");
-    return;
-  }
-
-  isChangingPassword.value = true;
+const cargarPedidos = async () => {
+  loading.value = true;
   try {
-    await userStore.changePassword(passwords.actual, passwords.nueva);
-    toast.success("Contraseña actualizada correctamente");
-    passwords.actual = '';
-    passwords.nueva = '';
-    passwords.confirmar = '';
+    await pedidoStore.fetchPedidosByUser(userStore.user.id);
+    pedidos.value = pedidoStore.pedidos;
   } catch (error) {
-    console.error("Error al cambiar contraseña:", error);
-    toast.error("No se pudo actualizar la contraseña");
+    console.error("Error al cargar pedidos:", error);
+    toast.error("No se pudieron cargar tus pedidos");
   } finally {
-    isChangingPassword.value = false;
+    loading.value = false;
   }
 };
 
@@ -218,14 +146,17 @@ const watchActiveTab = (newTab) => {
   }
 };
 
-// Observar cambios en activeTab
 watch(activeTab, watchActiveTab);
 
+onMounted(() => {
+  if (activeTab.value === 'pedidos') {
+    cargarPedidos();
+  }
+});
 </script>
 
 <style lang="scss" scoped>
 @use '@/styles/variables' as *;
-
 
 .mi-cuenta {
   width: 100%;
@@ -266,7 +197,6 @@ watch(activeTab, watchActiveTab);
     display: flex;
     border-bottom: 2px solid $tertiary-color;
     margin-bottom: $spacing-lg;
-    overflow-x: auto;
     -webkit-overflow-scrolling: touch;
 
     @media (min-width: $breakpoint-sm) {
@@ -577,7 +507,6 @@ watch(activeTab, watchActiveTab);
     0% {
       transform: rotate(0deg);
     }
-
     100% {
       transform: rotate(360deg);
     }

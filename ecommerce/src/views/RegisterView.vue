@@ -60,6 +60,7 @@ const handleRegister = async () => {
     router.push('/login');
   }
 };
+
 </script>
 
 <style lang="scss" scoped>
