@@ -38,60 +38,58 @@
   </div>
 </template>
 
-
 <script setup lang="ts">
-import { ref } from 'vue';
-import { useUserStore } from '@/stores/userStore';
-import { usePedidoStore } from '@/stores/pedidoStore';
-import { useDetallePedidoStore } from '@/stores/detallePedidoStore';
-import { useCartStore } from '@/stores/cartStore';
-import { useRouter } from 'vue-router';
-import { useToast } from 'vue-toastification';
+import { ref } from 'vue'
+import { useUserStore } from '@/stores/userStore'
+import { usePedidoStore } from '@/stores/pedidoStore'
+import { useDetallePedidoStore } from '@/stores/detallePedidoStore'
+import { useCartStore } from '@/stores/cartStore'
+import { useRouter } from 'vue-router'
+import { useToast } from 'vue-toastification'
 
-const userStore = useUserStore();
-const pedidoStore = usePedidoStore();
-const detallePedidoStore = useDetallePedidoStore();
-const cartStore = useCartStore();
-const router = useRouter();
-const toast = useToast();
+const userStore = useUserStore()
+const pedidoStore = usePedidoStore()
+const detallePedidoStore = useDetallePedidoStore()
+const cartStore = useCartStore()
+const router = useRouter()
+const toast = useToast()
 
-const direccion = ref(userStore.user.direccion || '');
-const telefono = ref(userStore.user.telefono || '');
-const isSubmitting = ref(false);
+const direccion = ref(userStore.user.direccion || '')
+const telefono = ref(userStore.user.telefono || '')
+const isSubmitting = ref(false)
 
 const confirmarPedido = async () => {
   if (cartStore.cart.length === 0) {
-    toast.error("No puedes realizar un pedido sin productos en el carrito.");
-    return;
+    toast.error("No puedes realizar un pedido sin productos en el carrito.")
+    return
   }
 
-  isSubmitting.value = true;
+  isSubmitting.value = true
 
   try {
     // Actualizamos el teléfono y la dirección
-    await userStore.updateUserPhoneAndAddress(telefono.value, direccion.value);
-    console.log("Datos de contacto actualizados");
+    await userStore.updateUserPhoneAndAddress(telefono.value, direccion.value)
+    console.log("Datos de contacto actualizados")
 
     // Luego creamos el pedido
     const pedidoId = await pedidoStore.crearPedidoConDetalles(
-      userStore.user.id, 
-      cartStore.cart, 
+      userStore.user.id,
+      cartStore.cart,
       cartStore.cartTotal
-    );
+    )
 
     // Después de crear el pedido, agregamos los detalles
-    await detallePedidoStore.agregarDetallesPedido(pedidoId, cartStore.cart);
+    await detallePedidoStore.agregarDetallesPedido(pedidoId, cartStore.cart)
 
-    toast.success("¡Pedido realizado con éxito!");
-    router.push(`/pedido-detalle/${pedidoId}`);
+    toast.success("¡Pedido realizado con éxito!")
+    router.push(`/pedido-detalle/${pedidoId}`)
   } catch (error) {
-    console.error("Error al confirmar el pedido:", error);
-    toast.error(error.message || "Error al procesar el pedido");
+    console.error("Error al confirmar el pedido:", error)
+    toast.error(error.message || "Error al procesar el pedido")
   } finally {
-    isSubmitting.value = false;
+    isSubmitting.value = false
   }
-};
-
+}
 </script>
 
 <style lang="scss" scoped>
@@ -125,7 +123,7 @@ const confirmarPedido = async () => {
     color: $primary-color;
     text-align: center;
     font-weight: 700;
-    
+
     @media (min-width: $breakpoint-md) {
       font-size: $font-size-xxl;
       margin-bottom: $spacing-xl;
@@ -137,11 +135,11 @@ const confirmarPedido = async () => {
     padding: $spacing-md;
     border-radius: $border-radius;
     margin-bottom: $spacing-lg;
-    
+
     p {
       margin: 0;
       font-size: $font-size-base;
-      
+
       strong {
         color: $primary-color;
       }
@@ -173,7 +171,7 @@ const confirmarPedido = async () => {
     font-size: $font-size-base;
     font-family: $font-family-secondary;
     transition: border $transition-fast;
-    
+
     &:focus {
       outline: none;
       border: $input-focus-border;
@@ -204,39 +202,39 @@ const confirmarPedido = async () => {
     padding: $spacing-md;
     border-radius: $border-radius;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    
+
     @media (max-width: $breakpoint-sm - 1) {
       flex-direction: column;
       align-items: flex-start;
     }
-    
+
     &-image {
       width: 80px;
       height: 80px;
       object-fit: cover;
       border-radius: $border-radius;
-      
+
       @media (max-width: $breakpoint-sm - 1) {
         margin-bottom: $spacing-sm;
       }
     }
-    
+
     &-info {
       flex: 1;
       padding: 0 $spacing-md;
-      
+
       h3 {
         font-family: $font-family-primary;
         font-size: $font-size-base;
         margin: 0 0 $spacing-xs;
         color: $text-color;
       }
-      
+
       p {
         margin: 0;
         font-size: $font-size-small;
         color: $text-color-secondary;
-        
+
         &:first-of-type {
           color: $primary-color;
           font-weight: 600;
@@ -266,22 +264,21 @@ const confirmarPedido = async () => {
     transition: background-color $transition-normal, transform $transition-fast;
     box-shadow: $button-shadow;
     margin-top: $spacing-lg;
-    
+
     &:hover:not(:disabled) {
       background-color: $primary-color-hover;
       transform: translateY(-2px);
       box-shadow: $button-hover-shadow;
     }
-    
+
     &:active:not(:disabled) {
       transform: translateY(0);
     }
-    
+
     &:disabled {
       background-color: $text-color-secondary;
       cursor: not-allowed;
     }
   }
 }
-
 </style>

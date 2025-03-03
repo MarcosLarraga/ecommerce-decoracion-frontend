@@ -1,25 +1,27 @@
 <script setup>
-import PageHero from '@/components/PageHero.vue';
-import SoporteInfo from '@/components/SoporteInfo.vue';
+import PageHero from '@/components/PageHero.vue'
+import SoporteInfo from '@/components/SoporteInfo.vue'
 </script>
 
 <template>
   <v-container fluid class="pa-0">
     <PageHero title="Sobre Nosotros" imageSrc="/fotos/PageHero.jpg" />
 
+    <!-- Bloque "about" con el elemento "__container" -->
     <v-container class="about__container">
       <v-row justify="center">
         <v-col cols="12" md="10" lg="6">
           <h2 class="about__title">Nuestra Historia</h2>
           <p class="about__text">
-            Desde nuestros inicios, nos hemos dedicado a ofrecer productos de decoración únicos y de alta calidad. Nuestra 
-            pasión por el diseño de interiores nos llevó a crear una tienda donde cada pieza tiene una historia y un propósito.
+            Desde nuestros inicios, nos hemos dedicado a ofrecer productos de decoración únicos y de alta calidad. 
+            Nuestra pasión por el diseño de interiores nos llevó a crear una tienda donde cada pieza tiene una 
+            historia y un propósito.
           </p>
           
           <h2 class="about__title">Nuestra Misión</h2>
           <p class="about__text">
-            Buscamos transformar cada hogar en un espacio acogedor y con estilo. Creemos que los pequeños detalles marcan la 
-            diferencia y queremos ayudarte a encontrar esos complementos que harán de tu casa un hogar.
+            Buscamos transformar cada hogar en un espacio acogedor y con estilo. Creemos que los pequeños detalles 
+            marcan la diferencia y queremos ayudarte a encontrar esos complementos que harán de tu casa un hogar.
           </p>
           
           <h2 class="about__title">Nuestros Valores</h2>
@@ -32,9 +34,9 @@ import SoporteInfo from '@/components/SoporteInfo.vue';
           
           <h2 class="about__title">Nuestro Equipo</h2>
           <p class="about__text">
-            Contamos con un equipo de expertos en diseño de interiores y decoración que trabajan cada día para ofrecerte 
-            los mejores productos y asesoramiento personalizado. Nos enorgullece formar parte de tu hogar a través de 
-            nuestros productos.
+            Contamos con un equipo de expertos en diseño de interiores y decoración que trabajan cada día para 
+            ofrecerte los mejores productos y asesoramiento personalizado. Nos enorgullece formar parte de tu hogar 
+            a través de nuestros productos.
           </p>
           
           <h2 class="about__title">¿Por qué elegirnos?</h2>
@@ -54,7 +56,7 @@ import SoporteInfo from '@/components/SoporteInfo.vue';
   </v-container>
 </template>
 
-<style lang="scss" scoped>
+<style scoped lang="scss">
 .about {
   &__container {
     flex-grow: 1;
@@ -76,6 +78,8 @@ import SoporteInfo from '@/components/SoporteInfo.vue';
   }
 }
 
+/* Mobile first: estilos base arriba,
+   breakpoints abajo para escalar en pantallas mayores */
 @media (min-width: 768px) {
   .about {
     &__title {
