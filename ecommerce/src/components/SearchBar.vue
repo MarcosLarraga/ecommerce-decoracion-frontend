@@ -1,5 +1,5 @@
 <template>
-  <div class="search-container">
+  <div class="search">
     <v-text-field
       v-model="searchQuery"
       @keyup.enter="goToProducts"
@@ -7,7 +7,7 @@
       variant="plain"
       density="compact"
       hide-details
-      class="search-field"
+      class="search__field"
       prepend-inner-icon="mdi-magnify"
       dark
     ></v-text-field>
@@ -31,13 +31,15 @@ const goToProducts = () => {
 };
 </script>
 
-<style scoped>
-.search-container {
+<style scoped lang="scss">
+@use '@/styles/variables' as *;
+
+.search {
   width: 100%;
   max-width: 300px;
 }
 
-.search-field {
+.search__field {
   border-bottom: 1px solid #000000 !important;
   border-radius: 0;
 }
@@ -72,16 +74,14 @@ const goToProducts = () => {
   color: #000000 !important;
 }
 
-/* Para tablet: entre 768px */
 @media (min-width: 768px) {
-  .search-container {
+  .search {
     width: 250px;
   }
 }
 
-/* Para laptop 1024px */
 @media (min-width: 1024px) {
-  .search-container {
+  .search {
     width: 200px;
   }
 }

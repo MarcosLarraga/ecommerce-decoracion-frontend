@@ -2,7 +2,11 @@
   <div class="product-card">
     <router-link :to="`/product/${producto.id}`" class="product-card__content">
       <div class="product-card__image-wrapper">
-        <img :src="producto.urlImagen" alt="Imagen del producto" class="product-card__image" />
+        <img
+          :src="producto.urlImagen"
+          alt="Imagen del producto"
+          class="product-card__image"
+        />
         <div class="product-card__overlay">
           <span class="product-card__view">Ver</span>
         </div>
@@ -12,8 +16,15 @@
         <p class="product-card__price">{{ producto.precio.toFixed(2) }} €</p>
       </div>
     </router-link>
-    <button class="product-card__cart-btn" @click="addToCart($event)" :disabled="isAddingToCart">
-      <font-awesome-icon :icon="isAddingToCart ? faSpinner : faShoppingCart" :spin="isAddingToCart" />
+    <button
+      class="product-card__cart-btn"
+      @click="addToCart($event)"
+      :disabled="isAddingToCart"
+    >
+      <font-awesome-icon
+        :icon="isAddingToCart ? faSpinner : faShoppingCart"
+        :spin="isAddingToCart"
+      />
     </button>
   </div>
 </template>
@@ -55,7 +66,6 @@ const addToCart = async (event: Event) => {
 <style lang="scss" scoped>
 @use '@/styles/variables' as *;
 
-
 .product-card {
   position: relative;
   background-color: $background-color;
@@ -66,8 +76,8 @@ const addToCart = async (event: Event) => {
   height: 100%;
   display: flex;
   flex-direction: column;
-  max-width: 200px; // Tamaño máximo más pequeño
-  
+  max-width: 200px; 
+
   &:hover {
     transform: translateY(-3px);
     box-shadow: $box-shadow-lg;
@@ -91,11 +101,11 @@ const addToCart = async (event: Event) => {
   
   &__image-wrapper {
     position: relative;
-    padding-top: 80%; // Relación de aspecto 4:5 (más pequeña que 1:1)
+    padding-top: 80%; 
     overflow: hidden;
     margin: 0 auto;
-    width: 90%; // Imagen más pequeña que el ancho de la tarjeta
-    margin-top: 10px; // Espacio superior
+    width: 90%;
+    margin-top: 10px;
   }
   
   &__image {
@@ -158,13 +168,12 @@ const addToCart = async (event: Event) => {
     margin: 0 0 $spacing-xs;
     color: $text-color;
     line-height: $line-height-tight;
-    // Limitar a 2 líneas con elipsis
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
-    height: 2.4em; // Altura fija para 2 líneas
+    height: 2.4em;
   }
   
   &__price {
@@ -203,10 +212,9 @@ const addToCart = async (event: Event) => {
   }
 }
 
-// Responsive para grid
 @media (min-width: $breakpoint-md) {
   .product-card {
-    max-width: 220px; // Un poco más grande en pantallas medianas
+    max-width: 220px;
   }
 }
 </style>

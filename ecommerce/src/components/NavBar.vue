@@ -18,7 +18,11 @@
         <!-- Iconos (derecha) -->
         <div class="navbar__icons">
           <!-- Usuario no autenticado -->
-          <router-link to="/login" class="navbar__icon" v-if="!store.isAuthenticated">
+          <router-link 
+            to="/login" 
+            class="navbar__icon" 
+            v-if="!store.isAuthenticated"
+          >
             <v-icon size="28">mdi-account</v-icon>
             <span class="navbar__icon-text">Iniciar sesión</span>
           </router-link>
@@ -28,7 +32,9 @@
             <div class="navbar__user-dropdown" @click="toggleUserMenu">
               <v-icon size="28">mdi-account</v-icon>
               <span class="navbar__user-name">{{ getUserName }}</span>
-              <v-icon size="20">{{ isUserMenuOpen ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
+              <v-icon size="20">
+                {{ isUserMenuOpen ? 'mdi-chevron-up' : 'mdi-chevron-down' }}
+              </v-icon>
             </div>
             
             <!-- Menú desplegable del usuario -->
@@ -47,7 +53,7 @@
           <!-- Carrito -->
           <router-link to="/cart" class="navbar__icon navbar__cart">
             <v-icon size="28">mdi-cart</v-icon>
-            <span v-if="cartStore.totalItems > 0" class="cart-badge">
+            <span v-if="cartStore.totalItems > 0" class="navbar__cart-badge">
               {{ cartStore.totalItems }}
             </span>
           </router-link>
@@ -59,10 +65,34 @@
       
       <!-- Menú inferior -->
       <nav class="navbar__menu">
-        <router-link to="/shop" class="navbar__menu-item" :class="{ 'active': $route.path.startsWith('/shop') }">Tienda</router-link>
-        <router-link to="/guia" class="navbar__menu-item" :class="{ 'active': $route.path.startsWith('/guia') }">Guía</router-link>
-        <router-link to="/contacto" class="navbar__menu-item" :class="{ 'active': $route.path.startsWith('/contacto') }">Contacto</router-link>
-        <router-link to="/sobre-nosotros" class="navbar__menu-item" :class="{ 'active': $route.path.startsWith('/sobre-nosotros') }">Sobre LM</router-link>
+        <router-link
+          to="/shop"
+          class="navbar__menu-item"
+          :class="{ 'navbar__menu-item--active': $route.path.startsWith('/shop') }"
+        >
+          Tienda
+        </router-link>
+        <router-link
+          to="/guia"
+          class="navbar__menu-item"
+          :class="{ 'navbar__menu-item--active': $route.path.startsWith('/guia') }"
+        >
+          Guía
+        </router-link>
+        <router-link
+          to="/contacto"
+          class="navbar__menu-item"
+          :class="{ 'navbar__menu-item--active': $route.path.startsWith('/contacto') }"
+        >
+          Contacto
+        </router-link>
+        <router-link
+          to="/sobre-nosotros"
+          class="navbar__menu-item"
+          :class="{ 'navbar__menu-item--active': $route.path.startsWith('/sobre-nosotros') }"
+        >
+          Sobre LM
+        </router-link>
       </nav>
     </div>
   </header>
@@ -110,9 +140,12 @@ const closeUserMenu = (event: MouseEvent) => {
   const userDropdown = document.querySelector('.navbar__user-dropdown');
   const userMenu = document.querySelector('.navbar__user-menu');
   
-  if (userDropdown && userMenu && 
-      !userDropdown.contains(target) && 
-      !userMenu.contains(target)) {
+  if (
+    userDropdown && 
+    userMenu && 
+    !userDropdown.contains(target) && 
+    !userMenu.contains(target)
+  ) {
     isUserMenuOpen.value = false;
   }
 };
@@ -138,6 +171,11 @@ onBeforeUnmount(() => {
 <style lang="scss" scoped>
 @use '@/styles/variables' as *;
 
+/* 
+   ==============================
+   BASE: Mobile First
+   ==============================
+*/
 .navbar {
   width: 100%;
   background-color: $background-color;
@@ -149,36 +187,44 @@ onBeforeUnmount(() => {
   }
   
   &__top {
+    /* Para móvil: flex-wrap */
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-wrap: wrap;
     padding: 15px 0;
   }
   
   &__search {
+    /* Para móvil (ocupa 2do orden y ancho total) */
+    order: 2;
     flex: 1;
-    max-width: 300px;
+    max-width: 100%;
+    margin-top: 15px;
   }
   
   &__logo {
-    text-align: center;
+    /* Para móvil (1er orden, centrado) */
+    order: 1;
     flex: 1;
+    text-align: center;
     display: flex;
     justify-content: center;
     
     &-img {
-      height: 110px;
-      margin-top: 15px;
+      /* Para móvil, más pequeño */
+      height: 60px;
     }
   }
   
   &__icons {
+    /* Para móvil (3er orden) */
+    order: 3;
+    flex: 1;
     display: flex;
     gap: 24px;
     justify-content: flex-end;
-    flex: 1;
-    max-width: 300px;
-    margin-left: 50px;
+    max-width: auto;
   }
   
   &__icon {
@@ -200,6 +246,7 @@ onBeforeUnmount(() => {
       font-size: 14px;
       display: none;
       
+      /* Se mostrará en pantallas mayores */
       @media (min-width: 768px) {
         display: inline;
       }
@@ -234,7 +281,8 @@ onBeforeUnmount(() => {
     &-menu {
       position: absolute;
       top: 100%;
-      right: 0;
+      /* En móvil, pequeño offset a la derecha */
+      right: -50px;
       background-color: white;
       border-radius: 8px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -274,16 +322,19 @@ onBeforeUnmount(() => {
   }
   
   &__menu {
+    /* En móvil, menú envuelto y separado */
     display: flex;
+    flex-wrap: wrap;
     justify-content: center;
-    gap: 60px;
+    gap: 20px;
     padding: 15px 0;
     
     &-item {
       text-decoration: none;
       color: $text-color;
       font-family: $font-family-primary;
-      font-size: 25px;
+      /* En móvil, tipografía más pequeña */
+      font-size: 20px;
       font-weight: 600;
       letter-spacing: 0.5px;
       transition: color 0.3s ease-in-out;
@@ -292,14 +343,16 @@ onBeforeUnmount(() => {
         color: $primary-color;
       }
       
-      &.active {
+      /* Modificador BEM en vez de .active */
+      &--active {
         color: $primary-color;
       }
     }
   }
 }
 
-.cart-badge {
+/* Ajuste del badge para el carrito, en BEM */
+.navbar__cart-badge {
   position: absolute;
   top: -5px;
   right: -10px;
@@ -313,44 +366,49 @@ onBeforeUnmount(() => {
   text-align: center;
 }
 
-/* Responsive para móviles */
-@media (max-width: 768px) {
+/* 
+   ==============================
+   Pantallas mayores: >= 768px
+   ==============================
+*/
+@media (min-width: 768px) {
   .navbar {
     &__top {
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
     }
     
     &__search {
-      order: 2;
-      max-width: 100%;
-      margin-top: 15px;
+      order: 0;
+      max-width: 300px;
+      margin-top: 0;
     }
     
     &__logo {
-      order: 1;
-      flex: 1;
+      order: 0;
       
       &-img {
-        height: 60px;
+        height: 110px;
+        margin-top: 15px;
       }
     }
     
     &__icons {
-      order: 3;
-      max-width: auto;
+      order: 0;
+      max-width: 300px;
+      margin-left: 50px;
     }
     
     &__menu {
-      flex-wrap: wrap;
-      gap: 20px;
+      flex-wrap: nowrap;
+      gap: 60px;
       
       &-item {
-        font-size: 20px;
+        font-size: 25px;
       }
     }
     
     &__user-menu {
-      right: -50px; 
+      right: 0; 
     }
   }
 }

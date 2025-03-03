@@ -1,10 +1,16 @@
 <template>
-  <v-container fluid class="benefits-container">
+  <v-container fluid class="benefits">
     <v-row justify="center">
-      <v-col cols="12" sm="3" v-for="(benefit, index) in benefits" :key="index" class="benefit">
-        <v-icon class="benefit-icon">{{ benefit.icon }}</v-icon>
-        <h3 class="benefit-title">{{ benefit.title }}</h3>
-        <p class="benefit-text">{{ benefit.text }}</p>
+      <v-col
+        cols="12"
+        sm="3"
+        v-for="(benefit, index) in benefits"
+        :key="index"
+        class="benefits__item"
+      >
+        <v-icon class="benefits__icon">{{ benefit.icon }}</v-icon>
+        <h3 class="benefits__title">{{ benefit.title }}</h3>
+        <p class="benefits__text">{{ benefit.text }}</p>
       </v-col>
     </v-row>
   </v-container>
@@ -22,32 +28,34 @@ const benefits = ref([
 </script>
 
 <style lang="scss" scoped>
-.benefits-container {
+@use '@/styles/variables' as *;
+
+.benefits {
   width: 100vw;
   max-width: 100vw;
   margin: 0;
   padding: 40px 0;
   background-color: #fff7e7;
   text-align: center;
-}
 
-.benefit {
-  text-align: center;
-}
+  &__item {
+    text-align: center;
+  }
 
-.benefit-icon {
-  font-size: 2.5rem;
-  color: #c99a2e;
-}
+  &__icon {
+    font-size: 2.5rem;
+    color: #c99a2e;
+  }
 
-.benefit-title {
-  font-size: 1.2rem;
-  font-weight: bold;
-  margin-top: 10px;
-}
+  &__title {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-top: 10px;
+  }
 
-.benefit-text {
-  font-size: 0.9rem;
-  color: #666;
+  &__text {
+    font-size: 0.9rem;
+    color: #666;
+  }
 }
 </style>

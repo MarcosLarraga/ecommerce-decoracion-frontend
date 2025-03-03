@@ -62,7 +62,6 @@ const secciones = [
 
 .guia__imagen {
   width: 100%;
-  /* Aumentamos el max-width de 600px a 900px */
   max-width: 900px;
   border-radius: 12px;
   margin-bottom: 20px;
