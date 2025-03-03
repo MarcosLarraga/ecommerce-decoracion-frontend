@@ -52,7 +52,8 @@
           
           <!-- Carrito -->
           <router-link to="/cart" class="navbar__icon navbar__cart">
-            <v-icon size="28">mdi-cart</v-icon>
+            <!-- Reemplazamos el antiguo <v-icon> por nuestro componente SVG -->
+            <CartIcon :size="28" :fill="'#000'" />
             <span v-if="cartStore.totalItems > 0" class="navbar__cart-badge">
               {{ cartStore.totalItems }}
             </span>
@@ -99,46 +100,47 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
-import { useUserStore } from '@/stores/userStore';
-import { useCartStore } from '@/stores/cartStore';
-import LogoCanvasBlack from '@/components/LogoCanvasBlack.vue';
-import SearchBar from '@/components/SearchBar.vue';
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+import { useUserStore } from '@/stores/userStore'
+import { useCartStore } from '@/stores/cartStore'
+import LogoCanvasBlack from '@/components/LogoCanvasBlack.vue'
+import SearchBar from '@/components/SearchBar.vue'
+import CartIcon from '@/components/icons/CartIcon.vue' // <-- Importamos el ícono SVG personalizado
 
-const router = useRouter();
-const route = useRoute();
-const store = useUserStore();
-const cartStore = useCartStore();
-const isUserMenuOpen = ref(false);
+const router = useRouter()
+const route = useRoute()
+const store = useUserStore()
+const cartStore = useCartStore()
+const isUserMenuOpen = ref(false)
 
 // Obtener el nombre de usuario para mostrar
 const getUserName = computed(() => {
-  if (!store.user) return '';
+  if (!store.user) return ''
   
   // Si hay un nombre, mostrar el primer nombre
   if (store.user.nombre) {
-    return store.user.nombre.split(' ')[0];
+    return store.user.nombre.split(' ')[0]
   }
   
   // Si no hay nombre pero hay email, mostrar la parte antes del @
   if (store.user.email) {
-    return store.user.email.split('@')[0];
+    return store.user.email.split('@')[0]
   }
   
-  return 'Usuario';
-});
+  return 'Usuario'
+})
 
 // Alternar el menú de usuario
 const toggleUserMenu = () => {
-  isUserMenuOpen.value = !isUserMenuOpen.value;
-};
+  isUserMenuOpen.value = !isUserMenuOpen.value
+}
 
 // Cerrar el menú cuando se hace clic fuera
 const closeUserMenu = (event: MouseEvent) => {
-  const target = event.target as HTMLElement;
-  const userDropdown = document.querySelector('.navbar__user-dropdown');
-  const userMenu = document.querySelector('.navbar__user-menu');
+  const target = event.target as HTMLElement
+  const userDropdown = document.querySelector('.navbar__user-dropdown')
+  const userMenu = document.querySelector('.navbar__user-menu')
   
   if (
     userDropdown && 
@@ -146,26 +148,26 @@ const closeUserMenu = (event: MouseEvent) => {
     !userDropdown.contains(target) && 
     !userMenu.contains(target)
   ) {
-    isUserMenuOpen.value = false;
+    isUserMenuOpen.value = false
   }
-};
+}
 
 // Cerrar sesión
 const logout = (): void => {
-  store.logout();
-  router.push('/login');
-  isUserMenuOpen.value = false;
-};
+  store.logout()
+  router.push('/login')
+  isUserMenuOpen.value = false
+}
 
 // Agregar listener para cerrar el menú al hacer clic fuera
 onMounted(() => {
-  document.addEventListener('click', closeUserMenu);
-});
+  document.addEventListener('click', closeUserMenu)
+})
 
 // Limpiar listener al desmontar
 onBeforeUnmount(() => {
-  document.removeEventListener('click', closeUserMenu);
-});
+  document.removeEventListener('click', closeUserMenu)
+})
 </script>
 
 <style lang="scss" scoped>
@@ -343,7 +345,6 @@ onBeforeUnmount(() => {
         color: $primary-color;
       }
       
-      /* Modificador BEM en vez de .active */
       &--active {
         color: $primary-color;
       }
@@ -351,20 +352,28 @@ onBeforeUnmount(() => {
   }
 }
 
-/* Ajuste del badge para el carrito, en BEM */
 .navbar__cart-badge {
   position: absolute;
-  top: -5px;
-  right: -10px;
-  background: red;
-  color: white;
+  top: -10px;
+  right: -5px;
+  background-color: #ff6347; 
+  color: #fff;
   font-size: 12px;
-  font-weight: bold;
-  padding: 4px 6px;
+  font-weight: 600;
+  padding: 2px 6px;
   border-radius: 50%;
   min-width: 20px;
   text-align: center;
+  border: 1px solid #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s ease-in-out;
+  
+  &:hover {
+    transform: scale(1.05);
+  }
 }
+
+
 
 /* 
    ==============================

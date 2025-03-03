@@ -15,8 +15,13 @@ export const useCartStore = defineStore('cart', {
   }),
 
   getters: {
+    // Suma el total en euros (precio * cantidad)
     cartTotal: (state) =>
       state.cart.reduce((total, item) => total + item.price * item.quantity, 0),
+
+    // Suma el total de unidades en el carrito (quantity de cada ítem)
+    totalItems: (state) =>
+      state.cart.reduce((sum, item) => sum + item.quantity, 0),
   },
 
   actions: {
@@ -26,7 +31,8 @@ export const useCartStore = defineStore('cart', {
 
       if (existingItem) {
         existingItem.quantity += 1;
-        // Solo notificación para el cliente cuando añade un producto nuevo
+        // Puedes lanzar un toast aquí si quieres notificar
+        // toast.info(`Se agregó otra unidad de ${product.name} al carrito`);
       } else {
         this.cart.push({ ...product, quantity: 1 });
         toast.success(`${product.name} añadido al carrito`);
@@ -45,11 +51,10 @@ export const useCartStore = defineStore('cart', {
     },
 
     removeFromCart(productId: number) {
-      const product = this.cart.find(item => item.id === productId);
+      const product = this.cart.find((item) => item.id === productId);
       
       if (product) {
         this.cart = this.cart.filter((item) => item.id !== productId);
-        // Eliminamos la notificación
         this.saveCart();
       }
     },
@@ -57,7 +62,6 @@ export const useCartStore = defineStore('cart', {
     clearCart() {
       this.cart = [];
       localStorage.removeItem('cart');
-      // Eliminamos la notificación de "Carrito vaciado correctamente"
       console.log("Carrito vaciado");
     },
 
