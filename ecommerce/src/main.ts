@@ -33,7 +33,7 @@ const app = createApp(App);
 app.use(router);
 app.use(pinia);
 app.use(vuetify);
-app.use(Toast); // <-- Registra el plugin Toast aquí, antes de montar la app
+app.use(Toast); 
 app.mount('#app');
 
 // Inicializa el store de usuario para restaurar la sesión (si existe)
