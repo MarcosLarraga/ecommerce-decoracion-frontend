@@ -40,17 +40,18 @@ export const useUserStore = defineStore('user', {
             Authorization: `Bearer ${token}`
           }
         });
-        this.user = {
-          ...response.data,
-          nombre: response.data.nombre || decoded.name || response.data.email,
-          role: response.data.role || decoded.role
-        };
+        // Asignamos todo el objeto recibido a this.user
+        this.user = response.data;
+        // Mostramos en consola toda la información
+        console.log("Información completa del usuario:", this.user);
+        // Guardamos en localStorage la información completa
         localStorage.setItem('user', JSON.stringify(this.user));
       } catch (error) {
         console.error('Error obteniendo datos del usuario:', error);
         toast.error("Error al obtener los datos del usuario.");
       }
-    },
+    }
+    ,
     async register(nombre: string, email: string, password: string) {
       this.loading = true;
       this.error = '';
@@ -61,10 +62,10 @@ export const useUserStore = defineStore('user', {
           email,
           password
         });
-        
+
         // Si el registro fue exitoso, podemos mostrar un mensaje
         toast.success("Registro exitoso. ¡Ya puedes iniciar sesión!");
-        
+
         // Retornamos true o algo para indicar éxito
         return true;
       } catch (err) {
@@ -92,7 +93,7 @@ export const useUserStore = defineStore('user', {
         this.loading = false;
       }
     },
-    
+
 
     async updateUserProfile(datos: { nombre: string, telefono: string, direccion: string }) {
       try {
@@ -121,7 +122,10 @@ export const useUserStore = defineStore('user', {
     async updateUserPhoneAndAddress(telefono: string, direccion: string) {
       try {
         const token = localStorage.getItem('token');
-        if (!token) return;
+        if (!token) {
+          toast.error("No se encontró token de autenticación.");
+          return;
+        }
         const decoded: any = this.decodeToken(token);
         if (!decoded?.sub) return;
         const userId = decoded.sub;
@@ -131,15 +135,16 @@ export const useUserStore = defineStore('user', {
             "Content-Type": "application/json"
           }
         });
+
         if (this.user) {
           this.user.telefono = telefono;
           this.user.direccion = direccion;
           localStorage.setItem('user', JSON.stringify(this.user));
         }
         toast.success("Teléfono y dirección actualizados correctamente.");
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error actualizando teléfono y dirección:', error);
-        toast.error("Error al actualizar teléfono y dirección.");
+        toast.error(error.response?.data || "Error al actualizar teléfono y dirección.");
       }
     },
 
@@ -214,7 +219,7 @@ export const useUserStore = defineStore('user', {
         this.loading = false;
       }
     },
-    
+
 
     async googleLogin(idToken: string) {
       this.loading = true;

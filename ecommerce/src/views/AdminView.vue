@@ -51,7 +51,7 @@
       </div>
     </div>
 
-    <!-- SECCIÓN PRODUCTOS (MISMA MAQUETA) -->
+    <!-- SECCIÓN PRODUCTOS -->
     <div v-if="activeTab === 'products'" class="admin-panel__section">
       <h2 class="admin-panel__subtitle">GESTIÓN DE PRODUCTOS</h2>
       <button @click="showAddProductForm = true" class="admin-panel__add-btn">Añadir Producto</button>
@@ -88,7 +88,7 @@
       </div>
     </div>
 
-    <!-- SECCIÓN PEDIDOS (SOLO "VER DETALLES") -->
+    <!-- SECCIÓN PEDIDOS (solo "Eliminar") -->
     <div v-if="activeTab === 'orders'" class="admin-panel__section">
       <h2 class="admin-panel__subtitle">GESTIÓN DE PEDIDOS</h2>
       <div class="users-table">
@@ -112,9 +112,8 @@
                   {{ order.total ? `${order.total.toFixed(2)}€` : '0€' }}
                 </td>
                 <td class="users-table__cell">
-                  <!-- ÚNICO BOTÓN EN PEDIDOS -->
-                  <button @click="viewOrderDetails(order.id)" class="users-table__btn">
-                    Ver Detalles
+                  <button @click="deleteOrder(order.id)" class="users-table__btn users-table__btn--delete">
+                    Eliminar
                   </button>
                 </td>
               </tr>
@@ -192,9 +191,11 @@
 import { ref, onMounted } from 'vue';
 import { useAdminStore } from '@/stores/adminStore';
 import { useRouter } from 'vue-router';
+import { useToast } from 'vue-toastification';
 
 const router = useRouter();
 const adminStore = useAdminStore();
+const toast = useToast();
 
 const activeTab = ref('users');
 const users = ref<any[]>([]);
@@ -216,7 +217,9 @@ const tabs = [
 function formatDate(dateString: string): string {
   if (!dateString) return 'Sin fecha';
   const date = new Date(dateString);
-  return isNaN(date.getTime()) ? 'Fecha inválida' : date.toLocaleDateString('es-ES');
+  return isNaN(date.getTime())
+    ? 'Fecha inválida'
+    : date.toLocaleString('es-ES', { dateStyle: 'short', timeStyle: 'short' });
 }
 
 onMounted(async () => {
@@ -243,6 +246,8 @@ async function saveUserEdits() {
     await adminStore.fetchAllUsers();
     users.value = adminStore.users;
     editingUser.value = null;
+    toast.success("Usuario actualizado correctamente");
+    location.reload();
   }
 }
 function cancelUserEdit() {
@@ -251,9 +256,11 @@ function cancelUserEdit() {
 async function deleteUser(userId: number) {
   try {
     await adminStore.deleteUser(userId);
-    users.value = [...adminStore.users];
+    toast.success("Usuario eliminado correctamente");
+    location.reload();
   } catch (error) {
     console.error('Error al eliminar usuario:', error);
+    toast.error("Error al eliminar usuario");
   }
 }
 
@@ -267,6 +274,8 @@ async function saveProductEdits() {
     await adminStore.fetchAllProducts();
     products.value = adminStore.products;
     editingProduct.value = null;
+    toast.success("Producto actualizado correctamente");
+    location.reload();
   }
 }
 function cancelProductEdit() {
@@ -275,19 +284,26 @@ function cancelProductEdit() {
 async function deleteProduct(productId: number) {
   try {
     await adminStore.deleteProduct(productId);
-    products.value = [...adminStore.products];
+    toast.success("Producto eliminado correctamente");
+    location.reload();
   } catch (error) {
     console.error('Error al eliminar producto:', error);
+    toast.error("Error al eliminar producto");
   }
 }
 
 /* PEDIDOS */
-// Único botón => "Ver Detalles"
-function viewOrderDetails(orderId: number) {
-  router.push({ name: 'OrderDetails', params: { id: orderId } });
+async function deleteOrder(orderId: number) {
+  try {
+    await adminStore.deleteOrder(orderId);
+    toast.success("Pedido eliminado correctamente");
+    location.reload();
+  } catch (error) {
+    console.error('Error al eliminar pedido:', error);
+    toast.error("Error al eliminar pedido");
+  }
 }
 </script>
-
 <style lang="scss" scoped>
 @use '@/styles/variables' as *;
 
@@ -453,7 +469,8 @@ function viewOrderDetails(orderId: number) {
 */
 .users-table {
   width: 100%;
-  overflow-x: auto; /* Scroll horizontal en móvil */
+  overflow-x: auto;
+  /* Scroll horizontal en móvil */
   -webkit-overflow-scrolling: touch;
 
   &__container {
@@ -475,7 +492,8 @@ function viewOrderDetails(orderId: number) {
     &--sticky {
       position: sticky;
       left: 0;
-      background-color: $background-color; /* Fijamos el color de fondo */
+      background-color: $background-color;
+      /* Fijamos el color de fondo */
       z-index: $z-index-sticky;
     }
   }

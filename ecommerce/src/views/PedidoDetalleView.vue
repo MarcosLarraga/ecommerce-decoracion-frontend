@@ -8,18 +8,18 @@
     </div>
 
     <!-- Datos del Pedido -->
-    <div class="pedido-detalle__info" v-else-if="detallePedidoStore.detallesPedido.length > 0 && detallePedidoStore.usuario">
-      <p><strong>ID del Pedido:</strong> {{ detallePedidoStore.detallesPedido[0].pedido.id }}</p>
-      <p><strong>Fecha:</strong> {{ new Date(detallePedidoStore.detallesPedido[0].pedido.fechaPedido).toLocaleString() }}</p>
-      <p><strong>Total:</strong> {{ detallePedidoStore.detallesPedido[0].pedido.total.toFixed(2) }} €</p>
-      <p><strong>Estado:</strong> <span class="pedido-detalle__estado">{{ detallePedidoStore.detallesPedido[0].pedido.estado || 'Pendiente' }}</span></p>
+    <div class="pedido-detalle__info" v-else-if="pedido && usuario">
+      <p><strong>ID del Pedido:</strong> {{ pedido.id }}</p>
+      <p><strong>Fecha:</strong> {{ formatDate(pedido.fechaPedido) }}</p>
+      <p><strong>Total:</strong> {{ formatCurrency(pedido.total) }}</p>
+      <p><strong>Estado:</strong> <span class="pedido-detalle__estado">{{ pedido.estado || 'Pendiente' }}</span></p>
 
       <!-- Datos del Usuario -->
       <h2 class="pedido-detalle__subtitle">Datos del Usuario</h2>
-      <p><strong>Nombre:</strong> {{ detallePedidoStore.usuario.nombre }}</p>
-      <p><strong>Correo:</strong> {{ detallePedidoStore.usuario.email }}</p>
-      <p><strong>Teléfono:</strong> {{ detallePedidoStore.usuario.telefono }}</p>
-      <p><strong>Dirección:</strong> {{ detallePedidoStore.usuario.direccion }}</p>
+      <p><strong>Nombre:</strong> {{ usuario.nombre }}</p>
+      <p><strong>Correo:</strong> {{ usuario.email }}</p>
+      <p><strong>Teléfono:</strong> {{ usuario.telefono || 'No disponible' }}</p>
+      <p><strong>Dirección:</strong> {{ usuario.direccion || 'No disponible' }}</p>
     </div>
 
     <div v-else class="pedido-detalle__error">
@@ -28,18 +28,24 @@
     </div>
 
     <!-- Lista de Productos -->
-    <h2 class="pedido-detalle__subtitle" v-if="!loading && detallePedidoStore.detallesPedido.length > 0">Productos</h2>
-    <div class="pedido-detalle__items" v-if="!loading && detallePedidoStore.detallesPedido.length > 0">
-      <div class="pedido-detalle__item" v-for="item in detallePedidoStore.detallesPedido" :key="item.id">
-        <p><strong>Producto:</strong> {{ item.producto.nombre }}</p>
-        <p><strong>Categoría:</strong> {{ item.producto.categoria.nombre }}</p>
+    <h2 class="pedido-detalle__subtitle" v-if="!loading && detallesPedido.length > 0">Productos</h2>
+    <div class="pedido-detalle__items" v-if="!loading && detallesPedido.length > 0">
+      <div class="pedido-detalle__item" v-for="item in detallesPedido" :key="item.id">
+        <p><strong>Producto:</strong> {{ item.producto?.nombre || 'Producto no disponible' }}</p>
+        <p><strong>Categoría:</strong> {{ item.producto?.categoria?.nombre || 'Categoría no disponible' }}</p>
         <p><strong>Cantidad:</strong> {{ item.cantidad }}</p>
-        <p><strong>Precio Unitario:</strong> {{ item.precioUnitario.toFixed(2) }} €</p>
+        <p><strong>Precio Unitario:</strong> {{ formatCurrency(item.precioUnitario) }}</p>
       </div>
     </div>
 
-    <!-- Botón para volver a mis pedidos -->
-    <div class="pedido-detalle__actions" v-if="!loading && detallePedidoStore.detallesPedido.length > 0">
+    <!-- Botón para enviar correo de confirmación -->
+    <div class="pedido-detalle__actions" v-if="!loading && detallesPedido.length > 0">
+      <button 
+        @click="enviarCorreoConfirmacion" 
+        class="pedido-detalle__email-btn"
+        :disabled="enviandoCorreo">
+        {{ enviandoCorreo ? 'Enviando...' : 'Reenviar confirmación por correo' }}
+      </button>
       <router-link to="/mi-cuenta" class="pedido-detalle__back-btn">
         Volver a mis pedidos
       </router-link>
@@ -47,10 +53,8 @@
   </div>
 </template>
 
-
-
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, computed } from 'vue';
 import { useDetallePedidoStore } from '@/stores/detallePedidoStore';
 import { useRoute } from 'vue-router';
 import { useToast } from 'vue-toastification';
@@ -63,9 +67,37 @@ const toast = useToast();
 const loading = ref(true);
 const enviandoCorreo = ref(false);
 
+// Computed properties para acceder a los datos del store
+const pedido = computed(() => detallePedidoStore.pedido);
+const usuario = computed(() => detallePedidoStore.usuario);
+const detallesPedido = computed(() => detallePedidoStore.detallesPedido);
+
+// Formatear fecha
+const formatDate = (dateString: string | Date) => {
+  if (!dateString) return 'Fecha no disponible';
+  return new Date(dateString).toLocaleString();
+};
+
+// Formatear moneda
+const formatCurrency = (amount: number) => {
+  if (amount === undefined || amount === null) return '0,00 €';
+  return `${amount.toFixed(2)} €`;
+};
+
 onMounted(async () => {
   try {
-    await detallePedidoStore.fetchDetallesPedido(pedidoId);
+    // Usamos fetchPedidoById en lugar de fetchDetallesPedido para obtener toda la información de una vez
+    await detallePedidoStore.fetchPedidoById(pedidoId);
+    
+    // Si no tenemos detalles pero sí tenemos el ID del pedido, intentamos obtenerlos
+    if (detallesPedido.value.length === 0 && pedido.value) {
+      await detallePedidoStore.fetchDetallesPedido(pedidoId);
+    }
+    
+    // Si no tenemos usuario pero sí tenemos el ID del usuario, intentamos obtenerlo
+    if (!usuario.value && pedido.value?.usuarioId) {
+      await detallePedidoStore.fetchUsuarioByPedidoId(pedido.value.usuarioId);
+    }
   } catch (error) {
     console.error("Error al cargar los detalles del pedido:", error);
     toast.error("No se pudieron cargar los detalles del pedido");
@@ -74,9 +106,8 @@ onMounted(async () => {
   }
 });
 
-
 const enviarCorreoConfirmacion = async () => {
-  if (!detallePedidoStore.detallesPedido.length) {
+  if (!pedido.value) {
     toast.error("No hay información suficiente para enviar el correo");
     return;
   }
