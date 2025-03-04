@@ -12,30 +12,28 @@ interface ProductoDTO {
 
 export const useProductsStore = defineStore('products', {
   state: () => ({
-    allProducts: [] as ProductoDTO[], // Lista de productos obtenidos desde la API
-    randomProducts: [] as ProductoDTO[], // Productos aleatorios seleccionados
-    filteredProducts: [] as ProductoDTO[], // Productos filtrados por categoría
-    loading: false, // Estado de carga
-    error: null as string | null, // Mensaje de error si ocurre algún problema
-    minProductPrice: 0, // Precio mínimo de los productos
-    maxProductPrice: 1000, // Precio máximo de los productos
+    allProducts: [] as ProductoDTO[],      // Lista de productos que usaremos para el autocomplete y búsquedas
+    randomProducts: [] as ProductoDTO[],     // Productos aleatorios seleccionados
+    filteredProducts: [] as ProductoDTO[],   // Productos filtrados por categoría
+    loading: false,                          // Estado de carga
+    error: null as string | null,            // Mensaje de error en caso de problemas
+    minProductPrice: 0,                      // Precio mínimo de los productos
+    maxProductPrice: 1000,                   // Precio máximo de los productos
   }),
 
   actions: {
     /**
-     * Calcula el precio mínimo y máximo de los productos disponibles
+     * Calcula el precio mínimo y máximo de los productos disponibles.
      */
     calculatePriceRange() {
       if (this.allProducts.length === 0) return;
-      
+
       this.minProductPrice = Math.floor(
         Math.min(...this.allProducts.map(product => product.precio))
       );
-      
       this.maxProductPrice = Math.ceil(
         Math.max(...this.allProducts.map(product => product.precio))
       );
-      
       console.log(`✅ [calculatePriceRange] Rango de precios calculado: ${this.minProductPrice}€ - ${this.maxProductPrice}€`);
     },
 
@@ -67,10 +65,9 @@ export const useProductsStore = defineStore('products', {
         }
 
         console.log("✅ [fetchProducts] Productos obtenidos correctamente:", data);
-
         this.allProducts = data;
-        this.calculatePriceRange(); // Calcular el rango de precios
-        this.getRandomProducts(); // Selecciona productos aleatorios
+        this.calculatePriceRange();
+        this.getRandomProducts();
 
       } catch (error) {
         this.error = error instanceof Error ? error.message : '❌ Error desconocido al obtener productos';
@@ -109,9 +106,8 @@ export const useProductsStore = defineStore('products', {
         }
 
         console.log(`✅ [fetchProductsByCategory] Productos de la categoría ${categoriaId} obtenidos:`, data);
-
         this.filteredProducts = data;
-        this.calculatePriceRange(); // Calcular el rango de precios
+        this.calculatePriceRange();
 
       } catch (error) {
         this.error = error instanceof Error ? error.message : '❌ Error desconocido al obtener productos';
@@ -147,15 +143,14 @@ export const useProductsStore = defineStore('products', {
 
         if (!Array.isArray(data) || data.length === 0) {
           console.warn(`🔍 No se encontraron productos para: "${query}"`);
-          this.allProducts = []; // ❌ Vacía la lista para que el mensaje "No hay productos" se muestre
+          this.allProducts = []; // Limpiamos la lista para el autocomplete
           return;
         }
 
         console.log("✅ [searchProducts] Productos encontrados:", data);
-
         this.allProducts = data;
-        this.calculatePriceRange(); // Calcular el rango de precios
-        this.getRandomProducts(); // Actualiza los productos aleatorios si lo necesitas
+        this.calculatePriceRange();
+        this.getRandomProducts();
 
       } catch (error) {
         this.error = error instanceof Error ? error.message : '❌ Error desconocido al buscar productos';
@@ -178,7 +173,6 @@ export const useProductsStore = defineStore('products', {
       // Mezcla los productos aleatoriamente y selecciona los primeros 4
       const shuffled = [...this.allProducts].sort(() => 0.5 - Math.random());
       this.randomProducts = shuffled.slice(0, 4);
-
       console.log("🔀 [getRandomProducts] Productos aleatorios seleccionados:", this.randomProducts);
     }
   }

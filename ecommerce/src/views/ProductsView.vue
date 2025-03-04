@@ -27,7 +27,9 @@
 
       <!-- Filtro de precio con slider -->
       <div class="shop__filter shop__filter--price">
-        <label class="shop__filter-label">Precio: {{ priceRange[0] }}€ - {{ priceRange[1] }}€</label>
+        <label class="shop__filter-label">
+          Precio: {{ priceRange[0] }}€ - {{ priceRange[1] }}€
+        </label>
         <div class="shop__price-slider-container">
           <div class="shop__price-slider-track"></div>
           <div class="shop__price-slider-progress" :style="progressStyle"></div>
@@ -55,7 +57,7 @@
       </div>
     </div>
 
-    <!-- si no hay productos encontrados -->
+    <!-- Mensaje de "sin resultados" -->
     <p v-if="filteredProducts.length === 0" class="no-results">
       No se encontraron productos con los filtros seleccionados
     </p>
@@ -87,9 +89,9 @@ const router = useRouter();
 const selectedCategory = ref<string>('Todas');
 
 // Rango de precio seleccionado [min, max]
-const priceRange = ref<[number, number]>([0, 1000]); // Valores iniciales que se actualizarán
+const priceRange = ref<[number, number]>([0, 1000]);
 
-// Estilo dinámico para la barra de progreso
+// Estilo dinámico para la barra de progreso del slider de precio
 const progressStyle = computed(() => {
   const min = ((priceRange.value[0] - productsStore.minProductPrice) / 
                (productsStore.maxProductPrice - productsStore.minProductPrice)) * 100;
@@ -106,22 +108,20 @@ const validatePriceRange = () => {
   if (priceRange.value[0] > priceRange.value[1]) {
     priceRange.value[0] = priceRange.value[1];
   }
-  
-  // Actualizar URL con el nuevo rango
   updateUrlWithFilters();
 };
 
-// Actualizar la URL con todos los filtros
+// Actualizar la URL con los filtros aplicados (categoría y precio)
 const updateUrlWithFilters = () => {
   const query = { ...route.query };
-  
+
   // Actualizar categoría
   if (selectedCategory.value !== 'Todas') {
     query.category = selectedCategory.value;
   } else {
     delete query.category;
   }
-  
+
   // Actualizar rango de precios
   if (priceRange.value[0] > productsStore.minProductPrice) {
     query.minPrice = priceRange.value[0].toString();
@@ -134,82 +134,80 @@ const updateUrlWithFilters = () => {
   } else {
     delete query.maxPrice;
   }
-  
-  // Actualizar URL
+
   router.push({ query });
 };
 
-// Al montar el componente
-onMounted(async () => {
-  await categoriesStore.fetchCategories();
-
+// Función para realizar la búsqueda según el query "search"
+const fetchProducts = async () => {
   const searchParam = route.query.search ? String(route.query.search) : '';
   if (searchParam) {
     await productsStore.searchProducts(searchParam);
   } else {
     await productsStore.fetchProducts();
   }
-  
-  // Inicializar el rango de precios con los valores calculados
+};
+
+// Al montar el componente
+onMounted(async () => {
+  // Cargar categorías
+  await categoriesStore.fetchCategories();
+  // Realizar la búsqueda (si hay query search, se filtra; sino, carga todos)
+  await fetchProducts();
+
+  // Inicializar el rango de precios con los valores calculados en el store
   priceRange.value = [
     productsStore.minProductPrice,
     productsStore.maxProductPrice
   ];
 
-  // Inicializar filtros desde la URL
+  // Si en la URL hay filtros de categoría o precio, los aplicamos
   if (route.query.category) {
     selectedCategory.value = String(route.query.category);
   }
-  
-  // Inicializar rango de precios desde la URL
   if (route.query.minPrice) {
     priceRange.value[0] = Number(route.query.minPrice);
   }
-  
   if (route.query.maxPrice) {
     priceRange.value[1] = Number(route.query.maxPrice);
   }
 });
 
-// Detectar cambios en la URL para actualizar la búsqueda
+// Detectar cambios en el query de búsqueda y actualizar los productos
 watch(
   () => route.query.search,
-  async (newSearch) => {
-    if (newSearch) {
-      await productsStore.searchProducts(String(newSearch));
-    } else {
-      await productsStore.fetchProducts();
-    }
+  async () => {
+    await fetchProducts();
   }
 );
 
-// Watch para cambios en la categoría seleccionada
+// Watch para cambios en la categoría seleccionada y actualizar la URL
 watch(selectedCategory, () => {
   updateUrlWithFilters();
 });
 
-// Computed: filtra los productos según la categoría seleccionada y el rango de precio
+// Computed: filtra los productos según la categoría y el rango de precio
 const filteredProducts = computed(() => {
   let products = productsStore.allProducts;
-  
+
   // Filtrar por categoría
   if (selectedCategory.value !== 'Todas') {
-    const selectedCategoryObject = categoriesStore.allCategories.find(
+    const cat = categoriesStore.allCategories.find(
       (category) => category.name === selectedCategory.value
     );
-    if (selectedCategoryObject) {
+    if (cat) {
       products = products.filter(
-        (product) => product.categoriaId === selectedCategoryObject.id
+        (product) => product.categoriaId === cat.id
       );
     }
   }
-  
+
   // Filtrar por rango de precio
-  products = products.filter(product => 
-    product.precio >= priceRange.value[0] && 
+  products = products.filter(product =>
+    product.precio >= priceRange.value[0] &&
     product.precio <= priceRange.value[1]
   );
-  
+
   return products;
 });
 </script>
@@ -217,7 +215,7 @@ const filteredProducts = computed(() => {
 <style lang="scss" scoped>
 @use '@/styles/variables' as *;
 
-/* Estilos base (móvil primero) */
+/* Estilos base */
 .shop {
   width: 100%;
   padding: $spacing-md;
@@ -225,10 +223,10 @@ const filteredProducts = computed(() => {
   margin-top: 40px;
   margin-left: auto;
   margin-right: auto;
-  max-width: 1200px; /* Limitar ancho máximo del contenedor */
+  max-width: 1200px;
 }
 
-/* Estilos del mensaje de "sin resultados" */
+/* Estilos del mensaje "sin resultados" */
 .no-results {
   font-size: $font-size-base;
   font-weight: bold;
@@ -236,7 +234,7 @@ const filteredProducts = computed(() => {
   margin-top: $spacing-md;
 }
 
-/* Estilo del título */
+/* Título */
 .shop__title {
   font-size: $font-size-xl;
   font-weight: bold;
@@ -244,14 +242,14 @@ const filteredProducts = computed(() => {
   margin-top: 0 !important;
 }
 
-/* Estilos para los filtros */
+/* Filtros */
 .shop__filters {
   margin-bottom: $spacing-xl;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: $spacing-lg;
-  max-width: 800px; /* Limitar ancho de la sección de filtros */
+  max-width: 800px;
   margin-left: auto;
   margin-right: auto;
 }
@@ -262,7 +260,7 @@ const filteredProducts = computed(() => {
   align-items: center;
   gap: $spacing-sm;
   width: 100%;
-  max-width: 300px; /* Limitar ancho de cada filtro */
+  max-width: 300px;
 
   &-label {
     font-size: $font-size-small;
@@ -281,10 +279,10 @@ const filteredProducts = computed(() => {
   }
 }
 
-/* Estilos para el slider de precio */
+/* Slider de precio */
 .shop__filter--price {
   width: 100%;
-  max-width: 250px; /* Ancho máximo razonable para el filtro de precio */
+  max-width: 250px;
 }
 
 .shop__price-slider-container {
@@ -362,14 +360,14 @@ const filteredProducts = computed(() => {
 /* Grid de productos */
 .products-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr); /* 2 columnas en móvil */
-  gap: $spacing-md; /* Aumentar espacio entre productos */
+  grid-template-columns: repeat(2, 1fr);
+  gap: $spacing-md;
   justify-items: center;
-  max-width: 1100px; /* Limitar ancho máximo del grid */
-  margin: 0 auto; /* Centrar el grid */
+  max-width: 1100px;
+  margin: 0 auto;
 }
 
-/* Media queries para pantallas más grandes */
+/* Media queries */
 @media (min-width: $breakpoint-sm) {
   .shop {
     padding: $spacing-lg;
@@ -385,18 +383,16 @@ const filteredProducts = computed(() => {
   }
   
   .products-grid {
-    grid-template-columns: repeat(3, 1fr); /* 3 columnas en tablets */
-    gap: $spacing-lg; /* Más espacio entre productos */
+    grid-template-columns: repeat(3, 1fr);
+    gap: $spacing-lg;
   }
 }
 
 @media (min-width: $breakpoint-lg) {
   .products-grid {
-    grid-template-columns: repeat(4, 1fr); /* 4 columnas en desktop */
-    column-gap: $spacing-lg; /* Espacio horizontal */
-    row-gap: $spacing-xl; /* Más espacio vertical */
+    grid-template-columns: repeat(4, 1fr);
+    column-gap: $spacing-lg;
+    row-gap: $spacing-xl;
   }
 }
-
-
 </style>
