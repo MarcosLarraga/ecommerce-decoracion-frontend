@@ -15,11 +15,36 @@ interface Producto {
   categoria: string;
 }
 
+interface DetallePedido {
+  productoId: number;
+  nombreProducto: string;
+  cantidad: number;
+  precioUnitario: number;
+}
+
 interface Pedido {
   id: number;
   usuarioId: number;
-  FechaPedido: string;
+  FechaPedido: Date;
   total: number;
+  detalles?: DetallePedido[];
+}
+
+/**
+ * Función auxiliar para parsear la fecha.
+ * Se contempla que el string puede venir como "FechaPedido" o "fechaPedido",
+ * o incluso en formato .NET (/Date(1234567890)/).
+ */
+function parseFechaPedido(dateStr: string): Date {
+  let date = new Date(dateStr);
+  if (isNaN(date.getTime())) {
+    // Intenta extraer el timestamp del formato .NET: /Date(1648763622000)/
+    const match = dateStr.match(/\/Date\((\d+)\)\//);
+    if (match) {
+      date = new Date(parseInt(match[1]));
+    }
+  }
+  return date;
 }
 
 export const useAdminStore = defineStore('admin', {
@@ -33,7 +58,9 @@ export const useAdminStore = defineStore('admin', {
   }),
 
   actions: {
-    // MÉTODOS PARA USUARIOS
+    // ======================
+    //  MÉTODOS PARA USUARIOS
+    // ======================
     async fetchAllUsers() {
       this.loading = true;
       this.error = null;
@@ -41,14 +68,12 @@ export const useAdminStore = defineStore('admin', {
         const response = await axios.get<any[]>('http://localhost:5162/api/Usuario', {
           headers: { Authorization: `Bearer ${this.token}` }
         });
-        // Suponemos que la API devuelve el objeto Usuario y que "EsAdmin" determina el rol
         this.users = response.data.map(user => ({
           id: user.id,
           nombre: user.nombre,
           email: user.email,
           role: user.esAdmin ? 'Admin' : 'Usuario'
         }));
-        
       } catch (error) {
         console.error('Error fetching users:', error);
         this.error = 'Error al obtener usuarios';
@@ -60,7 +85,6 @@ export const useAdminStore = defineStore('admin', {
     async updateUser(user: Usuario) {
       this.error = null;
       try {
-        // En este ejemplo se envía el objeto completo; asegúrate de que el back espera el formato correcto
         await axios.put(`http://localhost:5162/api/Usuario/${user.id}`, user, {
           headers: { Authorization: `Bearer ${this.token}` }
         });
@@ -87,7 +111,9 @@ export const useAdminStore = defineStore('admin', {
       }
     },
 
-    // MÉTODOS PARA PRODUCTOS
+    // ========================
+    //  MÉTODOS PARA PRODUCTOS
+    // ========================
     async fetchAllProducts() {
       this.loading = true;
       this.error = null;
@@ -95,12 +121,12 @@ export const useAdminStore = defineStore('admin', {
         const response = await axios.get<any[]>('http://localhost:5162/api/Producto', {
           headers: { Authorization: `Bearer ${this.token}` }
         });
-        // Suponemos que el DTO de producto devuelve "CategoriaNombre", lo mapeamos a "categoria"
         this.products = response.data.map(prod => ({
           id: prod.id,
           nombre: prod.nombre,
           precio: prod.precio,
-          categoria: prod.CategoriaNombre || ''
+          // Se contempla que la propiedad pueda venir en PascalCase o camelCase
+          categoria: prod.categoriaNombre || prod.CategoriaNombre || 'Sin Categoría'
         }));
       } catch (error) {
         console.error('Error fetching products:', error);
@@ -113,7 +139,6 @@ export const useAdminStore = defineStore('admin', {
     async updateProduct(product: Producto) {
       this.error = null;
       try {
-        // En este ejemplo, el endpoint PUT no devuelve datos, por lo que actualizamos el store manualmente
         await axios.put(`http://localhost:5162/api/Producto/${product.id}`, product, {
           headers: { Authorization: `Bearer ${this.token}` }
         });
@@ -140,16 +165,21 @@ export const useAdminStore = defineStore('admin', {
       }
     },
 
-    // MÉTODOS PARA PEDIDOS
+    // ======================
+    //  MÉTODOS PARA PEDIDOS
+    // ======================
     async fetchAllOrders() {
       this.loading = true;
       this.error = null;
       try {
-        const response = await axios.get<Pedido[]>('http://localhost:5162/api/Pedido', {
+        const response = await axios.get<any[]>('http://localhost:5162/api/Pedido', {
           headers: { Authorization: `Bearer ${this.token}` }
         });
-        // Se espera que el DTO de Pedido devuelva "FechaPedido" en formato string
-        this.orders = response.data;
+        this.orders = response.data.map((order: any) => ({
+          ...order,
+          // Se utiliza la función auxiliar para parsear la fecha
+          FechaPedido: parseFechaPedido(order.FechaPedido || order.fechaPedido)
+        }));
       } catch (error) {
         console.error('Error fetching orders:', error);
         this.error = 'Error al obtener pedidos';
@@ -182,9 +212,18 @@ export const useAdminStore = defineStore('admin', {
         });
         this.orders = this.orders.filter(o => o.id !== orderId);
       } catch (error) {
-        console.error('Error deleting order:', error);
-        this.error = 'Error al eliminar pedido';
+        if (error.response) {
+          // Extract the detailed error message from the response
+          const errorMessage = error.response.data;
+          console.error('Error deleting order:', errorMessage);
+          this.error = `Error al eliminar pedido: ${errorMessage}`;
+        } else {
+          console.error('Error deleting order:', error);
+          this.error = 'Error al eliminar pedido';
+        }
+        throw error;
       }
     }
+
   }
 });

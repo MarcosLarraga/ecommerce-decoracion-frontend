@@ -11,40 +11,21 @@ export const useDetallePedidoStore = defineStore('detallePedido', {
   }),
 
   actions: {
-    async fetchDetallesPedido(pedidoId: number) {
+    async fetchPedidoById(pedidoId: number) {
       try {
-        const response = await axios.get(`http://localhost:5162/api/DetallePedido/pedido/${pedidoId}`);
-        
-        console.log("Detalles del pedido:", response.data);
-
-        if (response.data && response.data.length > 0) {
-          this.detallesPedido = response.data;
-          const usuarioId = this.detallesPedido[0]?.pedido?.usuarioId;
-          if (usuarioId) {
-            await this.fetchUsuarioByPedidoId(usuarioId);
-            // Eliminamos esta notificación
-            console.log("Detalles del pedido cargados correctamente");
-          } else {
-            console.error("No se encontró el usuarioId en los detalles del pedido.");
-            throw new Error("No se pudo obtener el usuario asociado al pedido.");
-          }
-        } else {
-          console.error("No se encontraron detalles del pedido.");
-          throw new Error("No se encontraron detalles del pedido.");
+        const response = await axios.get(`http://localhost:5162/api/Pedido/${pedidoId}`);
+        console.log("Pedido completo obtenido:", response.data);
+        if (!response.data) {
+          throw new Error("Pedido no encontrado.");
         }
+        // Asignamos la información devuelta; si 'detalles' es null, usamos []
+        this.pedido = response.data;
+        this.usuario = response.data.usuario;
+        this.detallesPedido = response.data.detalles ?? [];
+        console.log("Pedido cargado correctamente");
       } catch (error) {
-        console.error("Error obteniendo detalles del pedido:", error);
-        throw new Error("No se pudo obtener el detalle del pedido.");
-      }
-    },
-
-    async fetchUsuarioByPedidoId(usuarioId: number) {
-      try {
-        const response = await axios.get(`http://localhost:5162/api/Usuario/${usuarioId}`);
-        this.usuario = response.data;
-      } catch (error) {
-        console.error("Error obteniendo el usuario:", error);
-        throw new Error("No se pudo obtener el usuario.");
+        console.error("Error obteniendo el pedido:", error);
+        throw new Error("No se pudo obtener el pedido.");
       }
     },
 
@@ -93,25 +74,50 @@ export const useDetallePedidoStore = defineStore('detallePedido', {
         throw new Error("No se pudo eliminar el detalle del pedido.");
       }
     },
-
-    async fetchPedidoById(pedidoId: number) {
+    async fetchDetallesPedido(pedidoId: number) {
       try {
-        const response = await axios.get(`http://localhost:5162/api/Pedido/${pedidoId}`);
+        const response = await axios.get(`http://localhost:5162/api/DetallePedido/pedido/${pedidoId}`);
         
-        console.log("Pedido completo obtenido:", response.data);
-        
-        if (!response.data) {
-          throw new Error("Pedido no encontrado.");
+        console.log("Detalles del pedido:", response.data);
+    
+        if (response.data && response.data.length > 0) {
+          this.detallesPedido = response.data;
+          const usuarioId = this.detallesPedido[0]?.pedido?.usuarioId;
+          if (usuarioId) {
+            await this.fetchUsuarioByPedidoId(usuarioId);
+            console.log("Detalles del pedido cargados correctamente");
+          } else {
+            console.error("No se encontró el usuarioId en los detalles del pedido.");
+            throw new Error("No se pudo obtener el usuario asociado al pedido.");
+          }
+        } else {
+          console.error("No se encontraron detalles del pedido.");
+          throw new Error("No se encontraron detalles del pedido.");
         }
-
-        this.pedido = response.data;
-        this.usuario = response.data.usuario;
-        this.detallesPedido = response.data.detalles;
-        console.log("Pedido cargado correctamente");
-
       } catch (error) {
-        console.error("Error obteniendo el pedido:", error);
-        throw new Error("No se pudo obtener el pedido.");
+        console.error("Error obteniendo detalles del pedido:", error);
+        throw new Error("No se pudo obtener el detalle del pedido.");
+      }
+    },
+    
+    async fetchUsuarioByPedidoId(usuarioId: number) {
+      return this.fetchUsuarioCompleto(usuarioId);
+    },
+    
+
+    async fetchUsuarioCompleto(usuarioId: number) {
+      try {
+        const response = await axios.get(`http://localhost:5162/api/Usuario/${usuarioId}`);
+        console.log("Datos completos del usuario:", response.data);
+        if (!response.data) {
+          throw new Error("Usuario no encontrado.");
+        }
+        this.usuario = response.data;
+        console.log("Usuario cargado correctamente");
+        return this.usuario;
+      } catch (error) {
+        console.error("Error obteniendo el usuario:", error);
+        throw new Error("No se pudo obtener la información del usuario.");
       }
     },
   },

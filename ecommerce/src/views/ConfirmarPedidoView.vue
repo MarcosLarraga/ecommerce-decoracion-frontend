@@ -54,8 +54,9 @@ const cartStore = useCartStore()
 const router = useRouter()
 const toast = useToast()
 
-const direccion = ref(userStore.user.direccion || '')
-const telefono = ref(userStore.user.telefono || '')
+const direccion = ref(userStore.user?.direccion || '');
+const telefono = ref(userStore.user?.telefono || '');
+
 const isSubmitting = ref(false)
 
 const confirmarPedido = async () => {
