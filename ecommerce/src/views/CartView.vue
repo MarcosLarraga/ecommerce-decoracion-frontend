@@ -15,12 +15,26 @@
             <h3 class="cart__item-name">{{ item.name }}</h3>
             <p class="cart__item-price">{{ item.price.toFixed(2) }} €</p>
             <div class="cart__item-quantity-controls">
-              <button class="cart__quantity-btn" @click="decreaseQuantity(item)" :disabled="item.quantity <= 1">-</button>
+              <button
+                class="cart__quantity-btn"
+                @click="decreaseQuantity(item)"
+                :disabled="item.quantity <= 1"
+              >
+                -
+              </button>
               <p class="cart__item-quantity">{{ item.quantity }}</p>
-              <button class="cart__quantity-btn" @click="increaseQuantity(item)">+</button>
+              <button
+                class="cart__quantity-btn"
+                @click="increaseQuantity(item)"
+              >
+                +
+              </button>
             </div>
           </div>
-          <button class="cart__remove-btn" @click="removeItem(item)">
+          <button
+            class="cart__remove-btn"
+            @click="removeItem(item)"
+          >
             Quitar
           </button>
         </div>
@@ -29,8 +43,12 @@
       <div class="cart__total">
         <h2>Total: {{ cartStore.cartTotal.toFixed(2) }} €</h2>
         <div class="cart__actions">
-          <button class="cart__clear-btn" @click="clearCart">Vaciar Carrito</button>
-          <router-link to="/pedido-confirmacion" class="cart__checkout-btn">Finalizar Compra</router-link>
+          <button class="cart__clear-btn" @click="clearCart">
+            Vaciar Carrito
+          </button>
+          <router-link to="/pedido-confirmacion" class="cart__checkout-btn">
+            Finalizar Compra
+          </router-link>
         </div>
       </div>
     </div>
@@ -44,24 +62,55 @@ import { useToast } from 'vue-toastification';
 const cartStore = useCartStore();
 const toast = useToast();
 
+// Remover un ítem del carrito
 const removeItem = (item) => {
   cartStore.removeFromCart(item.id);
 };
 
+// Vaciar todo el carrito
 const clearCart = () => {
   if (confirm("¿Estás seguro de que deseas vaciar el carrito?")) {
     cartStore.clearCart();
   }
 };
 
+// Guardamos timeouts de "sumar" por producto (clave: item.id)
+const increaseTimeouts: Record<number, ReturnType<typeof setTimeout> | null> = {};
+
+// Guardamos timeouts de "restar" por producto (clave: item.id)
+const decreaseTimeouts: Record<number, ReturnType<typeof setTimeout> | null> = {};
+
+// Sumar cantidad
 const increaseQuantity = (item) => {
   cartStore.addToCart(item);
+
+  // Cancelamos cualquier timeout previo para este item
+  if (increaseTimeouts[item.id]) {
+    clearTimeout(increaseTimeouts[item.id]);
+  }
+
+  // Programamos un nuevo timeout para mostrar 1 sola notificación
+  increaseTimeouts[item.id] = setTimeout(() => {
+    toast.success(`Producto "${item.name}" añadido al carrito`);
+    increaseTimeouts[item.id] = null;
+  }, 800);
 };
 
+// Restar cantidad
 const decreaseQuantity = (item) => {
   if (item.quantity > 1) {
     cartStore.decreaseQuantity(item.id);
-    toast.info(`Cantidad de ${item.name} reducida`);
+
+    // Cancelamos cualquier timeout previo para este item
+    if (decreaseTimeouts[item.id]) {
+      clearTimeout(decreaseTimeouts[item.id]);
+    }
+
+    // Programamos un nuevo timeout para mostrar 1 sola notificación
+    decreaseTimeouts[item.id] = setTimeout(() => {
+      toast.info(`Cantidad de "${item.name}" reducida`);
+      decreaseTimeouts[item.id] = null;
+    }, 800);
   }
 };
 </script>
@@ -359,5 +408,4 @@ const decreaseQuantity = (item) => {
     }
   }
 }
-
 </style>

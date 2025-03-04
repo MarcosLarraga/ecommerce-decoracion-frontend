@@ -8,7 +8,7 @@ import * as directives from 'vuetify/directives';
 import 'vuetify/styles';
 import '@mdi/font/css/materialdesignicons.css';
 
-//Notificaciones
+// Notificaciones
 import Toast from 'vue-toastification';
 import 'vue-toastification/dist/index.css';
 
@@ -33,8 +33,8 @@ const app = createApp(App);
 app.use(router);
 app.use(pinia);
 app.use(vuetify);
+app.use(Toast); // <-- Registra el plugin Toast aquí, antes de montar la app
 app.mount('#app');
-app.use(Toast);
 
 // Inicializa el store de usuario para restaurar la sesión (si existe)
 const userStore = useUserStore();
