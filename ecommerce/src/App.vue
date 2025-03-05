@@ -1,15 +1,15 @@
 <template>
-  <v-app class="app">
+  <VApp class="app">
     <NavBar />
     <div class="layout">
-      <v-main class="main">
-        <v-container fluid class="pa-0">
+      <VMain class="main">
+        <VContainer fluid class="pa-0">
           <RouterView />
-        </v-container>
-      </v-main>
+        </VContainer>
+      </VMain>
     </div>
     <Footer />
-  </v-app>
+  </VApp>
 </template>
 
 <script setup>
@@ -41,7 +41,6 @@ import Footer from '@/components/Footer.vue';
 .v-main {
   padding-bottom: 0 !important;
 }
-
 
 .content {
   flex-grow: 1;

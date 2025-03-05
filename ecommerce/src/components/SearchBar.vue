@@ -12,17 +12,16 @@
       class="search__field"
       prepend-inner-icon="mdi-magnify"
       dark
+      return-object
       item-title="nombre"
-      item-value="id"
       @update:search-input="onSearchInput"
-      @change="onSelectItem"
       @keydown.enter.prevent="onEnter"
     >
       <template v-slot:item="{ props, item }">
         <v-list-item v-bind="props">
           <v-list-item-content>
             <v-list-item-title>{{ item.raw.nombre }}</v-list-item-title>
-            <v-list-item-subtitle>{{ item.raw.precio | currency }}</v-list-item-subtitle>
+            <v-list-item-subtitle>{{ formatCurrency(item.raw.precio) }}</v-list-item-subtitle>
           </v-list-item-content>
           <v-img
             :src="item.raw.urlImagen"
@@ -37,10 +36,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue';
 import { useProductsStore } from '@/stores/productsStore';
 import { useRouter } from 'vue-router';
 import debounce from 'lodash/debounce';
+
+function formatCurrency(value: number) {
+  return new Intl.NumberFormat('es-ES', { 
+    style: 'currency', 
+    currency: 'EUR' 
+  }).format(value);
+}
 
 const router = useRouter();
 const store = useProductsStore();
@@ -52,32 +58,53 @@ const isLoading = computed(() => store.loading);
 const filteredItems = computed(() => store.allProducts);
 
 const onSearchInput = debounce(async (query: string) => {
-  searchQuery.value = query;
-  if (!query) {
-    store.allProducts = [];
+  searchQuery.value = query.trim();
+  if (!searchQuery.value) {
+    await store.fetchProducts();
     return;
   }
-  await store.searchProducts(query);
+  await store.searchProducts(searchQuery.value);
 }, 300);
 
-const redirectToProductsPage = (query: string) => {
-  router.push({
-    name: 'Products',
-    query: { search: query }
-  });
-};
-
-const onSelectItem = (value: any) => {
-  if (value && value.nombre) {
-    redirectToProductsPage(value.nombre);
-  }
+const redirectToProductDetail = (id: number) => {
+  console.log('Redirigiendo a producto con ID:', id);
+  // Forzamos la recarga completa de la página
+  window.location.href = `/product/${id}`;
 };
 
 const onEnter = () => {
-  if (searchQuery.value) {
-    redirectToProductsPage(searchQuery.value);
+  console.log('Enter presionado. searchQuery:', searchQuery.value);
+  if (!searchQuery.value) return;
+  const matchedProduct = store.allProducts.find((item) =>
+    item.raw.nombre.toLowerCase() === searchQuery.value.toLowerCase()
+  );
+  if (matchedProduct && matchedProduct.raw.id) {
+    redirectToProductDetail(matchedProduct.raw.id);
+  } else {
+    router.push({
+      name: 'Products',
+      query: { search: searchQuery.value }
+    });
   }
 };
+
+watch(selectedItem, (value) => {
+  console.log('Cambio en selectedItem:', value);
+  if (value && typeof value === 'object') {
+    const productId = value.raw ? value.raw.id : value.id;
+    if (productId) {
+      redirectToProductDetail(productId);
+    } else {
+      console.warn('Producto seleccionado no tiene id:', value);
+    }
+  }
+});
+
+onMounted(() => {
+  if (store.allProducts.length === 0) {
+    store.fetchProducts();
+  }
+});
 </script>
 
 <style scoped lang="scss">
