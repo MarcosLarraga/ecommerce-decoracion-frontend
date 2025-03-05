@@ -18,15 +18,15 @@
       @keydown.enter.prevent="onEnter"
     >
       <template v-slot:item="{ props, item }">
-        <v-list-item v-bind="props">
-          <v-list-item-content>
+        <v-list-item v-bind="props" class="search-item">
+          <div class="search-item__content">
             <v-list-item-title>{{ item.raw.nombre }}</v-list-item-title>
             <v-list-item-subtitle>{{ formatCurrency(item.raw.precio) }}</v-list-item-subtitle>
-          </v-list-item-content>
+          </div>
           <v-img
             :src="item.raw.urlImagen"
-            max-width="50"
-            max-height="50"
+            width="50"
+            height="50"
             class="rounded-img"
           ></v-img>
         </v-list-item>
@@ -118,10 +118,18 @@ onMounted(() => {
 .search__field {
   border-bottom: 1px solid #000000 !important;
   border-radius: 0;
+  background-color: rgba(255, 255, 255, 0.1);
+  transition: background-color 0.3s ease;
+
+  &:hover, &:focus-within {
+    background-color: rgba(255, 255, 255, 0.2);
+  }
 }
 
 .rounded-img {
   border-radius: 8px;
+  margin-left: 16px;
+  object-fit: cover;
 }
 
 :deep(.v-field__input) {
@@ -135,15 +143,45 @@ onMounted(() => {
   color: #000000 !important;
 }
 
+:deep(.v-autocomplete__content) {
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+:deep(.v-list-item) {
+  padding: 8px 16px;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+}
+
+:deep(.v-list-item__content) {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+:deep(.v-list-item-title) {
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+:deep(.v-list-item-subtitle) {
+  font-size: 0.85em;
+  color: rgba(0, 0, 0, 0.6);
+}
+
 @media (min-width: 768px) {
   .search {
-    width: 250px;
+    width: 300px;
   }
 }
 
 @media (min-width: 1024px) {
   .search {
-    width: 200px;
+    width: 350px;
   }
 }
 </style>
