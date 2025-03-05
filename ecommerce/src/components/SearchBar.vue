@@ -2,6 +2,8 @@
   <div class="search">
     <v-autocomplete
       v-model="selectedItem"
+      :menu="menuOpen"
+      @update:menu="menuOpen = $event"
       :items="filteredItems"
       :loading="isLoading"
       :search-input.sync="searchQuery"
@@ -16,6 +18,7 @@
       item-title="nombre"
       @update:search-input="onSearchInput"
       @keydown.enter.prevent="onEnter"
+      :menu-props="{ attach: 'body', offsetY: true }"
     >
       <template v-slot:item="{ props, item }">
         <v-list-item v-bind="props" class="search-item">
@@ -35,27 +38,22 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted } from 'vue';
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
 import { useProductsStore } from '@/stores/productsStore';
 import { useRouter } from 'vue-router';
 import debounce from 'lodash/debounce';
-
-function formatCurrency(value: number) {
-  return new Intl.NumberFormat('es-ES', { 
-    style: 'currency', 
-    currency: 'EUR' 
-  }).format(value);
-}
 
 const router = useRouter();
 const store = useProductsStore();
 
 const searchQuery = ref('');
 const selectedItem = ref(null);
+const menuOpen = ref(false); // Controla si el menú está abierto
 
 const isLoading = computed(() => store.loading);
 const filteredItems = computed(() => store.allProducts);
 
+// Al escribir, se busca y se abre el menú
 const onSearchInput = debounce(async (query: string) => {
   searchQuery.value = query.trim();
   if (!searchQuery.value) {
@@ -63,16 +61,15 @@ const onSearchInput = debounce(async (query: string) => {
     return;
   }
   await store.searchProducts(searchQuery.value);
+  menuOpen.value = true;
 }, 300);
 
 const redirectToProductDetail = (id: number) => {
   console.log('Redirigiendo a producto con ID:', id);
-  // Forzamos la recarga completa de la página
   window.location.href = `/product/${id}`;
 };
 
 const onEnter = () => {
-  console.log('Enter presionado. searchQuery:', searchQuery.value);
   if (!searchQuery.value) return;
   const matchedProduct = store.allProducts.find((item) =>
     item.raw.nombre.toLowerCase() === searchQuery.value.toLowerCase()
@@ -80,29 +77,35 @@ const onEnter = () => {
   if (matchedProduct && matchedProduct.raw.id) {
     redirectToProductDetail(matchedProduct.raw.id);
   } else {
-    router.push({
-      name: 'Products',
-      query: { search: searchQuery.value }
-    });
+    router.push({ name: 'Products', query: { search: searchQuery.value } });
   }
 };
 
 watch(selectedItem, (value) => {
-  console.log('Cambio en selectedItem:', value);
   if (value && typeof value === 'object') {
     const productId = value.raw ? value.raw.id : value.id;
     if (productId) {
       redirectToProductDetail(productId);
-    } else {
-      console.warn('Producto seleccionado no tiene id:', value);
     }
   }
 });
+
+// Función para cerrar el menú inmediatamente al detectar scroll
+const onScroll = () => {
+  if (menuOpen.value) {
+    menuOpen.value = false;
+  }
+};
 
 onMounted(() => {
   if (store.allProducts.length === 0) {
     store.fetchProducts();
   }
+  window.addEventListener('scroll', onScroll);
+});
+
+onUnmounted(() => {
+  window.removeEventListener('scroll', onScroll);
 });
 </script>
 
@@ -120,7 +123,8 @@ onMounted(() => {
   background-color: rgba(255, 255, 255, 0.1);
   transition: background-color 0.3s ease;
 
-  &:hover, &:focus-within {
+  &:hover,
+  &:focus-within {
     background-color: rgba(255, 255, 255, 0.2);
   }
 }
@@ -161,14 +165,14 @@ onMounted(() => {
 }
 
 @media (min-width: 768px) {
-   .search {
-     width:300px;
-   }
+  .search {
+    width: 300px;
+  }
 }
 
-@media (min-width:1024px){
-   .search{
-     width:350px; 
-   }
+@media (min-width: 1024px) {
+  .search {
+    width: 350px;
+  }
 }
 </style>
