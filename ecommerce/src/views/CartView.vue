@@ -390,7 +390,7 @@ const decreaseQuantity = (item) => {
     box-shadow: $button-shadow;
     
     &:hover {
-      background-color: darken($error-color, 10%);
+      background-color: #E63946;
       transform: translateY(-2px);
       box-shadow: $button-hover-shadow;
     }

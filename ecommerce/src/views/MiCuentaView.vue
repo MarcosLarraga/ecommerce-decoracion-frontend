@@ -435,22 +435,22 @@ onMounted(() => {
 
     &--pending {
       background-color: $warning-color;
-      color: darken($warning-color, 30%);
+      color: $status-pending-text;
     }
 
     &--completed {
       background-color: $success-color;
-      color: darken($success-color, 30%);
+      color: $status-completed-text;
     }
 
     &--shipped {
       background-color: $info-color;
-      color: darken($info-color, 30%);
+      color: $status-shipped-text;
     }
 
     &--cancelled {
       background-color: $error-color;
-      color: darken($error-color, 30%);
+      color: $status-cancelled-text;
     }
   }
 

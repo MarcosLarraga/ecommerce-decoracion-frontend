@@ -258,7 +258,6 @@ const getUserPlaceholder = (userId: number): string => {
 
 
 <style lang="scss" scoped>
-/* Los mismos estilos que proporcioné anteriormente */
 @use '@/styles/variables' as *;
 
 .product-detail {
@@ -366,7 +365,7 @@ const getUserPlaceholder = (userId: number): string => {
     max-width: 300px;
 
     &:hover {
-      background-color: darken($primary-color, 10%);
+      background-color: $primary-color-hover; 
       transform: translateY(-2px);
     }
   }
@@ -587,7 +586,7 @@ const getUserPlaceholder = (userId: number): string => {
     width: 100%;
 
     &:hover {
-      background-color: darken($primary-color, 10%);
+      background-color: $primary-color-hover; 
     }
 
     &:disabled {

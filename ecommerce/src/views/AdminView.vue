@@ -566,7 +566,7 @@ async function deleteOrder(orderId: number) {
     }
 
     &:hover {
-      background-color: darken($success-color, 10%);
+      background-color: $success-color; 
     }
   }
 
@@ -594,17 +594,13 @@ async function deleteOrder(orderId: number) {
       background-color: $error-color;
 
       &:hover {
-        background-color: darken($error-color, 10%);
+        background-color: $error-color;
       }
     }
   }
 }
 
-/* 
-  Usamos la misma clase .users-table para las TRES secciones,
-  así todos tienen el mismo maquetado (sticky en la primera columna, 
-  color de cabecera, etc.).
-*/
+/* Usamos la misma clase .users-table para las TRES secciones */
 .users-table {
   width: 100%;
   overflow-x: auto;
@@ -669,7 +665,7 @@ async function deleteOrder(orderId: number) {
       color: $button-text-color;
 
       &:hover {
-        background-color: darken($error-color, 10%);
+        background-color: $error-color;
       }
     }
   }
@@ -686,7 +682,7 @@ async function deleteOrder(orderId: number) {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 9999; // Valor alto para que se muestre por encima de otros elementos, incluido el footer
+  z-index: 9999; // Valor alto para que se muestre por encima de otros elementos
   animation: fadeIn 0.3s ease;
 }
 
@@ -780,7 +776,7 @@ async function deleteOrder(orderId: number) {
     border: none;
 
     &:hover {
-      background-color: darken($primary-color, 10%);
+      background-color: $primary-color;
     }
   }
 
@@ -799,7 +795,6 @@ async function deleteOrder(orderId: number) {
   from {
     opacity: 0;
   }
-
   to {
     opacity: 1;
   }
@@ -810,7 +805,6 @@ async function deleteOrder(orderId: number) {
     transform: translateY(-20px);
     opacity: 0;
   }
-
   to {
     transform: translateY(0);
     opacity: 1;
