@@ -4,13 +4,8 @@
 
     <!-- Pestañas (Usuarios, Productos, Pedidos) -->
     <div class="admin-panel__tabs">
-      <button
-        v-for="tab in tabs"
-        :key="tab.id"
-        class="admin-panel__tab-btn"
-        :class="{ 'admin-panel__tab-btn--active': activeTab === tab.id }"
-        @click="activeTab = tab.id"
-      >
+      <button v-for="tab in tabs" :key="tab.id" class="admin-panel__tab-btn"
+        :class="{ 'admin-panel__tab-btn--active': activeTab === tab.id }" @click="activeTab = tab.id">
         {{ tab.name }}
       </button>
     </div>
@@ -132,58 +127,144 @@
     </div>
 
     <!-- Modal de Edición de Usuario -->
+    <!-- Modal de Edición de Usuario -->
     <div v-if="editingUser" class="modal-overlay">
       <div class="modal-content">
-        <h3>Editar Usuario</h3>
-        <label>
-          ID:
-          <input type="text" v-model="editingUser.id" disabled />
-        </label>
-        <label>
-          Nombre:
-          <input type="text" v-model="editingUser.nombre" />
-        </label>
-        <label>
-          Email:
-          <input type="email" v-model="editingUser.email" />
-        </label>
-        <div class="modal-buttons">
-          <button @click="saveUserEdits" class="admin-panel__action-btn">Guardar</button>
-          <button @click="cancelUserEdit" class="admin-panel__action-btn admin-panel__action-btn--danger">
-            Cancelar
-          </button>
-        </div>
+        <h3 class="modal-title">Editar Usuario</h3>
+        <form @submit.prevent="saveUserEdits" class="modal-form">
+          <div class="form-group">
+            <label for="user-id">ID:</label>
+            <input type="text" id="user-id" v-model="editingUser.id" disabled
+              class="form-control form-control--disabled" />
+          </div>
+
+          <div class="form-group">
+            <label for="user-name">Nombre:</label>
+            <input type="text" id="user-name" v-model="editingUser.nombre" class="form-control" required />
+          </div>
+
+          <div class="form-group">
+            <label for="user-email">Email:</label>
+            <input type="email" id="user-email" v-model="editingUser.email" class="form-control" required />
+          </div>
+
+          <div class="form-group">
+            <label for="user-role">Rol:</label>
+            <select id="user-role" v-model="editingUser.role" class="form-control">
+              <option value="User">Usuario</option>
+              <option value="Admin">Administrador</option>
+            </select>
+          </div>
+
+          <div class="modal-buttons">
+            <button type="submit" class="modal-btn modal-btn--primary">Guardar cambios</button>
+            <button type="button" @click="cancelUserEdit" class="modal-btn modal-btn--secondary">Cancelar</button>
+          </div>
+        </form>
       </div>
     </div>
+
 
     <!-- Modal de Edición de Producto -->
     <div v-if="editingProduct" class="modal-overlay">
       <div class="modal-content">
-        <h3>Editar Producto</h3>
-        <label>
-          ID:
-          <input type="text" v-model="editingProduct.id" disabled />
-        </label>
-        <label>
-          Nombre:
-          <input type="text" v-model="editingProduct.nombre" />
-        </label>
-        <label>
-          Precio:
-          <input type="number" step="0.01" v-model.number="editingProduct.precio" />
-        </label>
-        <label>
-          Categoría:
-          <input type="text" v-model="editingProduct.categoria" />
-        </label>
-        <div class="modal-buttons">
-          <button @click="saveProductEdits" class="admin-panel__action-btn">Guardar</button>
-          <button @click="cancelProductEdit" class="admin-panel__action-btn admin-panel__action-btn--danger">
-            Cancelar
-          </button>
-        </div>
+        <h3 class="modal-title">Editar Producto</h3>
+        <form @submit.prevent="saveProductEdits" class="modal-form">
+          <div class="form-group">
+            <label for="product-id">ID:</label>
+            <input type="text" id="product-id" v-model="editingProduct.id" disabled
+              class="form-control form-control--disabled" />
+          </div>
+
+          <div class="form-group">
+            <label for="product-name">Nombre:</label>
+            <input type="text" id="product-name" v-model="editingProduct.nombre" class="form-control" required />
+          </div>
+
+          <div class="form-group">
+            <label for="product-price">Precio (€):</label>
+            <input type="number" id="product-price" v-model.number="editingProduct.precio" step="0.01" min="0"
+              class="form-control" required />
+          </div>
+
+          <div class="form-group">
+            <label for="product-category">Categoría:</label>
+            <input type="text" id="product-category" v-model="editingProduct.categoria" class="form-control" required />
+          </div>
+
+          <div class="form-group">
+            <label for="product-description">Descripción:</label>
+            <textarea id="product-description" v-model="editingProduct.descripcion" rows="3"
+              class="form-control"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="product-image">URL de imagen:</label>
+            <input type="url" id="product-image" v-model="editingProduct.urlImagen" class="form-control" />
+            <div v-if="editingProduct.urlImagen" class="image-preview">
+              <img :src="editingProduct.urlImagen" alt="Vista previa" />
+            </div>
+          </div>
+
+          <div class="modal-buttons">
+            <button type="submit" class="modal-btn modal-btn--primary">Guardar cambios</button>
+            <button type="button" @click="cancelProductEdit" class="modal-btn modal-btn--secondary">Cancelar</button>
+          </div>
+        </form>
       </div>
     </div>
+    <!-- Modal para añadir producto -->
+    <div v-if="showAddProductForm" class="modal-overlay">
+      <div class="modal-content">
+        <h3 class="modal-title">Añadir Nuevo Producto</h3>
+        <form @submit.prevent="createNewProduct" class="modal-form">
+          <div class="form-group">
+            <label for="new-product-name">Nombre:</label>
+            <input type="text" id="new-product-name" v-model="newProduct.nombre" class="form-control" required />
+          </div>
+
+          <div class="form-group">
+            <label for="new-product-price">Precio (€):</label>
+            <input type="number" id="new-product-price" v-model.number="newProduct.precio" step="0.01" min="0"
+              class="form-control" required />
+          </div>
+
+          <div class="form-group">
+            <label for="new-product-category">Categoría:</label>
+            <select id="new-product-category" v-model="newProduct.categoria" class="form-control" required>
+              <option disabled value="">Seleccione una categoría</option>
+              <option value="1">Textil</option>
+              <option value="2">Decoración vertical</option>
+              <option value="3">Accesorio decorativo</option>
+            </select>
+          </div>
+
+
+          <div class="form-group">
+            <label for="new-product-description">Descripción:</label>
+            <textarea id="new-product-description" v-model="newProduct.descripcion" rows="3"
+              class="form-control"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="new-product-image">URL de imagen:</label>
+            <input type="url" id="new-product-image" v-model="newProduct.urlImagen" class="form-control" />
+            <div v-if="newProduct.urlImagen" class="image-preview">
+              <img :src="newProduct.urlImagen" alt="Vista previa" />
+            </div>
+          </div>
+
+          <div class="modal-buttons">
+            <button type="submit" class="modal-btn modal-btn--primary" :disabled="isCreatingProduct">
+              {{ isCreatingProduct ? 'Creando...' : 'Crear Producto' }}
+            </button>
+            <button type="button" @click="cancelAddProduct" class="modal-btn modal-btn--secondary">Cancelar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+
   </div>
 </template>
 
@@ -202,10 +283,20 @@ const users = ref<any[]>([]);
 const products = ref<any[]>([]);
 const orders = ref<any[]>([]);
 const showAddProductForm = ref(false);
+const isCreatingProduct = ref(false);
 
 // Variables reactivas para modales (Usuario y Producto)
 const editingUser = ref<any>(null);
 const editingProduct = ref<any>(null);
+
+// Variable para nuevo producto
+const newProduct = ref({
+  nombre: '',
+  precio: 0,
+  categoria: '',
+  descripcion: '',
+  urlImagen: ''
+});
 
 const tabs = [
   { id: 'users', name: 'Usuarios' },
@@ -292,6 +383,52 @@ async function deleteProduct(productId: number) {
   }
 }
 
+// Funciones para añadir producto
+function openAddProductForm() {
+  showAddProductForm.value = true;
+}
+
+function cancelAddProduct() {
+  showAddProductForm.value = false;
+  // Resetear el formulario
+  newProduct.value = {
+    nombre: '',
+    precio: 0,
+    categoria: '',
+    descripcion: '',
+    urlImagen: ''
+  };
+}
+
+async function createNewProduct() {
+  if (!newProduct.value.nombre || !newProduct.value.precio || !newProduct.value.categoria) {
+    toast.warning("Por favor, completa los campos obligatorios");
+    return;
+  }
+
+  try {
+    isCreatingProduct.value = true;
+    const productoParaEnviar = {
+      nombre: newProduct.value.nombre,
+      precio: newProduct.value.precio,
+      categoriaId: parseInt(newProduct.value.categoria),
+      descripcion: newProduct.value.descripcion || '',
+      urlImagen: newProduct.value.urlImagen || ''
+    };
+
+    await adminStore.createNewProduct(productoParaEnviar);
+    toast.success("Producto creado correctamente");
+    showAddProductForm.value = false;
+    // Reiniciar el formulario y actualizar la lista
+    newProduct.value = { nombre: '', precio: 0, categoria: '', descripcion: '', urlImagen: '' };
+  } catch (error) {
+    toast.error("Error al crear el producto");
+  } finally {
+    isCreatingProduct.value = false;
+  }
+}
+
+
 /* PEDIDOS */
 async function deleteOrder(orderId: number) {
   try {
@@ -304,6 +441,7 @@ async function deleteOrder(orderId: number) {
   }
 }
 </script>
+
 <style lang="scss" scoped>
 @use '@/styles/variables' as *;
 
@@ -537,39 +675,145 @@ async function deleteOrder(orderId: number) {
   }
 }
 
-/* Modal */
+/* Estilos para los modales */
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba($secondary-color, $opacity-medium);
+  background: rgba(0, 0, 0, 0.7);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: $z-index-modal;
+  z-index: 9999; // Valor alto para que se muestre por encima de otros elementos, incluido el footer
+  animation: fadeIn 0.3s ease;
 }
 
 .modal-content {
-  background: $background-color;
-  padding: $spacing-md;
-  border-radius: $border-radius;
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
   width: 90%;
-  max-width: 500px;
+  max-width: 550px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  animation: slideIn 0.3s ease;
+}
 
-  @media (min-width: $breakpoint-md) {
-    padding: $spacing-lg;
+.modal-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: $primary-color;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  label {
+    font-weight: 500;
+    color: #333;
+  }
+}
+
+.form-control {
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+  transition: border-color 0.2s;
+
+  &:focus {
+    outline: none;
+    border-color: $primary-color;
+    box-shadow: 0 0 0 2px rgba($primary-color, 0.2);
+  }
+
+  &--disabled {
+    background-color: #f5f5f5;
+    cursor: not-allowed;
+  }
+}
+
+.image-preview {
+  margin-top: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 0.5rem;
+
+  img {
+    max-width: 100%;
+    max-height: 150px;
+    display: block;
+    margin: 0 auto;
   }
 }
 
 .modal-buttons {
   display: flex;
   justify-content: flex-end;
-  margin-top: $spacing-md;
+  gap: 1rem;
+  margin-top: 1.5rem;
 }
 
-.modal-buttons button {
-  margin-left: $spacing-xs;
+.modal-btn {
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &--primary {
+    background-color: $primary-color;
+    color: white;
+    border: none;
+
+    &:hover {
+      background-color: darken($primary-color, 10%);
+    }
+  }
+
+  &--secondary {
+    background-color: transparent;
+    color: #666;
+    border: 1px solid #ddd;
+
+    &:hover {
+      background-color: #f5f5f5;
+    }
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 </style>

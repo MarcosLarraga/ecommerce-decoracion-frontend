@@ -141,7 +141,6 @@ export const useUserStore = defineStore('user', {
           this.user.direccion = direccion;
           localStorage.setItem('user', JSON.stringify(this.user));
         }
-        toast.success("Teléfono y dirección actualizados correctamente.");
       } catch (error: any) {
         console.error('Error actualizando teléfono y dirección:', error);
         toast.error(error.response?.data || "Error al actualizar teléfono y dirección.");

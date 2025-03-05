@@ -39,10 +39,8 @@ export const usePedidoStore = defineStore('pedido', {
       try {
         const response = await axios.get(`http://localhost:5162/api/Pedido/user/${userId}`);
         this.pedidos = response.data;
-        toast.success("Pedidos cargados correctamente");
       } catch (error) {
         console.error("Error obteniendo pedidos del usuario:", error);
-        toast.error("No se pudieron cargar los pedidos.");
         throw new Error("No se pudieron cargar los pedidos.");
       }
     },

@@ -43,7 +43,7 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useUserStore } from '@/stores/userStore';
 import { useRouter } from 'vue-router';
 import Alerta from '@/components/Alerta.vue';
@@ -53,38 +53,44 @@ const email = ref('');
 const password = ref('');
 const loading = ref(false);
 const error = ref('');
-const showAdminModal = ref(false); // Controla la visibilidad del modal
+const showAdminModal = ref(false);
 const userStore = useUserStore();
 const router = useRouter();
+
+// Verificar si ya hay un usuario admin logueado al cargar el componente
+onMounted(() => {
+  if (userStore.isAuthenticated && userStore.user?.esAdmin) {
+    showAdminModal.value = true;
+  }
+});
 
 const handleLogin = async () => {
   loading.value = true;
   error.value = '';
   try {
     await userStore.login(email.value, password.value);
+    
     if (userStore.isAuthenticated) {
-      // Añade estos logs para depuración
-      console.log("Usuario autenticado:", userStore.user);
-      console.log("Rol del usuario:", userStore.user?.role);
-      console.log("¿Es admin?:", userStore.user?.role === 'admin' || userStore.user?.role === 'Admin');
-
-      if (userStore.user?.role === 'Admin' || userStore.user?.role === 'admin') {
-        console.log("Mostrando modal de admin");
+      // Depuración completa del objeto de usuario
+      console.log("Usuario completo:", JSON.stringify(userStore.user, null, 2));
+      
+      // Verificamos si el usuario es admin usando la propiedad correcta
+      // Ajusta esto según la estructura real de tu objeto de usuario
+      if (userStore.user?.esAdmin === true) {
+        console.log("Usuario es administrador, mostrando modal");
         showAdminModal.value = true;
       } else {
-        console.log("Redirigiendo a home");
+        console.log("Usuario no es administrador, redirigiendo a home");
         router.push('/');
       }
     }
   } catch (err) {
     console.error("Error en login:", err);
-    error.value = 'Error al iniciar sesión';
+    error.value = 'Error al iniciar sesión. Verifica tus credenciales.';
   } finally {
     loading.value = false;
   }
 };
-
-
 
 const redirectToHome = () => {
   showAdminModal.value = false;
@@ -96,6 +102,7 @@ const redirectToAdmin = () => {
   router.push('/admin');
 };
 </script>
+
 <style lang="scss" scoped>
 @use '@/styles/variables' as *;
 

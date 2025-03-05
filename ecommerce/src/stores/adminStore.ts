@@ -30,11 +30,6 @@ interface Pedido {
   detalles?: DetallePedido[];
 }
 
-/**
- * Función auxiliar para parsear la fecha.
- * Se contempla que el string puede venir como "FechaPedido" o "fechaPedido",
- * o incluso en formato .NET (/Date(1234567890)/).
- */
 function parseFechaPedido(dateStr: string): Date {
   let date = new Date(dateStr);
   if (isNaN(date.getTime())) {
@@ -85,18 +80,37 @@ export const useAdminStore = defineStore('admin', {
     async updateUser(user: Usuario) {
       this.error = null;
       try {
-        await axios.put(`http://localhost:5162/api/Usuario/${user.id}`, user, {
+        // Preparamos el payload para la API:
+        // Convertimos el rol a booleano: 'Admin' -> true, de lo contrario false.
+        const payload = {
+          id: user.id,
+          nombre: user.nombre,
+          email: user.email,
+          esAdmin: user.role === 'Admin'
+        };
+        const response = await axios.put(`http://localhost:5162/api/Usuario/${user.id}`, payload, {
           headers: { Authorization: `Bearer ${this.token}` }
         });
+        // Suponiendo que la API devuelve el usuario actualizado, mapeamos el campo booleano a string para la vista
+        const updatedUser = response.data;
+        const mappedUser = {
+          id: updatedUser.id,
+          nombre: updatedUser.nombre,
+          email: updatedUser.email,
+          role: updatedUser.esAdmin ? 'Admin' : 'Usuario'
+        };
         const index = this.users.findIndex(u => u.id === user.id);
         if (index !== -1) {
-          this.users[index] = user;
+          this.users[index] = mappedUser;
         }
+        return mappedUser;
       } catch (error) {
-        console.error('Error updating user:', error);
-        this.error = 'Error al actualizar usuario';
+        console.error("Error updating user:", error);
+        this.error = "Error al actualizar usuario";
+        throw error;
       }
-    },
+    }
+    ,
 
     async deleteUser(userId: number) {
       this.error = null;
@@ -126,7 +140,9 @@ export const useAdminStore = defineStore('admin', {
           nombre: prod.nombre,
           precio: prod.precio,
           // Se contempla que la propiedad pueda venir en PascalCase o camelCase
-          categoria: prod.categoriaNombre || prod.CategoriaNombre || 'Sin Categoría'
+          categoria: prod.categoriaNombre || prod.CategoriaNombre || 'Sin Categoría',
+          descripcion: prod.descripcion || '',   // Agregamos descripción
+          urlImagen: prod.urlImagen || ''          // Agregamos URL de imagen
         }));
       } catch (error) {
         console.error('Error fetching products:', error);
@@ -134,7 +150,8 @@ export const useAdminStore = defineStore('admin', {
       } finally {
         this.loading = false;
       }
-    },
+    }
+    ,
 
     async updateProduct(product: Producto) {
       this.error = null;
@@ -164,6 +181,29 @@ export const useAdminStore = defineStore('admin', {
         this.error = 'Error al eliminar producto';
       }
     },
+    async createNewProduct(productoParaEnviar: {
+      nombre: string;
+      precio: number;
+      categoriaId: number;
+      descripcion?: string;
+      urlImagen?: string;
+    }) {
+      this.error = null;
+      try {
+        await axios.post('http://localhost:5162/api/Producto', productoParaEnviar, {
+          headers: { Authorization: `Bearer ${this.token}` }
+        });
+        // Actualizamos la lista de productos
+        await this.fetchAllProducts();
+      } catch (error) {
+        console.error('Error creando producto:', error);
+        this.error = 'Error al crear producto';
+        throw error;
+      }
+    }
+    ,
+  
+    
 
     // ======================
     //  MÉTODOS PARA PEDIDOS

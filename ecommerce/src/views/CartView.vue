@@ -31,10 +31,7 @@
               </button>
             </div>
           </div>
-          <button
-            class="cart__remove-btn"
-            @click="removeItem(item)"
-          >
+          <button class="cart__remove-btn" @click="removeItem(item)">
             Quitar
           </button>
         </div>
@@ -46,9 +43,21 @@
           <button class="cart__clear-btn" @click="clearCart">
             Vaciar Carrito
           </button>
-          <router-link to="/pedido-confirmacion" class="cart__checkout-btn">
+          <!-- Condicionamos el acceso a finalizar compra -->
+          <router-link
+            v-if="userStore.isAuthenticated"
+            to="/pedido-confirmacion"
+            class="cart__checkout-btn"
+          >
             Finalizar Compra
           </router-link>
+          <button
+            v-else
+            class="cart__checkout-btn"
+            @click="notifyNotLoggedIn"
+          >
+            Finalizar Compra
+          </button>
         </div>
       </div>
     </div>
@@ -57,10 +66,17 @@
 
 <script setup lang="ts">
 import { useCartStore } from '@/stores/cartStore';
+import { useUserStore } from '@/stores/userStore';
 import { useToast } from 'vue-toastification';
 
 const cartStore = useCartStore();
+const userStore = useUserStore();
 const toast = useToast();
+
+// Notificar al usuario que debe iniciar sesión
+const notifyNotLoggedIn = () => {
+  toast.info("Debes iniciar sesión para finalizar la compra");
+};
 
 // Remover un ítem del carrito
 const removeItem = (item) => {
@@ -91,9 +107,9 @@ const increaseQuantity = (item) => {
 
   // Programamos un nuevo timeout para mostrar 1 sola notificación
   increaseTimeouts[item.id] = setTimeout(() => {
-    toast.success(`Producto "${item.name}" añadido al carrito`);
+    toast.success(`Cantidad actualizada: ${item.quantity} unidades de "${item.name}"`);
     increaseTimeouts[item.id] = null;
-  }, 800);
+  }, 1000);
 };
 
 // Restar cantidad
@@ -108,11 +124,12 @@ const decreaseQuantity = (item) => {
 
     // Programamos un nuevo timeout para mostrar 1 sola notificación
     decreaseTimeouts[item.id] = setTimeout(() => {
-      toast.info(`Cantidad de "${item.name}" reducida`);
+      toast.info(`Cantidad actualizada: ${item.quantity} unidades de "${item.name}"`);
       decreaseTimeouts[item.id] = null;
-    }, 800);
+    }, 2000);
   }
 };
+
 </script>
 
 <style lang="scss" scoped>
