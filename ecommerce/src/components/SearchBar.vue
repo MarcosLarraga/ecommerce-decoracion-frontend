@@ -21,7 +21,6 @@
         <v-list-item v-bind="props" class="search-item">
           <div class="search-item__content">
             <v-list-item-title>{{ item.raw.nombre }}</v-list-item-title>
-            <v-list-item-subtitle>{{ formatCurrency(item.raw.precio) }}</v-list-item-subtitle>
           </div>
           <v-img
             :src="item.raw.urlImagen"
@@ -159,29 +158,17 @@ onMounted(() => {
 
 :deep(.v-list-item__content) {
   display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-:deep(.v-list-item-title) {
-  font-weight: 500;
-  margin-bottom: 4px;
-}
-
-:deep(.v-list-item-subtitle) {
-  font-size: 0.85em;
-  color: rgba(0, 0, 0, 0.6);
 }
 
 @media (min-width: 768px) {
-  .search {
-    width: 300px;
-  }
+   .search {
+     width:300px;
+   }
 }
 
-@media (min-width: 1024px) {
-  .search {
-    width: 350px;
-  }
+@media (min-width:1024px){
+   .search{
+     width:350px; 
+   }
 }
 </style>
