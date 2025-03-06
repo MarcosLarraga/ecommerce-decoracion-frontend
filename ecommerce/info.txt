@@ -13,3 +13,6 @@ npm install vue-toastification@next
 
 Paquete compilacion SFC
 npm install -D @vue/compiler-sfc
+
+Validacion formulario 
+npm install @vuelidate/core @vuelidate/validators

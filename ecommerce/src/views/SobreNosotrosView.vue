@@ -1,106 +1,99 @@
 <script setup>
+import { ref } from 'vue';
 import PageHero from '@/components/PageHero.vue'
 import SoporteInfo from '@/components/SoporteInfo.vue'
+
+const sections = ref([
+  {
+    title: "Nuestra Historia",
+    content: "Desde nuestros inicios, nos hemos dedicado a ofrecer productos de decoración únicos y de alta calidad. Nuestra pasión por el diseño de interiores nos llevó a crear una tienda donde cada pieza tiene una historia y un propósito.",
+  },
+  {
+    title: "Nuestra Misión",
+    content: "Buscamos transformar cada hogar en un espacio acogedor y con estilo. Creemos que los pequeños detalles marcan la diferencia y queremos ayudarte a encontrar esos complementos que harán de tu casa un hogar.",
+  },
+  {
+    title: "Nuestros Valores",
+    content: "Calidad, Sostenibilidad, Innovación, Atención al Cliente",
+  },
+  {
+    title: "Nuestro Equipo",
+    content: "Contamos con expertos en diseño de interiores y decoración que trabajan para ofrecerte los mejores productos y asesoramiento personalizado.",
+  },
+  {
+    title: "¿Por qué elegirnos?",
+    content: "Productos seleccionados, Envíos rápidos, Atención personalizada, Materiales sostenibles, Diseños exclusivos",
+  }
+]);
 </script>
 
 <template>
-  <v-container fluid class="pa-0">
+  <div class="about">
     <PageHero title="Sobre Nosotros" imageSrc="/fotos/PageHero.jpg" />
 
-    <!-- Bloque "about" con el elemento "__container" -->
-    <v-container class="about__container">
-      <v-row justify="center">
-        <v-col cols="12" md="10" lg="6">
-          <h2 class="about__title">Nuestra Historia</h2>
-          <p class="about__text">
-            Desde nuestros inicios, nos hemos dedicado a ofrecer productos de decoración únicos y de alta calidad. 
-            Nuestra pasión por el diseño de interiores nos llevó a crear una tienda donde cada pieza tiene una 
-            historia y un propósito.
-          </p>
-          
-          <h2 class="about__title">Nuestra Misión</h2>
-          <p class="about__text">
-            Buscamos transformar cada hogar en un espacio acogedor y con estilo. Creemos que los pequeños detalles 
-            marcan la diferencia y queremos ayudarte a encontrar esos complementos que harán de tu casa un hogar.
-          </p>
-          
-          <h2 class="about__title">Nuestros Valores</h2>
-          <p class="about__text">
-            Calidad: Seleccionamos productos cuidadosamente para garantizar que sean duraderos y de buen gusto.<br>
-            Sostenibilidad: Nos comprometemos con materiales ecológicos y procesos responsables con el medio ambiente.<br>
-            Innovación: Siempre buscamos tendencias y diseños que aporten un toque único a tu hogar.<br>
-            Atención al Cliente: Nos preocupamos por cada detalle de tu compra y brindamos una atención personalizada.<br>
-          </p>
-          
-          <h2 class="about__title">Nuestro Equipo</h2>
-          <p class="about__text">
-            Contamos con un equipo de expertos en diseño de interiores y decoración que trabajan cada día para 
-            ofrecerte los mejores productos y asesoramiento personalizado. Nos enorgullece formar parte de tu hogar 
-            a través de nuestros productos.
-          </p>
-          
-          <h2 class="about__title">¿Por qué elegirnos?</h2>
-          <p class="about__text">
-            Productos seleccionados cuidadosamente <br>
-            Envíos rápidos y seguros <br>
-            Atención al cliente personalizada <br>
-            Materiales sostenibles y ecológicos <br>
-            Diseños exclusivos y en tendencia <br>
-          </p>
-        </v-col>
-      </v-row>
-    </v-container>
+    <div class="about__content">
+      <div v-for="(section, index) in sections" :key="index" class="about__section">
+        <h2 class="about__title">{{ section.title }}</h2>
+        <p class="about__text">{{ section.content }}</p>
+      </div>
+    </div>
 
-    <!-- Sección de soporte -->
     <SoporteInfo />
-  </v-container>
+  </div>
 </template>
 
-<style scoped lang="scss">
-.about {
-  &__container {
-    flex-grow: 1;
-    text-align: center;
-    padding: 20px;
-  }
-
-  &__title {
-    font-size: 1.5rem;
-    font-weight: bold;
-    margin-top: 30px;
-  }
-
-  &__text {
-    font-size: 1rem;
-    color: #666;
-    margin-bottom: 20px;
-    padding: 0 10px;
-  }
+<style scoped>
+.about__content {
+  max-width: 900px;
+  margin: 3rem auto;
+  padding: 0 1rem;
 }
 
-/* Mobile first: estilos base arriba,
-   breakpoints abajo para escalar en pantallas mayores */
+.about__section {
+  margin-bottom: 3rem;
+  padding: 2rem;
+  border-radius: 10px;
+  text-align: center;
+  background-color: #f9f9f9;
+  transition: box-shadow 0.3s ease;
+}
+
+.about__section:hover {
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.about__title {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  color: #333;
+  position: relative;
+  display: inline-block;
+}
+
+.about__title::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 50px;
+  height: 2px;
+  background-color: #666;
+}
+
+.about__text {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: #555;
+}
+
 @media (min-width: 768px) {
-  .about {
-    &__title {
-      font-size: 1.8rem;
-    }
-
-    &__text {
-      font-size: 1.2rem;
-    }
+  .about__title {
+    font-size: 2.25rem;
   }
-}
 
-@media (min-width: 1024px) {
-  .about {
-    &__title {
-      font-size: 2rem;
-    }
-
-    &__text {
-      font-size: 1.3rem;
-    }
+  .about__text {
+    font-size: 1.2rem;
   }
 }
 </style>
