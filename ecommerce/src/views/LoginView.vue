@@ -44,10 +44,10 @@
 </template>
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue';
-import { useUserStore } from '@/stores/userStore';
+import { useUserStore } from '../stores/userStore';
 import { useRouter } from 'vue-router';
-import Alerta from '@/components/Alerta.vue';
-import BotonGoogle from '@/components/BotonGoogle.vue';
+import Alerta from '../components/Alerta.vue';
+import BotonGoogle from '../components/BotonGoogle.vue';
 
 const email = ref('');
 const password = ref('');
@@ -104,7 +104,8 @@ const redirectToAdmin = () => {
 </script>
 
 <style lang="scss" scoped>
-@use '@/styles/variables' as *;
+@use '../styles/variables' as *;
+
 
 .login-view {
   position: relative;

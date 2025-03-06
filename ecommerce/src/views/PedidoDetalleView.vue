@@ -55,7 +55,7 @@
 
 <script setup lang="ts">
 import { onMounted, ref, computed } from 'vue';
-import { useDetallePedidoStore } from '@/stores/detallePedidoStore';
+import { useDetallePedidoStore } from '../stores/detallePedidoStore';
 import { useRoute } from 'vue-router';
 import { useToast } from 'vue-toastification';
 import axios from 'axios';
@@ -127,7 +127,8 @@ const enviarCorreoConfirmacion = async () => {
 </script>
 
 <style lang="scss" scoped>
-@use '@/styles/variables' as *;
+@use '../styles/variables' as *;
+
 
 .pedido-detalle {
   width: 100%;

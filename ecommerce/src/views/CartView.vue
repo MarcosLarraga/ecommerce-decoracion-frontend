@@ -65,8 +65,8 @@
 </template>
 
 <script setup lang="ts">
-import { useCartStore } from '@/stores/cartStore';
-import { useUserStore } from '@/stores/userStore';
+import { useCartStore } from '../stores/cartStore';
+import { useUserStore } from '../stores/userStore';
 import { useToast } from 'vue-toastification';
 
 const cartStore = useCartStore();
@@ -133,7 +133,8 @@ const decreaseQuantity = (item) => {
 </script>
 
 <style lang="scss" scoped>
-@use '@/styles/variables' as *;
+@use '../styles/variables' as *;
+
 
 .cart {
   width: 100%;

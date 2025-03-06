@@ -38,7 +38,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
-import { useProductsStore } from '@/stores/productsStore';
+import { useProductsStore } from '../stores/productsStore';
 import { useRouter } from 'vue-router';
 import debounce from 'lodash/debounce';
 
@@ -108,7 +108,8 @@ onUnmounted(() => {
 </script>
 
 <style scoped lang="scss">
-@use '@/styles/variables' as *;
+@use '../styles/variables' as *;
+
 
 .search {
   width: 100%;

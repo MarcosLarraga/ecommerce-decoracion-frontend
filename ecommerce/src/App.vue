@@ -14,12 +14,15 @@
 
 <script setup>
 import { RouterView } from 'vue-router';
-import NavBar from '@/components/NavBar.vue';
-import Footer from '@/components/Footer.vue';
+import NavBar from './components/NavBar.vue';
+import Footer from './components/Footer.vue';
 </script>
 
 <style lang="scss">
-@use '@/styles/variables' as *;
+// Correcto desde App.vue
+@use './styles/variables' as *;
+
+
 
 .app {
   background-color: $background-color !important;

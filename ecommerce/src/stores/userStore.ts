@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
-import { useCartStore } from '@/stores/cartStore';
+import { useCartStore } from '../stores/cartStore';
 import { useToast } from 'vue-toastification';
 
 const toast = useToast();

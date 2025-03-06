@@ -28,7 +28,8 @@ const benefits = ref([
 </script>
 
 <style lang="scss" scoped>
-@use '@/styles/variables' as *;
+@use '../styles/variables' as *;
+
 
 .benefits {
   width: 100vw;

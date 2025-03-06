@@ -270,7 +270,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { useAdminStore } from '@/stores/adminStore';
+import { useAdminStore } from '../stores/adminStore';
 import { useRouter } from 'vue-router';
 import { useToast } from 'vue-toastification';
 
@@ -443,7 +443,8 @@ async function deleteOrder(orderId: number) {
 </script>
 
 <style lang="scss" scoped>
-@use '@/styles/variables' as *;
+@use '../styles/variables' as *;
+
 
 /* Contenedor principal del Admin Panel */
 .admin-panel {

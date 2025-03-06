@@ -37,10 +37,10 @@
 
 <script lang="ts" setup>
 import { ref } from 'vue';
-import { useUserStore } from '@/stores/userStore';
+import { useUserStore } from '../stores/userStore';
 import { useRouter } from 'vue-router';
-import Alerta from '@/components/Alerta.vue';
-import BotonGoogle from '@/components/BotonGoogle.vue';
+import Alerta from '../components/Alerta.vue';
+import BotonGoogle from '../components/BotonGoogle.vue';
 
 const nombre = ref('');
 const email = ref('');
