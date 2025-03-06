@@ -83,89 +83,109 @@ const submitForm = async () => {
   </div>
 </template>
 
-<style scoped>
-.contact__container {
-  max-width: 700px;
-  margin: 3rem auto;
-  padding: 0 1.5rem;
-}
+<style scoped lang="scss">
+.contact {
+  &__container {
+    max-width: 700px;
+    margin: 2rem auto;
+    padding: 0 1rem;
 
-.contact__header {
-  text-align: center;
-  margin-bottom: 2rem;
-}
+    @media (min-width: 768px) {
+      margin: 3rem auto;
+      padding: 0 1.5rem;
+    }
+  }
 
-.contact__title {
-  font-size: 2rem;
-  color: #333;
-  margin-bottom: 0.75rem;
-}
+  &__header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
 
-.contact__text {
-  font-size: 1rem;
-  color: #666;
-  line-height: 1.5;
-  max-width: 600px;
-  margin: 0 auto;
-}
+  &__title {
+    font-size: 1.75rem;
+    color: #333;
+    margin-bottom: 0.75rem;
 
-.contact__form {
-  background-color: #f9f9f9;
-  padding: 2.5rem;
-  border-radius: 10px;
-  box-shadow: 0 3px 15px rgba(0,0,0,0.08);
-}
+    @media (min-width: 768px) {
+      font-size: 2rem;
+    }
+  }
 
-.contact__form-group {
-  margin-bottom: 2rem;
-}
+  &__text {
+    font-size: 0.9rem;
+    color: #666;
+    line-height: 1.5;
+    max-width: 600px;
+    margin: 0 auto;
 
-.contact__form-group label {
-  display: block;
-  margin-bottom: 0.75rem;
-  color: #333;
-  font-weight: bold;
-  font-size: 1.1rem;
-}
+    @media (min-width: 768px) {
+      font-size: 1rem;
+    }
+  }
 
-.contact__form-group input,
-.contact__form-group textarea {
-  width: 100%;
-  padding: 1rem;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  font-size: 1.1rem;
-  transition: border-color 0.3s ease;
-}
+  &__form {
+    background-color: #f9f9f9;
+    padding: 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 3px 15px rgba(0,0,0,0.08);
 
-.contact__form-group input:focus,
-.contact__form-group textarea:focus {
-  outline: none;
-  border-color: #4CAF50;
-}
+    @media (min-width: 768px) {
+      padding: 2.5rem;
+    }
+  }
 
-.contact__form-group textarea {
-  min-height: 180px;
-}
+  &__form-group {
+    margin-bottom: 1.5rem;
 
-.contact__btn {
-  display: block;
-  width: auto;
-  min-width: 150px;
-  padding: 0.8rem 1.5rem;
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  font-size: 1rem;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-  margin: 0 auto;
-}
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: #333;
+      font-weight: bold;
+    }
 
-.contact__btn:hover {
-  background-color: #45a049;
+    input,
+    textarea {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 1rem;
+      transition: border-color 0.3s ease;
+
+      &:focus {
+        outline: none;
+        border-color: #4CAF50;
+      }
+    }
+
+    textarea {
+      min-height: 150px;
+    }
+  }
+
+  &__btn {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+
+    &:hover {
+      background-color: #45a049;
+    }
+
+    @media (min-width: 768px) {
+      width: auto;
+      min-width: 150px;
+      margin: 0 auto;
+      display: block;
+    }
+  }
 }
 
 .is-invalid {
@@ -174,31 +194,7 @@ const submitForm = async () => {
 
 .error-message {
   color: #dc3545;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   margin-top: 0.5rem;
-}
-
-@media (max-width: 768px) {
-  .contact__container {
-    margin: 2rem auto;
-    padding: 0 1rem;
-  }
-
-  .contact__title {
-    font-size: 1.75rem;
-  }
-
-  .contact__text {
-    font-size: 0.9rem;
-  }
-
-  .contact__form {
-    padding: 1.5rem;
-  }
-
-  .contact__btn {
-    width: 100%;
-    min-width: unset;
-  }
 }
 </style>
