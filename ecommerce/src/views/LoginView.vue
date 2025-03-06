@@ -10,11 +10,29 @@
       <form class="auth__form" @submit.prevent="handleLogin">
         <div class="auth__group">
           <label for="email" class="auth__label">Email</label>
-          <input type="email" id="email" class="auth__input" v-model="email" required />
+          <input
+            type="email"
+            id="email"
+            class="auth__input"
+            v-model="form.email"
+            :class="{ 'is-invalid': v$.email.$error }"
+          />
+          <div v-if="v$.email.$error" class="error-message">
+            Por favor, introduce un correo electrónico válido.
+          </div>
         </div>
         <div class="auth__group">
           <label for="password" class="auth__label">Contraseña</label>
-          <input type="password" id="password" class="auth__input" v-model="password" required />
+          <input
+            type="password"
+            id="password"
+            class="auth__input"
+            v-model="form.password"
+            :class="{ 'is-invalid': v$.password.$error }"
+          />
+          <div v-if="v$.password.$error" class="error-message">
+            La contraseña es obligatoria.
+          </div>
         </div>
         <button type="submit" class="auth__button" :disabled="loading">
           {{ loading ? 'Iniciando sesión...' : 'Iniciar Sesión' }}
@@ -42,22 +60,34 @@
     </div>
   </div>
 </template>
+
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue';
+import { useVuelidate } from '@vuelidate/core';
+import { required, email as emailValidator } from '@vuelidate/validators';
 import { useUserStore } from '@/stores/userStore';
 import { useRouter } from 'vue-router';
 import Alerta from '@/components/Alerta.vue';
 import BotonGoogle from '@/components/BotonGoogle.vue';
 
-const email = ref('');
-const password = ref('');
+const form = ref({
+  email: '',
+  password: '',
+});
+
+const rules = {
+  email: { required, email: emailValidator },
+  password: { required },
+};
+
+const v$ = useVuelidate(rules, form);
+
 const loading = ref(false);
 const error = ref('');
 const showAdminModal = ref(false);
 const userStore = useUserStore();
 const router = useRouter();
 
-// Verificar si ya hay un usuario admin logueado al cargar el componente
 onMounted(() => {
   if (userStore.isAuthenticated && userStore.user?.esAdmin) {
     showAdminModal.value = true;
@@ -65,22 +95,23 @@ onMounted(() => {
 });
 
 const handleLogin = async () => {
+  // Validamos el formulario
+  const isValid = await v$.value.$validate();
+  if (!isValid) {
+    error.value = "Por favor, corrija los errores del formulario.";
+    return;
+  }
+  
   loading.value = true;
   error.value = '';
   try {
-    await userStore.login(email.value, password.value);
+    await userStore.login(form.value.email, form.value.password);
+    console.log("Usuario completo:", JSON.stringify(userStore.user, null, 2));
     
     if (userStore.isAuthenticated) {
-      // Depuración completa del objeto de usuario
-      console.log("Usuario completo:", JSON.stringify(userStore.user, null, 2));
-      
-      // Verificamos si el usuario es admin usando la propiedad correcta
-      // Ajusta esto según la estructura real de tu objeto de usuario
       if (userStore.user?.esAdmin === true) {
-        console.log("Usuario es administrador, mostrando modal");
         showAdminModal.value = true;
       } else {
-        console.log("Usuario no es administrador, redirigiendo a home");
         router.push('/');
       }
     }
@@ -147,7 +178,7 @@ const redirectToAdmin = () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000; // Asegura que esté por encima de otros elementos
+  z-index: 1000;
 }
 
 .modal {
@@ -295,7 +326,17 @@ const redirectToAdmin = () => {
   }
 }
 
-/* Media queries para pantallas más grandes */
+/* Estilos para mensajes de error y inputs inválidos */
+.error-message {
+  color: #dc3545;
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+}
+
+.is-invalid {
+  border-color: #dc3545 !important;
+}
+
 @media (min-width: 768px) {
   .auth {
     padding: 2rem;
