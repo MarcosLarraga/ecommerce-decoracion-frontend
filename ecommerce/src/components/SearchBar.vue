@@ -5,7 +5,6 @@
       :menu="menuOpen"
       @update:menu="menuOpen = $event"
       :items="filteredItems"
-      :loading="isLoading"
       :search-input.sync="searchQuery"
       placeholder="Buscar productos..."
       variant="plain"
@@ -50,7 +49,6 @@ const searchQuery = ref('');
 const selectedItem = ref(null);
 const menuOpen = ref(false); // Controla si el menú está abierto
 
-const isLoading = computed(() => store.loading);
 const filteredItems = computed(() => store.allProducts);
 
 // Al escribir, se busca y se abre el menú

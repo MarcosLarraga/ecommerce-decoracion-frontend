@@ -173,11 +173,7 @@ onBeforeUnmount(() => {
 <style lang="scss" scoped>
 @use '@/styles/variables' as *;
 
-/* 
-   ==============================
-   BASE: Mobile First
-   ==============================
-*/
+
 .navbar {
   width: 100%;
   background-color: $background-color;
@@ -189,7 +185,6 @@ onBeforeUnmount(() => {
   }
   
   &__top {
-    /* Para móvil: flex-wrap */
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -198,7 +193,6 @@ onBeforeUnmount(() => {
   }
   
   &__search {
-    /* Para móvil (ocupa 2do orden y ancho total) */
     order: 2;
     flex: 1;
     max-width: 100%;
@@ -206,7 +200,6 @@ onBeforeUnmount(() => {
   }
   
   &__logo {
-    /* Para móvil (1er orden, centrado) */
     order: 1;
     flex: 1;
     text-align: center;
@@ -214,13 +207,11 @@ onBeforeUnmount(() => {
     justify-content: center;
     
     &-img {
-      /* Para móvil, más pequeño */
       height: 60px;
     }
   }
   
   &__icons {
-    /* Para móvil (3er orden) */
     order: 3;
     flex: 1;
     display: flex;
@@ -248,7 +239,6 @@ onBeforeUnmount(() => {
       font-size: 14px;
       display: none;
       
-      /* Se mostrará en pantallas mayores */
       @media (min-width: 768px) {
         display: inline;
       }
@@ -283,7 +273,6 @@ onBeforeUnmount(() => {
     &-menu {
       position: absolute;
       top: 100%;
-      /* En móvil, pequeño offset a la derecha */
       right: -50px;
       background-color: white;
       border-radius: 8px;
@@ -324,7 +313,6 @@ onBeforeUnmount(() => {
   }
   
   &__menu {
-    /* En móvil, menú envuelto y separado */
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
@@ -335,7 +323,6 @@ onBeforeUnmount(() => {
       text-decoration: none;
       color: $text-color;
       font-family: $font-family-primary;
-      /* En móvil, tipografía más pequeña */
       font-size: 20px;
       font-weight: 600;
       letter-spacing: 0.5px;
@@ -373,13 +360,6 @@ onBeforeUnmount(() => {
   }
 }
 
-
-
-/* 
-   ==============================
-   Pantallas mayores: >= 768px
-   ==============================
-*/
 @media (min-width: 768px) {
   .navbar {
     &__top {
