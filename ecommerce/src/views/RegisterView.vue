@@ -10,15 +10,42 @@
       <form class="auth__form" @submit.prevent="handleRegister">
         <div class="auth__group">
           <label for="nombre" class="auth__label">Nombre</label>
-          <input type="text" id="nombre" class="auth__input" v-model="nombre" required />
+          <input
+            type="text"
+            id="nombre"
+            class="auth__input"
+            v-model="form.nombre"
+            :class="{ 'is-invalid': v$.nombre.$error }"
+          />
+          <div v-if="v$.nombre.$error" class="error-message">
+            El nombre es requerido y debe tener al menos 3 caracteres.
+          </div>
         </div>
         <div class="auth__group">
           <label for="email" class="auth__label">Email</label>
-          <input type="email" id="email" class="auth__input" v-model="email" required />
+          <input
+            type="email"
+            id="email"
+            class="auth__input"
+            v-model="form.email"
+            :class="{ 'is-invalid': v$.email.$error }"
+          />
+          <div v-if="v$.email.$error" class="error-message">
+            Por favor, introduce un correo electrónico válido.
+          </div>
         </div>
         <div class="auth__group">
           <label for="password" class="auth__label">Contraseña</label>
-          <input type="password" id="password" class="auth__input" v-model="password" required />
+          <input
+            type="password"
+            id="password"
+            class="auth__input"
+            v-model="form.password"
+            :class="{ 'is-invalid': v$.password.$error }"
+          />
+          <div v-if="v$.password.$error" class="error-message">
+            La contraseña debe tener al menos 8 caracteres, una mayúscula, un número y un carácter especial.
+          </div>
         </div>
         <button type="submit" class="auth__button" :disabled="loading">
           {{ loading ? 'Registrando...' : 'Registrarse' }}
@@ -37,30 +64,62 @@
 
 <script lang="ts" setup>
 import { ref } from 'vue';
+import { useVuelidate } from '@vuelidate/core';
+import { required, email, minLength } from '@vuelidate/validators';
 import { useUserStore } from '@/stores/userStore';
 import { useRouter } from 'vue-router';
 import Alerta from '@/components/Alerta.vue';
 import BotonGoogle from '@/components/BotonGoogle.vue';
 
-const nombre = ref('');
-const email = ref('');
-const password = ref('');
+const form = ref({
+  nombre: '',
+  email: '',
+  password: '',
+});
+
+// Expresión regular para validar la contraseña:
+// Al menos 8 caracteres, 1 mayúscula, 1 número y 1 carácter especial.
+const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/;
+
+const rules = {
+  nombre: { required, minLength: minLength(3) },
+  email: { required, email },
+  password: { 
+    required, 
+    // Validación personalizada usando una función que retorna true o false
+    passwordPattern: (value: string) => passwordRegex.test(value)
+  }
+};
+
+const v$ = useVuelidate(rules, form);
+
 const loading = ref(false);
 const error = ref('');
 const userStore = useUserStore();
 const router = useRouter();
 
 const handleRegister = async () => {
+  // Valida el formulario
+  const isValid = await v$.value.$validate();
+  if (!isValid) {
+    error.value = "Por favor, corrija los errores del formulario.";
+    return;
+  }
   loading.value = true;
   error.value = '';
-  await userStore.register(nombre.value, email.value, password.value);
+  
+  // Llamada al método de registro del store
+  await userStore.register(form.value.nombre, form.value.email, form.value.password);
   error.value = userStore.error;
   loading.value = false;
+  
   if (!error.value) {
+    // Reinicia la validación y el formulario si es necesario
+    v$.value.$reset();
+    form.value = { nombre: '', email: '', password: '' };
     router.push('/login');
   }
 };
-
 </script>
 
 <style lang="scss" scoped>
@@ -96,7 +155,7 @@ const handleRegister = async () => {
   background: rgba(255, 255, 255, 0.9);
   border-radius: 8px;
   text-align: center;
-  margin: 1rem; /* margen vertical para evitar que toque los bordes en móviles */
+  margin: 1rem;
 
   &__title {
     font-size: 2rem;
@@ -161,7 +220,17 @@ const handleRegister = async () => {
   }
 }
 
-/* Media query para pantallas más grandes */
+/* Estilos para inputs con error */
+.is-invalid {
+  border-color: #dc3545 !important;
+}
+
+.error-message {
+  color: #dc3545;
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+}
+
 @media (min-width: 768px) {
   .auth {
     padding: 2rem;
