@@ -2,8 +2,11 @@
 import { ref } from 'vue';
 import { useVuelidate } from '@vuelidate/core';
 import { required, email, minLength } from '@vuelidate/validators';
+import { useToast } from 'vue-toastification';
 import PageHero from '@/components/PageHero.vue';
 import SoporteInfo from '@/components/SoporteInfo.vue';
+
+const toast = useToast();
 
 const form = ref({
   name: '',
@@ -25,11 +28,11 @@ const submitForm = async () => {
   const isFormCorrect = await v$.value.$validate();
   if (isFormCorrect) {
     console.log("Formulario enviado:", form.value);
-    alert("Mensaje enviado con éxito.");
+    toast.success("Mensaje enviado con éxito.");
     v$.value.$reset();
     form.value = { name: '', email: '', subject: '', message: '' };
   } else {
-    alert("Por favor, corrija los errores en el formulario.");
+    toast.error("Por favor, corrija los errores en el formulario.");
   }
 };
 </script>
