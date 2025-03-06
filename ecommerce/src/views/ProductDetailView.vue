@@ -188,9 +188,6 @@ const addToCart = () => {
       price: product.value.precio,
       image: product.value.urlImagen,
     });
-    setTimeout(() => {
-      toast.success("Producto añadido al carrito");
-    }, 100);
   }
 };
 
