@@ -84,11 +84,10 @@ const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<
 const rules = {
   nombre: { required, minLength: minLength(3) },
   email: { required, email },
-  password: { 
-    required, 
-    // Validación personalizada usando una función que retorna true o false
-    passwordPattern: (value: string) => passwordRegex.test(value)
-  }
+  password: {
+    required,
+    passwordPattern: (value: string) => passwordRegex.test(value),
+  },
 };
 
 const v$ = useVuelidate(rules, form);
@@ -99,7 +98,6 @@ const userStore = useUserStore();
 const router = useRouter();
 
 const handleRegister = async () => {
-  // Valida el formulario
   const isValid = await v$.value.$validate();
   if (!isValid) {
     error.value = "Por favor, corrija los errores del formulario.";
@@ -107,14 +105,10 @@ const handleRegister = async () => {
   }
   loading.value = true;
   error.value = '';
-  
-  // Llamada al método de registro del store
   await userStore.register(form.value.nombre, form.value.email, form.value.password);
   error.value = userStore.error;
   loading.value = false;
-  
   if (!error.value) {
-    // Reinicia la validación y el formulario si es necesario
     v$.value.$reset();
     form.value = { nombre: '', email: '', password: '' };
     router.push('/login');
@@ -123,6 +117,8 @@ const handleRegister = async () => {
 </script>
 
 <style lang="scss" scoped>
+@use '@/styles/variables' as *;
+
 .register-view {
   position: relative;
   min-height: 100vh;
@@ -151,70 +147,85 @@ const handleRegister = async () => {
   z-index: 1;
   max-width: 400px;
   width: 90%;
-  padding: 1rem;
+  padding: $spacing-lg;
   background: rgba(255, 255, 255, 0.9);
-  border-radius: 8px;
+  border-radius: $border-radius-lg;
   text-align: center;
   margin: 1rem;
 
   &__title {
     font-size: 2rem;
     margin-bottom: 1rem;
+    color: $primary-color;
+    font-weight: bold;
   }
-  
+
   &__form {
     display: flex;
     flex-direction: column;
     gap: 1rem;
   }
-  
+
   &__group {
     display: flex;
     flex-direction: column;
     text-align: left;
   }
-  
+
   &__label {
     margin-bottom: 0.5rem;
     font-weight: 600;
+    color: $text-color;
   }
-  
+
   &__input {
     padding: 0.5rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+    border: 1px solid $border-color;
+    border-radius: $border-radius;
+    font-size: $font-size-base;
+
+    &:focus {
+      outline: none;
+      border-color: $primary-color;
+    }
   }
-  
+
+  /* Estilo de botón igual al login */
   &__button {
     padding: 0.75rem;
-    background-color: #007bff;
-    color: #fff;
+    background-color: $primary-color;
+    color: white;
     border: none;
-    border-radius: 4px;
+    border-radius: $border-radius;
     cursor: pointer;
-    transition: background-color 0.3s;
-    
+    transition: background-color $transition-fast;
+    font-weight: bold;
+
     &:hover {
-      background-color: #0069d9;
+      background-color: $primary-color-hover;
     }
-    
+
     &:disabled {
       opacity: 0.6;
       cursor: not-allowed;
     }
   }
-  
+
   &__links {
     margin-top: 1rem;
     display: flex;
     justify-content: center;
   }
-  
+
   &__link {
-    color: #007bff;
+    color: $primary-color;
     text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
   }
-  
+
   &__google {
     margin-top: 1.5rem;
   }
@@ -231,6 +242,7 @@ const handleRegister = async () => {
   margin-top: 0.5rem;
 }
 
+/* Media query para pantallas más grandes */
 @media (min-width: 768px) {
   .auth {
     padding: 2rem;
