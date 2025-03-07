@@ -65,10 +65,10 @@
 import { ref, onMounted } from 'vue';
 import { useVuelidate } from '@vuelidate/core';
 import { required, email as emailValidator } from '@vuelidate/validators';
-import { useUserStore } from '@/stores/userStore';
+import { useUserStore } from '../stores/userStore';
 import { useRouter } from 'vue-router';
-import Alerta from '@/components/Alerta.vue';
-import BotonGoogle from '@/components/BotonGoogle.vue';
+import Alerta from '../components/Alerta.vue';
+import BotonGoogle from '../components/BotonGoogle.vue';
 
 const form = ref({
   email: '',
@@ -135,7 +135,8 @@ const redirectToAdmin = () => {
 </script>
 
 <style lang="scss" scoped>
-@use '@/styles/variables' as *;
+@use '../styles/variables' as *;
+
 
 .login-view {
   position: relative;

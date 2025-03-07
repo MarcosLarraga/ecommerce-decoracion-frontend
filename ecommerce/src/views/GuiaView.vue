@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue';
-import PageHero from '@/components/PageHero.vue';
+import PageHero from '../components/PageHero.vue';
 
 const secciones = ref([
   {

@@ -3,8 +3,8 @@ import { ref } from 'vue';
 import { useVuelidate } from '@vuelidate/core';
 import { required, email, minLength } from '@vuelidate/validators';
 import { useToast } from 'vue-toastification';
-import PageHero from '@/components/PageHero.vue';
-import SoporteInfo from '@/components/SoporteInfo.vue';
+import PageHero from '../components/PageHero.vue';
+import SoporteInfo from '../components/SoporteInfo.vue';
 
 const toast = useToast();
 

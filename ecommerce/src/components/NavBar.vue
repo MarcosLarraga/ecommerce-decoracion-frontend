@@ -102,11 +102,11 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { useUserStore } from '@/stores/userStore'
-import { useCartStore } from '@/stores/cartStore'
-import LogoCanvasBlack from '@/components/LogoCanvasBlack.vue'
-import SearchBar from '@/components/SearchBar.vue'
-import CartIcon from '@/components/icons/CartIcon.vue' // <-- Importamos el ícono SVG personalizado
+import { useUserStore } from '../stores/userStore'
+import { useCartStore } from '../stores/cartStore'
+import LogoCanvasBlack from '../components/LogoCanvasBlack.vue'
+import SearchBar from '../components/SearchBar.vue'
+import CartIcon from '../components/icons/CartIcon.vue' // <-- Importamos el ícono SVG personalizado
 
 const router = useRouter()
 const route = useRoute()
@@ -171,7 +171,8 @@ onBeforeUnmount(() => {
 </script>
 
 <style lang="scss" scoped>
-@use '@/styles/variables' as *;
+@use '../styles/variables' as *;
+
 
 
 .navbar {

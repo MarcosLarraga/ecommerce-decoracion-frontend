@@ -76,9 +76,9 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { useProductsStore } from '@/stores/productsStore';
-import { useCategoriesStore } from '@/stores/categoriesStore';
-import ProductCard from '@/components/ProductCard.vue';
+import { useProductsStore } from '../stores/productsStore';
+import { useCategoriesStore } from '../stores/categoriesStore';
+import ProductCard from '../components/ProductCard.vue';
 
 const productsStore = useProductsStore();
 const categoriesStore = useCategoriesStore();
@@ -213,7 +213,8 @@ const filteredProducts = computed(() => {
 </script>
 
 <style lang="scss" scoped>
-@use '@/styles/variables' as *;
+@use '../styles/variables' as *;
+
 
 /* Estilos base */
 .shop {

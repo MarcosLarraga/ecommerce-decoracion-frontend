@@ -39,10 +39,10 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-import { useCategoriesStore } from '@/stores/categoriesStore';
-import { useProductsStore } from '@/stores/productsStore';
+import { useCategoriesStore } from '../stores/categoriesStore';
+import { useProductsStore } from '../stores/productsStore';
 import { useRouter } from 'vue-router';
-import ProductCard from '@/components/ProductCard.vue';
+import ProductCard from '../components/ProductCard.vue';
 
 const categoriesStore = useCategoriesStore();
 const productsStore = useProductsStore();
@@ -68,7 +68,8 @@ const goToCategory = (categoryName: string) => {
 </script>
 
 <style lang="scss" scoped>
-@use '@/styles/variables' as *;
+@use '../styles/variables' as *;
+
 
 .home {
   width: 100%;

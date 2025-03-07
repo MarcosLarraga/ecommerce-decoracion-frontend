@@ -66,10 +66,10 @@
 import { ref } from 'vue';
 import { useVuelidate } from '@vuelidate/core';
 import { required, email, minLength } from '@vuelidate/validators';
-import { useUserStore } from '@/stores/userStore';
+import { useUserStore } from '../stores/userStore';
 import { useRouter } from 'vue-router';
-import Alerta from '@/components/Alerta.vue';
-import BotonGoogle from '@/components/BotonGoogle.vue';
+import Alerta from '../components/Alerta.vue';
+import BotonGoogle from '../components/BotonGoogle.vue';
 
 const form = ref({
   nombre: '',

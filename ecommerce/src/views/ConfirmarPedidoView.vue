@@ -40,10 +40,10 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useUserStore } from '@/stores/userStore'
-import { usePedidoStore } from '@/stores/pedidoStore'
-import { useDetallePedidoStore } from '@/stores/detallePedidoStore'
-import { useCartStore } from '@/stores/cartStore'
+import { useUserStore } from '../stores/userStore'
+import { usePedidoStore } from '../stores/pedidoStore'
+import { useDetallePedidoStore } from '../stores/detallePedidoStore'
+import { useCartStore } from '../stores/cartStore'
 import { useRouter } from 'vue-router'
 import { useToast } from 'vue-toastification'
 
@@ -94,7 +94,8 @@ const confirmarPedido = async () => {
 </script>
 
 <style lang="scss" scoped>
-@use '@/styles/variables' as *;
+@use '../styles/variables' as *;
+
 
 .pedido {
   width: 100%;
