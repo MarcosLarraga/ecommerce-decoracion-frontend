@@ -15,7 +15,7 @@ export const usePedidoStore = defineStore('pedido', {
       }
     
       try {
-        const response = await axios.post("http://localhost:5162/api/Pedido", {
+        const response = await axios.post("http://lmdecoracionapi.retocsv.es/api/Pedido", {
           usuarioId,
           total,
           fechaPedido: new Date().toISOString(),
@@ -37,7 +37,7 @@ export const usePedidoStore = defineStore('pedido', {
     async fetchPedidosByUser(userId: number) {
       const toast = useToast();
       try {
-        const response = await axios.get(`http://localhost:5162/api/Pedido/user/${userId}`);
+        const response = await axios.get(`http://lmdecoracionapi.retocsv.es/api/Pedido/user/${userId}`);
         this.pedidos = response.data;
       } catch (error) {
         console.error("Error obteniendo pedidos del usuario:", error);
@@ -48,7 +48,7 @@ export const usePedidoStore = defineStore('pedido', {
     async fetchPedidoById(pedidoId: number) {
       const toast = useToast();
       try {
-        const response = await axios.get(`http://localhost:5162/api/Pedido/${pedidoId}`);
+        const response = await axios.get(`http://lmdecoracionapi.retocsv.es/api/Pedido/${pedidoId}`);
         this.pedido = response.data;
         toast.success("Pedido cargado correctamente");
       } catch (error) {

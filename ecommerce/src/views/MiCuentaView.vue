@@ -76,8 +76,8 @@
 
 <script setup lang="ts">
 import { ref, onMounted, reactive, watch } from 'vue';
-import { useUserStore } from '@/stores/userStore';
-import { usePedidoStore } from '@/stores/pedidoStore';
+import { useUserStore } from '../stores/userStore';
+import { usePedidoStore } from '../stores/pedidoStore';
 import { useToast } from 'vue-toastification';
 
 const userStore = useUserStore();
@@ -156,7 +156,7 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
-@use '@/styles/variables' as *;
+@use '../styles/variables' as *;
 
 .mi-cuenta {
   width: 100%;

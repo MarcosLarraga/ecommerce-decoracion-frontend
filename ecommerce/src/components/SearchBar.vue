@@ -5,7 +5,6 @@
       :menu="menuOpen"
       @update:menu="menuOpen = $event"
       :items="filteredItems"
-      :loading="isLoading"
       :search-input.sync="searchQuery"
       placeholder="Buscar productos..."
       variant="plain"
@@ -39,7 +38,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
-import { useProductsStore } from '@/stores/productsStore';
+import { useProductsStore } from '../stores/productsStore';
 import { useRouter } from 'vue-router';
 import debounce from 'lodash/debounce';
 
@@ -50,7 +49,6 @@ const searchQuery = ref('');
 const selectedItem = ref(null);
 const menuOpen = ref(false); // Controla si el menú está abierto
 
-const isLoading = computed(() => store.loading);
 const filteredItems = computed(() => store.allProducts);
 
 // Al escribir, se busca y se abre el menú
@@ -110,7 +108,8 @@ onUnmounted(() => {
 </script>
 
 <style scoped lang="scss">
-@use '@/styles/variables' as *;
+@use '../styles/variables' as *;
+
 
 .search {
   width: 100%;

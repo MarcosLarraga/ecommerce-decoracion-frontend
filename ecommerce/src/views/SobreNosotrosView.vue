@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from 'vue';
-import PageHero from '@/components/PageHero.vue'
-import SoporteInfo from '@/components/SoporteInfo.vue'
+import PageHero from '../components/PageHero.vue'
+import SoporteInfo from '../components/SoporteInfo.vue'
 
 const sections = ref([
   {

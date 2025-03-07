@@ -43,11 +43,12 @@
 </template>
 
 <script setup>
-import LogoCanvasWhite from '@/components/LogoCanvasWhite.vue'
+import LogoCanvasWhite from '../components/LogoCanvasWhite.vue'
 </script>
 
 <style lang="scss" scoped>
-@use '@/styles/variables' as *;
+@use '../styles/variables' as *;
+
 
 .v-footer {
   position: relative !important;

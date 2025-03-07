@@ -11,7 +11,7 @@ export const useReseñaStore = defineStore('reseña', {
     // Obtener todas las reseñas de un producto
     async fetchReseñasByProductoId(productoId: number) {
       try {
-        const response = await axios.get(`http://localhost:5162/api/Reseña/producto/${productoId}`);
+        const response = await axios.get(`http://lmdecoracionapi.retocsv.es/api/Reseña/producto/${productoId}`);
         this.reseñas = response.data;
       } catch (error) {
         console.error("❌ Error obteniendo reseñas:", error);
@@ -21,7 +21,7 @@ export const useReseñaStore = defineStore('reseña', {
     // Obtener el promedio de calificación de un producto
     async fetchPromedioCalificacion(productoId: number) {
       try {
-        const response = await axios.get(`http://localhost:5162/api/Reseña/producto/${productoId}/promedio`);
+        const response = await axios.get(`http://lmdecoracionapi.retocsv.es/api/Reseña/producto/${productoId}/promedio`);
         this.promedioCalificacion = response.data;
       } catch (error) {
         console.error("❌ Error obteniendo el promedio de calificación:", error);
@@ -38,7 +38,7 @@ export const useReseñaStore = defineStore('reseña', {
         }
 
         const response = await axios.post(
-          "http://localhost:5162/api/Reseña",
+          "http://lmdecoracionapi.retocsv.es/api/Reseña",
           {
             productoId,
             usuarioId,
@@ -69,7 +69,7 @@ export const useReseñaStore = defineStore('reseña', {
           throw new Error("No hay token disponible. Inicia sesión.");
         }
 
-        await axios.delete(`http://localhost:5162/api/Reseña/${reseñaId}`, {
+        await axios.delete(`http://lmdecoracionapi.retocsv.es/api/Reseña/${reseñaId}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           }

@@ -134,9 +134,9 @@
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import axios from 'axios';
-import { useCartStore } from '@/stores/cartStore';
-import { useReseñaStore } from '@/stores/reseñaStore';
-import { useUserStore } from '@/stores/userStore';
+import { useCartStore } from '../stores/cartStore';
+import { useReseñaStore } from '../stores/reseñaStore';
+import { useUserStore } from '../stores/userStore';
 import { useToast } from 'vue-toastification';
 
 const route = useRoute();
@@ -160,7 +160,7 @@ const cargarProducto = async () => {
   try {
     const productoId = route.params.id;
     const [productoResponse] = await Promise.all([
-      axios.get(`http://localhost:5162/api/Producto/${productoId}`)
+      axios.get(`http://lmdecoracionapi.retocsv.es/api/Producto/${productoId}`)
     ]);
     
     product.value = productoResponse.data;
@@ -255,7 +255,8 @@ const getUserPlaceholder = (userId: number): string => {
 
 
 <style lang="scss" scoped>
-@use '@/styles/variables' as *;
+@use '../styles/variables' as *;
+
 
 .product-detail {
   width: 100%;

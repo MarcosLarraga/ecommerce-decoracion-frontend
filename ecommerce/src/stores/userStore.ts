@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
-import { useCartStore } from '@/stores/cartStore';
+import { useCartStore } from '../stores/cartStore';
 import { useToast } from 'vue-toastification';
 
 const toast = useToast();
@@ -35,7 +35,7 @@ export const useUserStore = defineStore('user', {
         const decoded: any = this.decodeToken(token);
         if (!decoded?.sub) return;
         const userId = decoded.sub;
-        const response = await axios.get(`http://localhost:5162/api/usuario/${userId}`, {
+        const response = await axios.get(`http://lmdecoracionapi.retocsv.es/api/usuario/${userId}`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -57,7 +57,7 @@ export const useUserStore = defineStore('user', {
       this.error = '';
       try {
         // Llamamos a la API de registro
-        const response = await axios.post('http://localhost:5162/api/auth/register', {
+        const response = await axios.post('http://lmdecoracionapi.retocsv.es/api/auth/register', {
           nombre,
           email,
           password
@@ -81,7 +81,7 @@ export const useUserStore = defineStore('user', {
       this.loading = true;
       this.error = '';
       try {
-        const response = await axios.post('http://localhost:5162/api/auth/forgot-password', { email });
+        const response = await axios.post('http://lmdecoracionapi.retocsv.es/api/auth/forgot-password', { email });
         toast.success("Check your email for password reset instructions.");
         return true;
       } catch (err) {
@@ -102,7 +102,7 @@ export const useUserStore = defineStore('user', {
         const decoded: any = this.decodeToken(token);
         if (!decoded?.sub) return;
         const userId = decoded.sub;
-        await axios.put(`http://localhost:5162/api/usuario/${userId}`, datos, {
+        await axios.put(`http://lmdecoracionapi.retocsv.es/api/usuario/${userId}`, datos, {
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json"
@@ -129,7 +129,7 @@ export const useUserStore = defineStore('user', {
         const decoded: any = this.decodeToken(token);
         if (!decoded?.sub) return;
         const userId = decoded.sub;
-        await axios.put(`http://localhost:5162/api/usuario/${userId}`, { telefono, direccion }, {
+        await axios.put(`http://lmdecoracionapi.retocsv.es/api/usuario/${userId}`, { telefono, direccion }, {
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json"
@@ -151,7 +151,7 @@ export const useUserStore = defineStore('user', {
     async changePassword(nuevaContraseña: string) {
       try {
         // No se requiere enviar la contraseña actual para este endpoint
-        await axios.post('http://localhost:5162/api/Auth/reset-password', {
+        await axios.post('http://lmdecoracionapi.retocsv.es/api/Auth/reset-password', {
           newPassword: nuevaContraseña
         }, {
           headers: {
@@ -169,7 +169,7 @@ export const useUserStore = defineStore('user', {
       this.loading = true;
       this.error = '';
       try {
-        const response = await axios.post('http://localhost:5162/api/auth/login', { email, password });
+        const response = await axios.post('http://lmdecoracionapi.retocsv.es/api/auth/login', { email, password });
         const { token } = response.data;
         if (!token) return;
         this.token = token;
@@ -199,7 +199,7 @@ export const useUserStore = defineStore('user', {
       this.loading = true;
       this.error = '';
       try {
-        const response = await axios.post('http://localhost:5162/api/Auth/reset-password', {
+        const response = await axios.post('http://lmdecoracionapi.retocsv.es/api/Auth/reset-password', {
           token,
           newPassword
         }, {
@@ -224,7 +224,7 @@ export const useUserStore = defineStore('user', {
       this.loading = true;
       this.error = '';
       try {
-        const response = await axios.post('http://localhost:5162/api/auth/google-login', { idToken });
+        const response = await axios.post('http://lmdecoracionapi.retocsv.es/api/auth/google-login', { idToken });
         const { token } = response.data;
         if (!token) return;
         this.token = token;

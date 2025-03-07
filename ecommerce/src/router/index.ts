@@ -1,21 +1,21 @@
 import { createRouter, createWebHistory } from 'vue-router';
 
 // Importación de vistas
-import HomeView from '@/views/HomeView.vue';
-import ProductsView from '@/views/ProductsView.vue';
-import CartView from '@/views/CartView.vue';
-import GuiaView from '@/views/GuiaView.vue';
-import ContactView from '@/views/ContactView.vue';
-import ProductDetailView from '@/views/ProductDetailView.vue';
-import LoginView from '@/views/LoginView.vue';
-import RegisterView from '@/views/RegisterView.vue';
-import ForgotPasswordView from '@/views/ForgotPasswordView.vue';
-import ResetPasswordView from '@/views/ResetPasswordView.vue';
-import SobreNosotrosView from '@/views/SobreNosotrosView.vue';
-import ConfirmarPedido from '@/views/ConfirmarPedidoView.vue';
-import PedidoDetalle from '@/views/PedidoDetalleView.vue';
-import MiCuenta from '@/views/MiCuentaView.vue';
-import AdminView from '@/views/AdminView.vue';
+import HomeView from '../views/HomeView.vue';
+import ProductsView from '../views/ProductsView.vue';
+import CartView from '../views/CartView.vue';
+import GuiaView from '../views/GuiaView.vue';
+import ContactView from '../views/ContactView.vue';
+import ProductDetailView from '../views/ProductDetailView.vue';
+import LoginView from '../views/LoginView.vue';
+import RegisterView from '../views/RegisterView.vue';
+import ForgotPasswordView from '../views/ForgotPasswordView.vue';
+import ResetPasswordView from '../views/ResetPasswordView.vue';
+import SobreNosotrosView from '../views/SobreNosotrosView.vue';
+import ConfirmarPedido from '../views/ConfirmarPedidoView.vue';
+import PedidoDetalle from '../views/PedidoDetalleView.vue';
+import MiCuenta from '../views/MiCuentaView.vue';
+import AdminView from '../views/AdminView.vue';
 
 const routes = [
   { path: '/', name: 'Home', component: HomeView },

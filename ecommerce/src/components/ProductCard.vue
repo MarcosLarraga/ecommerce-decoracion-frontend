@@ -31,7 +31,7 @@
 
 <script setup lang="ts">
 import { defineProps, ref } from 'vue';
-import { useCartStore } from '@/stores/cartStore';
+import { useCartStore } from '../stores/cartStore';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faShoppingCart, faSpinner } from '@fortawesome/free-solid-svg-icons';
 
@@ -64,7 +64,8 @@ const addToCart = async (event: Event) => {
 </script>
 
 <style lang="scss" scoped>
-@use '@/styles/variables' as *;
+@use '../styles/variables' as *;
+
 
 .product-card {
   position: relative;
