@@ -13,7 +13,7 @@ export const useDetallePedidoStore = defineStore('detallePedido', {
   actions: {
     async fetchPedidoById(pedidoId: number) {
       try {
-        const response = await axios.get(`http://localhost:5162/api/Pedido/${pedidoId}`);
+        const response = await axios.get(`http://lmdecoracionapi.retocsv.es/api/Pedido/${pedidoId}`);
         console.log("Pedido completo obtenido:", response.data);
         if (!response.data) {
           throw new Error("Pedido no encontrado.");
@@ -46,12 +46,12 @@ export const useDetallePedidoStore = defineStore('detallePedido', {
 
         console.log("Enviando detalles del pedido:", JSON.stringify(detallesPedido, null, 2));
 
-        await axios.post("http://localhost:5162/api/DetallePedido", detallesPedido);
+        await axios.post("http://lmdecoracionapi.retocsv.es/api/DetallePedido", detallesPedido);
         console.log("Detalles del pedido agregados correctamente");
 
         // Enviar correo de confirmación automáticamente
         try {
-          await axios.post(`http://localhost:5162/api/Pedido/enviar-confirmacion/${pedidoId}`);
+          await axios.post(`http://lmdecoracionapi.retocsv.es/api/Pedido/enviar-confirmacion/${pedidoId}`);
           toast.success("Te hemos enviado al correo toda la información de tu pedido.");
         } catch (emailError) {
           console.error("Error al enviar correo:", emailError);
@@ -66,7 +66,7 @@ export const useDetallePedidoStore = defineStore('detallePedido', {
 
     async eliminarDetallePedido(detalleId: number) {
       try {
-        await axios.delete(`http://localhost:5162/api/DetallePedido/${detalleId}`);
+        await axios.delete(`http://lmdecoracionapi.retocsv.es/api/DetallePedido/${detalleId}`);
         this.detallesPedido = this.detallesPedido.filter((detalle) => detalle.id !== detalleId);
         console.log("Detalle del pedido eliminado correctamente");
       } catch (error) {
@@ -76,7 +76,7 @@ export const useDetallePedidoStore = defineStore('detallePedido', {
     },
     async fetchDetallesPedido(pedidoId: number) {
       try {
-        const response = await axios.get(`http://localhost:5162/api/DetallePedido/pedido/${pedidoId}`);
+        const response = await axios.get(`http://lmdecoracionapi.retocsv.es/api/DetallePedido/pedido/${pedidoId}`);
         
         console.log("Detalles del pedido:", response.data);
     
@@ -107,7 +107,7 @@ export const useDetallePedidoStore = defineStore('detallePedido', {
 
     async fetchUsuarioCompleto(usuarioId: number) {
       try {
-        const response = await axios.get(`http://localhost:5162/api/Usuario/${usuarioId}`);
+        const response = await axios.get(`http://lmdecoracionapi.retocsv.es/api/Usuario/${usuarioId}`);
         console.log("Datos completos del usuario:", response.data);
         if (!response.data) {
           throw new Error("Usuario no encontrado.");

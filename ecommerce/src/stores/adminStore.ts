@@ -60,7 +60,7 @@ export const useAdminStore = defineStore('admin', {
       this.loading = true;
       this.error = null;
       try {
-        const response = await axios.get<any[]>('http://localhost:5162/api/Usuario', {
+        const response = await axios.get<any[]>('http://lmdecoracionapi.retocsv.es/api/Usuario', {
           headers: { Authorization: `Bearer ${this.token}` }
         });
         this.users = response.data.map(user => ({
@@ -88,7 +88,7 @@ export const useAdminStore = defineStore('admin', {
           email: user.email,
           esAdmin: user.role === 'Admin'
         };
-        const response = await axios.put(`http://localhost:5162/api/Usuario/${user.id}`, payload, {
+        const response = await axios.put(`http://lmdecoracionapi.retocsv.es/api/Usuario/${user.id}`, payload, {
           headers: { Authorization: `Bearer ${this.token}` }
         });
         // Suponiendo que la API devuelve el usuario actualizado, mapeamos el campo booleano a string para la vista
@@ -115,7 +115,7 @@ export const useAdminStore = defineStore('admin', {
     async deleteUser(userId: number) {
       this.error = null;
       try {
-        await axios.delete(`http://localhost:5162/api/Usuario/${userId}`, {
+        await axios.delete(`http://lmdecoracionapi.retocsv.es/api/Usuario/${userId}`, {
           headers: { Authorization: `Bearer ${this.token}` }
         });
         this.users = this.users.filter(u => u.id !== userId);
@@ -132,7 +132,7 @@ export const useAdminStore = defineStore('admin', {
       this.loading = true;
       this.error = null;
       try {
-        const response = await axios.get<any[]>('http://localhost:5162/api/Producto', {
+        const response = await axios.get<any[]>('http://lmdecoracionapi.retocsv.es/api/Producto', {
           headers: { Authorization: `Bearer ${this.token}` }
         });
         this.products = response.data.map(prod => ({
@@ -156,7 +156,7 @@ export const useAdminStore = defineStore('admin', {
     async updateProduct(product: Producto) {
       this.error = null;
       try {
-        await axios.put(`http://localhost:5162/api/Producto/${product.id}`, product, {
+        await axios.put(`http://lmdecoracionapi.retocsv.es/api/Producto/${product.id}`, product, {
           headers: { Authorization: `Bearer ${this.token}` }
         });
         const index = this.products.findIndex(p => p.id === product.id);
@@ -172,7 +172,7 @@ export const useAdminStore = defineStore('admin', {
     async deleteProduct(productId: number) {
       this.error = null;
       try {
-        await axios.delete(`http://localhost:5162/api/Producto/${productId}`, {
+        await axios.delete(`http://lmdecoracionapi.retocsv.es/api/Producto/${productId}`, {
           headers: { Authorization: `Bearer ${this.token}` }
         });
         this.products = this.products.filter(p => p.id !== productId);
@@ -190,7 +190,7 @@ export const useAdminStore = defineStore('admin', {
     }) {
       this.error = null;
       try {
-        await axios.post('http://localhost:5162/api/Producto', productoParaEnviar, {
+        await axios.post('http://lmdecoracionapi.retocsv.es/api/Producto', productoParaEnviar, {
           headers: { Authorization: `Bearer ${this.token}` }
         });
         // Actualizamos la lista de productos
@@ -212,7 +212,7 @@ export const useAdminStore = defineStore('admin', {
       this.loading = true;
       this.error = null;
       try {
-        const response = await axios.get<any[]>('http://localhost:5162/api/Pedido', {
+        const response = await axios.get<any[]>('http://lmdecoracionapi.retocsv.es/api/Pedido', {
           headers: { Authorization: `Bearer ${this.token}` }
         });
         this.orders = response.data.map((order: any) => ({
@@ -231,7 +231,7 @@ export const useAdminStore = defineStore('admin', {
     async updateOrder(order: Pedido) {
       this.error = null;
       try {
-        await axios.put(`http://localhost:5162/api/Pedido/${order.id}`, order, {
+        await axios.put(`http://lmdecoracionapi.retocsv.es/api/Pedido/${order.id}`, order, {
           headers: { Authorization: `Bearer ${this.token}` }
         });
         const index = this.orders.findIndex(o => o.id === order.id);
@@ -247,7 +247,7 @@ export const useAdminStore = defineStore('admin', {
     async deleteOrder(orderId: number) {
       this.error = null;
       try {
-        await axios.delete(`http://localhost:5162/api/Pedido/${orderId}`, {
+        await axios.delete(`http://lmdecoracionapi.retocsv.es/api/Pedido/${orderId}`, {
           headers: { Authorization: `Bearer ${this.token}` }
         });
         this.orders = this.orders.filter(o => o.id !== orderId);
