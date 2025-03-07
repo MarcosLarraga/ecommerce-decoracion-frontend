@@ -115,7 +115,7 @@ const enviarCorreoConfirmacion = async () => {
   enviandoCorreo.value = true;
   
   try {
-    await axios.post(`http://localhost:5162/api/Pedido/enviar-confirmacion/${pedidoId}`);
+    await axios.post(`http://lmdecoracionapi.retocsv.es/api/Pedido/enviar-confirmacion/${pedidoId}`);
     toast.success("Te hemos enviado al correo toda la información de tu pedido.");
   } catch (error) {
     console.error("Error al enviar correo:", error);
