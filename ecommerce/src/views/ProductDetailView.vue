@@ -160,7 +160,7 @@ const cargarProducto = async () => {
   try {
     const productoId = route.params.id;
     const [productoResponse] = await Promise.all([
-      axios.get(`http://lmdecoracionapi.retocsv.es/api/Producto/${productoId}`)
+      axios.get(`/api/Producto/${productoId}`)
     ]);
     
     product.value = productoResponse.data;

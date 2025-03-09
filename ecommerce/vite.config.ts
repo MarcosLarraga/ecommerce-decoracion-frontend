@@ -12,9 +12,10 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://lmdecoracionapi.retocsv.es', // Apunta al backend en el puerto 80
+        target: 'http://a65be034e05f44fc4b7d6860484a1406-224601945.us-east-1.elb.amazonaws.com',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, '/api')
+        secure: false,  // 🔄 Desactiva SSL estricto si usas HTTP
+        rewrite: (path) => path.replace(/^\/api/, '')
       }
     }
   }

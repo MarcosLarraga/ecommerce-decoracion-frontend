@@ -87,7 +87,7 @@ export const useProductsStore = defineStore('products', {
       console.log(`⏳ [fetchProductsByCategory] Cargando productos de la categoría ${categoriaId}...`);
 
       try {
-        const response = await fetch(`http://lmdecoracionapi.retocsv.es/api/Producto/categoria/${categoriaId}`, {
+        const response = await fetch(`/api/Producto/categoria/${categoriaId}`, {
           method: 'GET',
           headers: {
             'Accept': 'application/json',
@@ -127,7 +127,7 @@ export const useProductsStore = defineStore('products', {
       console.log(`⏳ [searchProducts] Buscando productos con query: "${query}"...`);
 
       try {
-        const response = await fetch(`http://lmdecoracionapi.retocsv.es/api/Producto/search?query=${encodeURIComponent(query)}`, {
+        const response = await fetch(`/api/Producto/search?query=${encodeURIComponent(query)}`, {
           method: 'GET',
           headers: {
             'Accept': 'application/json',
