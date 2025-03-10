@@ -27,7 +27,9 @@
     <section class="home__products">
       <div class="home__products-header">
         <h2 class="home__products-title">Productos Destacados</h2>
-        <p class="home__products-description">Descubre nuestra selección de artículos de decoración que transformarán tu hogar con estilo y elegancia.</p>
+        <p class="home__products-description">
+          Descubre nuestra selección de artículos de decoración que transformarán tu hogar con estilo y elegancia.
+        </p>
       </div>
       <div class="home__products-grid">
         <ProductCard v-for="product in productsStore.randomProducts" :key="product.id" :producto="product" />
@@ -35,7 +37,6 @@
     </section>
   </div>
 </template>
-
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
@@ -69,7 +70,6 @@ const goToCategory = (categoryName: string) => {
 
 <style lang="scss" scoped>
 @use '../styles/variables' as *;
-
 
 .home {
   width: 100%;
@@ -114,8 +114,9 @@ const goToCategory = (categoryName: string) => {
     }
   }
 
+  /* Mobile First: Categoría en 1 columna */
   &__category-card {
-    flex: 0 0 calc(100% / 3);
+    flex: 0 0 100%;
     position: relative;
     overflow: hidden;
     cursor: pointer;
@@ -149,55 +150,81 @@ const goToCategory = (categoryName: string) => {
   }
 
   /* Productos Destacados */
-  /* Productos Destacados */
-&__products {
-  padding: $spacing-xl;
-  margin: 60px auto;
-  max-width: 1200px;
-  background-color: #f9f9f9; // Fondo sutil
-  border-radius: $border-radius-lg;
-  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.03);
+  &__products {
+    padding: $spacing-xl;
+    margin: 60px auto;
+    max-width: 1200px;
+    background-color: #f9f9f9; // Fondo sutil
+    border-radius: $border-radius-lg;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.03);
 
-  &-header {
-    margin-bottom: $spacing-xl;
-    text-align: center;
-  }
+    &-header {
+      margin-bottom: $spacing-xl;
+      text-align: center;
+    }
 
-  &-title {
-    text-align: center;
-    font-size: 2rem;
-    font-weight: 700;
-    margin-bottom: $spacing-md;
-    color: $text-color;
-    font-family: $font-family-primary;
-    position: relative;
+    &-title {
+      text-align: center;
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: $spacing-md;
+      color: $text-color;
+      font-family: $font-family-primary;
+      position: relative;
 
-    &::after {
-      content: '';
-      position: absolute;
-      bottom: -10px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 80px;
-      height: 3px;
-      background-color: $primary-color;
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80px;
+        height: 3px;
+        background-color: $primary-color;
+      }
+    }
+
+    &-description {
+      max-width: 600px;
+      margin: $spacing-lg auto 0;
+      color: $text-color-secondary;
+      font-size: $font-size-base;
+      line-height: 1.6;
+    }
+
+    /* Estilo base mobile first: 2 columnas */
+    &-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: $spacing-lg;
+      justify-items: center;
     }
   }
+}
 
-  &-description {
-    max-width: 600px;
-    margin: $spacing-lg auto 0;
-    color: $text-color-secondary;
-    font-size: $font-size-base;
-    line-height: 1.6;
+/* Estilo exclusivo para móviles */
+@media (max-width: 599px) {
+  .home__category-card[data-v-b4e148ca] {
+    max-height: 350px;
+  }
+}
+
+/* En pantallas más amplias se restauran los estilos */
+@media (min-width: 600px) {
+  /* Categorías: 3 columnas en pantallas grandes */
+  .home__category-card {
+    flex: 0 0 calc(100% / 3);
   }
 
-  &-grid {
-    display: grid;
+  /* Restauramos la altura y recorte para pantallas grandes */
+  .home__category-card__image {
+    height: 600px;
+    object-fit: cover;
+  }
+
+  /* Productos: se aprovecha el espacio */
+  .home__products-grid {
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: $spacing-lg;
-    justify-items: center;
   }
 }
-}
-  </style>
+</style>
