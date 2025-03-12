@@ -19,7 +19,6 @@ import Footer from './components/Footer.vue';
 </script>
 
 <style lang="scss">
-// Correcto desde App.vue
 @use './styles/variables' as *;
 
 

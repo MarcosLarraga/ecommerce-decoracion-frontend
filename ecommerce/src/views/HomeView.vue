@@ -76,7 +76,6 @@ const goToCategory = (categoryName: string) => {
   margin: 0;
   padding: 0;
 
-  /* Carrusel */
   &__carousel {}
 
   &__carousel-sheet {
@@ -101,7 +100,6 @@ const goToCategory = (categoryName: string) => {
     text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.8);
   }
 
-  /* Categorías */
   &__categories {
     width: 100%;
     margin: 0;
@@ -149,12 +147,11 @@ const goToCategory = (categoryName: string) => {
   }
 
   /* Productos Destacados */
-  /* Productos Destacados */
 &__products {
   padding: $spacing-xl;
   margin: 60px auto;
   max-width: 1200px;
-  background-color: #f9f9f9; // Fondo sutil
+  background-color: #f9f9f9; 
   border-radius: $border-radius-lg;
   box-shadow: 0 2px 15px rgba(0, 0, 0, 0.03);
 

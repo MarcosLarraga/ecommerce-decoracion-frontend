@@ -1,6 +1,5 @@
 <template>
   <div class="product-detail">
-    <!-- Indicador de carga -->
     <div v-if="isLoading" class="loading-container">
       <div class="loading-spinner"></div>
       <p>Cargando producto...</p>
@@ -607,7 +606,6 @@ const getUserPlaceholder = (userId: number): string => {
   }
 }
 
-// Estrellas
 .star {
   color: #ddd;
   font-size: 1.2rem;

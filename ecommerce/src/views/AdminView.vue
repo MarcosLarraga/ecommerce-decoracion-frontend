@@ -127,7 +127,6 @@
     </div>
 
     <!-- Modal de Edición de Usuario -->
-    <!-- Modal de Edición de Usuario -->
     <div v-if="editingUser" class="modal-overlay">
       <div class="modal-content">
         <h3 class="modal-title">Editar Usuario</h3>
@@ -683,7 +682,7 @@ async function deleteOrder(orderId: number) {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 9999; // Valor alto para que se muestre por encima de otros elementos
+  z-index: 9999; 
   animation: fadeIn 0.3s ease;
 }
 

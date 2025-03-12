@@ -4,7 +4,6 @@
 
     <!-- Filtros -->
     <div class="shop__filters">
-      <!-- Filtro de categorías -->
       <div class="shop__filter">
         <label for="categorySelect" class="shop__filter-label">
           Filtrar por categoría:
@@ -85,7 +84,6 @@ const categoriesStore = useCategoriesStore();
 const route = useRoute();
 const router = useRouter();
 
-// Categoría seleccionada
 const selectedCategory = ref<string>('Todas');
 
 // Rango de precio seleccionado [min, max]
@@ -150,7 +148,6 @@ const fetchProducts = async () => {
 
 // Al montar el componente
 onMounted(async () => {
-  // Cargar categorías
   await categoriesStore.fetchCategories();
   // Realizar la búsqueda (si hay query search, se filtra; sino, carga todos)
   await fetchProducts();
@@ -216,7 +213,6 @@ const filteredProducts = computed(() => {
 @use '../styles/variables' as *;
 
 
-/* Estilos base */
 .shop {
   width: 100%;
   padding: $spacing-md;
@@ -227,7 +223,6 @@ const filteredProducts = computed(() => {
   max-width: 1200px;
 }
 
-/* Estilos del mensaje "sin resultados" */
 .no-results {
   font-size: $font-size-base;
   font-weight: bold;
@@ -235,7 +230,6 @@ const filteredProducts = computed(() => {
   margin-top: $spacing-md;
 }
 
-/* Título */
 .shop__title {
   font-size: $font-size-xl;
   font-weight: bold;
@@ -243,7 +237,6 @@ const filteredProducts = computed(() => {
   margin-top: 0 !important;
 }
 
-/* Filtros */
 .shop__filters {
   margin-bottom: $spacing-xl;
   display: flex;
@@ -280,7 +273,6 @@ const filteredProducts = computed(() => {
   }
 }
 
-/* Slider de precio */
 .shop__filter--price {
   width: 100%;
   max-width: 250px;
@@ -358,7 +350,6 @@ const filteredProducts = computed(() => {
   margin-top: -5px;
 }
 
-/* Grid de productos */
 .products-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -368,7 +359,6 @@ const filteredProducts = computed(() => {
   margin: 0 auto;
 }
 
-/* Media queries */
 @media (min-width: $breakpoint-sm) {
   .shop {
     padding: $spacing-lg;

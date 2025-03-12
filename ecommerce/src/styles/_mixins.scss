@@ -31,11 +31,11 @@
   text-align: center;
   background-color: #ffffff;
   border: 1px solid #dddddd;
-  border-radius: $border-radius;  // Variable definida en variables.scss
+  border-radius: $border-radius;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
   overflow: hidden;
   position: relative;
-  padding: $spacing-xs;         // Variable definida en variables.scss
+  padding: $spacing-xs; 
   margin: auto;
   margin-bottom: 20px;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -56,8 +56,8 @@
 
   &__image-wrapper {
     width: 100%;
-    height: 200px; // Para que se vea más completa la imagen
-    background-color: #ffffff; // Fondo blanco para la imagen
+    height: 200px;
+    background-color: #ffffff; 
     display: flex;
     align-items: center;
     justify-content: center;
@@ -67,7 +67,7 @@
   &__image {
     width: 100%;
     height: 100%;
-    object-fit: contain; // Muestra la imagen completa sin recortes
+    object-fit: contain; 
     transition: transform 0.3s ease;
   }
 
@@ -80,15 +80,15 @@
   }
 
   &__title {
-    font-size: $font-size-small;  // Definida en variables.scss
+    font-size: $font-size-small; 
     font-weight: bold;
-    color: $text-color;           // Definida en variables.scss
+    color: $text-color;         
     margin: 0;
   }
 
   &__price {
-    font-size: $font-size-base;   // Definida en variables.scss
-    color: $primary-color;         // Definida en variables.scss
+    font-size: $font-size-base; 
+    color: $primary-color;
     font-weight: bold;
     margin-top: $spacing-xs;
   }

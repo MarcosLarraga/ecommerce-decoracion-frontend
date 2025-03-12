@@ -1,6 +1,5 @@
 <template>
   <div class="register-view">
-    <!-- Imagen de fondo -->
     <div class="background-image"></div>
 
     <!-- Contenedor del formulario de registro -->
@@ -128,7 +127,6 @@ const handleRegister = async () => {
   justify-content: center;
 }
 
-/* Imagen de fondo */
 .background-image {
   position: absolute;
   top: 0;
@@ -141,7 +139,6 @@ const handleRegister = async () => {
   z-index: 0;
 }
 
-/* Contenedor del formulario */
 .auth {
   position: relative;
   z-index: 1;
@@ -190,7 +187,6 @@ const handleRegister = async () => {
     }
   }
 
-  /* Estilo de botón igual al login */
   &__button {
     padding: 0.75rem;
     background-color: $primary-color;
@@ -231,7 +227,6 @@ const handleRegister = async () => {
   }
 }
 
-/* Estilos para inputs con error */
 .is-invalid {
   border-color: #dc3545 !important;
 }
@@ -242,7 +237,6 @@ const handleRegister = async () => {
   margin-top: 0.5rem;
 }
 
-/* Media query para pantallas más grandes */
 @media (min-width: 768px) {
   .auth {
     padding: 2rem;
