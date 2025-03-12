@@ -16,16 +16,16 @@
         </v-col>
 
         <v-col cols="12" md="3" class="footer__section footer__social">
-          <v-btn icon class="footer__icon">
+          <v-btn icon class="footer__icon" href="https://www.instagram.com" target="_blank">
             <v-icon color="black">mdi-instagram</v-icon>
           </v-btn>
-          <v-btn icon class="footer__icon">
+          <v-btn icon class="footer__icon" href="https://www.linkedin.com" target="_blank">
             <v-icon color="black">mdi-linkedin</v-icon>
           </v-btn>
-          <v-btn icon class="footer__icon">
+          <v-btn icon class="footer__icon" href="https://www.youtube.com" target="_blank">
             <v-icon color="black">mdi-youtube</v-icon>
           </v-btn>
-          <v-btn icon class="footer__icon">
+          <v-btn icon class="footer__icon" href="https://www.twitter.com" target="_blank">
             <v-icon color="black">mdi-twitter</v-icon>
           </v-btn>
         </v-col>
@@ -48,7 +48,6 @@ import LogoCanvasWhite from '../components/LogoCanvasWhite.vue'
 
 <style lang="scss" scoped>
 @use '../styles/variables' as *;
-
 
 .v-footer {
   position: relative !important;
@@ -131,6 +130,5 @@ import LogoCanvasWhite from '../components/LogoCanvasWhite.vue'
   &__copyright {
     font-size: $font-size-small;
   }
-
 }
 </style>
