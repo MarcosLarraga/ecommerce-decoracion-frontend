@@ -53,9 +53,7 @@ export const useAdminStore = defineStore('admin', {
   }),
 
   actions: {
-    // ======================
     //  MÉTODOS PARA USUARIOS
-    // ======================
     async fetchAllUsers() {
       this.loading = true;
       this.error = null;
@@ -125,9 +123,7 @@ export const useAdminStore = defineStore('admin', {
       }
     },
 
-    // ========================
     //  MÉTODOS PARA PRODUCTOS
-    // ========================
     async fetchAllProducts() {
       this.loading = true;
       this.error = null;
@@ -200,14 +196,8 @@ export const useAdminStore = defineStore('admin', {
         this.error = 'Error al crear producto';
         throw error;
       }
-    }
-    ,
-  
-    
-
-    // ======================
+    },
     //  MÉTODOS PARA PEDIDOS
-    // ======================
     async fetchAllOrders() {
       this.loading = true;
       this.error = null;

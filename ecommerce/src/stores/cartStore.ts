@@ -31,8 +31,6 @@ export const useCartStore = defineStore('cart', {
 
       if (existingItem) {
         existingItem.quantity += 1;
-        // Puedes lanzar un toast aquí si quieres notificar
-        // toast.info(`Se agregó otra unidad de ${product.name} al carrito`);
       } else {
         this.cart.push({ ...product, quantity: 1 });
         toast.success(`${product.name} añadido al carrito`);

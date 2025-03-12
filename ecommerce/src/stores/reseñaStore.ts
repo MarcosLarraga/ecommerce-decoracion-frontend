@@ -14,7 +14,7 @@ export const useReseñaStore = defineStore('reseña', {
         const response = await axios.get(`/api/Reseña/producto/${productoId}`);
         this.reseñas = response.data;
       } catch (error) {
-        console.error("❌ Error obteniendo reseñas:", error);
+        console.error(" Error obteniendo reseñas:", error);
       }
     },
 
@@ -24,7 +24,7 @@ export const useReseñaStore = defineStore('reseña', {
         const response = await axios.get(`/api/Reseña/producto/${productoId}/promedio`);
         this.promedioCalificacion = response.data;
       } catch (error) {
-        console.error("❌ Error obteniendo el promedio de calificación:", error);
+        console.error(" Error obteniendo el promedio de calificación:", error);
         this.promedioCalificacion = 0; // Evita errores en el frontend
       }      
     },
@@ -56,12 +56,12 @@ export const useReseñaStore = defineStore('reseña', {
         this.reseñas.push(response.data);
         await this.fetchPromedioCalificacion(productoId);
       } catch (error) {
-        console.error("❌ Error al agregar reseña:", error);
+        console.error(" Error al agregar reseña:", error);
         throw new Error("No se pudo agregar la reseña.");
       }
     },
 
-    // 🔹 Nuevo método para eliminar reseñas
+    //  Nuevo método para eliminar reseñas
     async eliminarReseña(reseñaId: number) {
       try {
         const token = localStorage.getItem('token');
@@ -76,9 +76,9 @@ export const useReseñaStore = defineStore('reseña', {
         });
 
         this.reseñas = this.reseñas.filter(r => r.id !== reseñaId);
-        console.log(`✅ Reseña ${reseñaId} eliminada correctamente`);
+        console.log(` Reseña ${reseñaId} eliminada correctamente`);
       } catch (error) {
-        console.error("❌ Error al eliminar la reseña:", error);
+        console.error(" Error al eliminar la reseña:", error);
         throw new Error("No se pudo eliminar la reseña.");
       }
     }

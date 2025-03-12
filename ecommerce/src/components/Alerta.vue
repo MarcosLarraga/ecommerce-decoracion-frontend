@@ -30,7 +30,6 @@
   };
   </script>
   
-  <style scoped>
-  /* estilos personalizados*/
+  <style lang="scss" scoped>
   </style>
   

@@ -20,10 +20,10 @@ function handleCredentialResponse(response: any) {
 // Función para recargar la página solo una vez
 function reloadPageOnce() {
   if (!sessionStorage.getItem('reloaded')) {
-    sessionStorage.setItem('reloaded', 'true'); // Marcar que ya recargó
+    sessionStorage.setItem('reloaded', 'true'); 
     setTimeout(() => {
       window.location.reload();
-    }, 1000); // 1 segundo
+    }, 1000); 
   }
 }
 

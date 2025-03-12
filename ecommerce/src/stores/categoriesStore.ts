@@ -16,15 +16,15 @@ export const useCategoriesStore = defineStore('categories', () => {
   // Función para obtener las categorías desde la API
   const fetchCategories = async () => {
     try {
-      const response = await axios.get('api/Categoria'); // ✅ Petición a la API
-      const data = response.data; // ✅ Extrae los datos correctamente
+      const response = await axios.get('api/Categoria'); 
+      const data = response.data; 
 
       // Asignar datos correctamente usando la URL de imagen de la API
       allCategories.value = data.map((category: any) => ({
         id: category.id,
         name: category.nombre,
         description: category.descripcion,
-        image: category.urlImagen && category.urlImagen.trim() !== "" ? category.urlImagen : '/fotos/default.jpg' // ✅ Si no hay imagen, usa una por defecto
+        image: category.urlImagen && category.urlImagen.trim() !== "" ? category.urlImagen : '/fotos/default.jpg'
       }));
 
       console.log("Categorías cargadas:", allCategories.value);
