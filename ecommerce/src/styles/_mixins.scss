@@ -1,7 +1,14 @@
+// mixins.scss (actualizado)
 @use 'sass:math';
 @use 'variables' as *;
 
 // Mixins para media queries
+@mixin media-xs {
+  @media (min-width: $breakpoint-xs) {
+    @content;
+  }
+}
+
 @mixin media-sm {
   @media (min-width: $breakpoint-sm) {
     @content;
@@ -16,6 +23,12 @@
 
 @mixin media-lg {
   @media (min-width: $breakpoint-lg) {
+    @content;
+  }
+}
+
+@mixin media-xl {
+  @media (min-width: $breakpoint-xl) {
     @content;
   }
 }
@@ -35,16 +48,17 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
   overflow: hidden;
   position: relative;
-  padding: $spacing-xs; 
+  padding: $spacing-xs;
+  
   margin: auto;
   margin-bottom: 20px;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
-
+  
   &:hover {
     transform: translateY(-5px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
   }
-
+  
   &__content {
     text-decoration: none;
     color: inherit;
@@ -53,46 +67,48 @@
     align-items: center;
     width: 100%;
   }
-
+  
   &__image-wrapper {
     width: 100%;
     height: 200px;
-    background-color: #ffffff; 
+    background-color: #ffffff;
+    
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
   }
-
+  
   &__image {
     width: 100%;
     height: 100%;
-    object-fit: contain; 
+    object-fit: contain;
+    
     transition: transform 0.3s ease;
   }
-
+  
   &:hover .product-card__image {
     transform: scale(1.05);
   }
-
+  
   &__info {
     padding: $spacing-xs;
   }
-
+  
   &__title {
     font-size: $font-size-small; 
     font-weight: bold;
-    color: $text-color;         
+    color: $text-color;      
     margin: 0;
   }
-
+  
   &__price {
     font-size: $font-size-base; 
     color: $primary-color;
     font-weight: bold;
     margin-top: $spacing-xs;
   }
-
+  
   &__cart-btn {
     background-color: $primary-color;
     border: none;
@@ -108,7 +124,7 @@
     position: absolute;
     bottom: 15px;
     right: 15px;
-
+    
     &:hover {
       transform: scale(1.05);
       opacity: 0.85;
@@ -129,4 +145,1159 @@
       height: 160px;
     }
   }
+}
+
+
+// Mixin para botones de administración
+@mixin adminButton($bg-color: $primary-color, $text-color: white) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-sm $spacing-md;
+  background-color: $bg-color;
+  color: $text-color;
+  border: none;
+  border-radius: $button-radius;
+  font-weight: $font-weight-medium;
+  font-size: $font-size-base;
+  cursor: pointer;
+  transition: background-color $transition-fast, box-shadow $transition-fast;
+  
+  &:hover {
+    @if $bg-color == $primary-color {
+      background-color: $primary-color-hover;
+    } @else if $bg-color == $error-color {
+      background-color: $button-remove-hover;
+    } @else if $bg-color == #f1f1f1 {
+      background-color: $secondary-button-hover;
+    } @else {
+      // Si es un color personalizado, usamos una variable de respaldo
+      background-color: $color-hover-boton;
+    }
+    box-shadow: $button-shadow;
+  }
+  
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    background-color: $color-boton-reserva-disabled;
+  }
+  
+  i, svg {
+    margin-right: $spacing-xs;
+  }
+}
+
+// Mixin para tarjetas en el panel de administración
+@mixin adminCard {
+  background-color: $background-color;
+  border-radius: $border-radius-lg;
+  box-shadow: $box-shadow;
+  padding: $admin-card-padding;
+  margin-bottom: $spacing-md;
+  
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: $spacing-md;
+    padding-bottom: $spacing-sm;
+    border-bottom: 1px solid $admin-divider-color;
+  }
+  
+  &__title {
+    font-size: $admin-section-title-size;
+    font-weight: $font-weight-semibold;
+    margin: 0;
+    color: $text-color;
+  }
+  
+  &__actions {
+    display: flex;
+    gap: $spacing-sm;
+  }
+  
+  &__content {
+    width: 100%;
+  }
+  
+  &__footer {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: $spacing-md;
+    margin-top: $spacing-md;
+    border-top: 1px solid $admin-divider-color;
+  }
+}
+
+// Mixin para tablas de administración
+@mixin adminTable {
+  width: 100%;
+  border-collapse: collapse;
+  
+  th, td {
+    padding: $spacing-sm $spacing-md;
+    text-align: left;
+    border-bottom: 1px solid $admin-divider-color;
+  }
+  
+  th {
+    background-color: $admin-table-header-bg;
+    font-weight: $font-weight-semibold;
+    color: $text-color;
+  }
+  
+  tr:hover td {
+    background-color: $admin-table-row-hover;
+  }
+  
+  &__empty {
+    text-align: center;
+    padding: $spacing-xl;
+    color: $admin-empty-msg-color;
+    font-style: italic;
+  }
+  
+  &__actions {
+    display: flex;
+    gap: $spacing-xs;
+  }
+  
+  &__button {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+    border-radius: $border-radius-sm;
+    color: $text-color-secondary;
+    transition: all $transition-fast;
+    
+    &:hover {
+      background-color: rgba($text-color-secondary, 0.1);
+    }
+    
+    &--edit:hover {
+      color: $primary-color;
+      background-color: rgba($primary-color, 0.1);
+    }
+    
+    &--delete:hover {
+      color: $error-color;
+      background-color: rgba($error-color, 0.1);
+    }
+  }
+}
+
+// Mixin para formularios de administración
+@mixin adminForm {
+  &__group {
+    margin-bottom: $spacing-md;
+  }
+  
+  &__label {
+    display: block;
+    margin-bottom: $spacing-xs;
+    font-weight: $font-weight-medium;
+    color: $text-color;
+  }
+  
+  &__input,
+  &__select,
+  &__textarea {
+    width: 100%;
+    padding: $input-padding;
+    border: $input-border;
+    border-radius: $input-border-radius;
+    font-family: $font-family-secondary;
+    font-size: $font-size-base;
+    
+    &:focus {
+      outline: none;
+      border-color: $primary-color;
+      box-shadow: 0 0 0 2px rgba($primary-color, 0.2);
+    }
+    
+    &--error {
+      border-color: $error-color;
+    }
+  }
+  
+  &__textarea {
+    min-height: 100px;
+    resize: vertical;
+  }
+  
+  &__error {
+    margin-top: $spacing-xs;
+    color: $error-color;
+    font-size: $font-size-small;
+  }
+  
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: $spacing-md;
+    margin-top: $spacing-lg;
+  }
+  
+  &__hint {
+    font-size: $font-size-small;
+    color: $text-color-secondary;
+    margin-top: $spacing-xs;
+  }
+}
+
+// Mixin para modales de administración
+@mixin adminModal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: $z-index-modal;
+  
+  &__backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: $admin-modal-backdrop;
+    backdrop-filter: blur(2px);
+  }
+  
+  &__content {
+    position: relative;
+    background-color: $background-color;
+    border-radius: $admin-modal-radius;
+    box-shadow: $box-shadow-xl;
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    z-index: 1;
+    animation: modalFadeIn 0.3s ease;
+    
+    &--sm {
+      max-width: 400px;
+    }
+    
+    &--lg {
+      max-width: 800px;
+    }
+  }
+  
+  &__header {
+    padding: $spacing-md $admin-modal-padding;
+    border-bottom: 1px solid $admin-divider-color;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  &__title {
+    font-size: $admin-section-subtitle-size;
+    font-weight: $font-weight-semibold;
+    margin: 0;
+    color: $text-color;
+  }
+  
+  &__close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: $font-size-large;
+    color: $text-color-secondary;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: $border-radius-circle;
+    
+    &:hover {
+      background-color: rgba($text-color-secondary, 0.1);
+    }
+  }
+  
+  &__body {
+    padding: $admin-modal-padding;
+  }
+  
+  &__footer {
+    padding: $spacing-md $admin-modal-padding;
+    border-top: 1px solid $admin-divider-color;
+    display: flex;
+    justify-content: flex-end;
+    gap: $spacing-md;
+  }
+  
+  &__warning {
+    background-color: rgba($warning-color, 0.1);
+    border-left: 3px solid $warning-color;
+    padding: $spacing-md;
+    margin: $spacing-md 0;
+    border-radius: $border-radius-sm;
+    
+    i {
+      color: $warning-color;
+      margin-right: $spacing-sm;
+    }
+  }
+}
+
+// Mixin para badges/etiquetas
+@mixin adminBadge($bg-color: $primary-color, $text-color: white) {
+  display: inline-block;
+  padding: $admin-badge-padding;
+  border-radius: $admin-badge-border-radius;
+  background-color: rgba($bg-color, 0.1);
+  color: $bg-color;
+  font-size: $font-size-small;
+  font-weight: $font-weight-medium;
+}
+
+// Mixin para layout de administración
+@mixin adminLayout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  
+  &__header {
+    height: $admin-header-height;
+    background-color: $primary-color;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 $spacing-md;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: $z-index-sticky;
+    box-shadow: $box-shadow;
+  }
+  
+  &__container {
+    display: flex;
+    margin-top: $admin-header-height;
+    min-height: calc(100vh - #{$admin-header-height});
+  }
+  
+  &__sidebar {
+    width: $admin-sidebar-width;
+    background-color: $background-color;
+    border-right: 1px solid $admin-divider-color;
+    overflow-y: auto;
+    position: fixed;
+    top: $admin-header-height;
+    bottom: 0;
+    left: 0;
+    z-index: $z-index-docked;
+    
+    @include media-md {
+      position: relative;
+      top: 0;
+    }
+  }
+  
+  &__content {
+    flex: 1;
+    padding: $spacing-lg;
+    margin-left: $admin-sidebar-width;
+    
+    @include media-md {
+      margin-left: 0;
+    }
+  }
+  
+  &__nav {
+    display: flex;
+    flex-direction: column;
+    padding: $spacing-md 0;
+  }
+  
+  &__nav-link {
+    display: flex;
+    align-items: center;
+    padding: $spacing-sm $spacing-md;
+    color: $text-color;
+    text-decoration: none;
+    border-left: 3px solid transparent;
+    
+    i {
+      margin-right: $spacing-sm;
+      width: 24px;
+      text-align: center;
+    }
+    
+    &:hover {
+      background-color: rgba($primary-color, 0.05);
+    }
+    
+    &--active {
+      border-left-color: $primary-color;
+      background-color: rgba($primary-color, 0.1);
+      color: $primary-color;
+      font-weight: $font-weight-medium;
+    }
+  }
+}
+
+// Mixin para la animación de entrada del modal
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+// mixins.scss (nuevos mixins)
+
+// Mixin para AdminInput
+@mixin adminInput {
+  width: 100%;
+  height: $admin-input-height;
+  padding: $spacing-sm $spacing-md;
+  border: $admin-input-border;
+  border-radius: $border-radius;
+  background-color: white;
+  font-size: $font-size-base;
+  color: $text-color;
+  transition: border-color $transition-fast, box-shadow $transition-fast;
+  
+  &:focus {
+    outline: none;
+    border-color: $admin-input-focus-border;
+    box-shadow: $admin-input-focus-shadow;
+  }
+  
+  &::placeholder {
+    color: $admin-input-placeholder-color;
+  }
+  
+  &:disabled {
+    background-color: $admin-input-disabled-bg;
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
+  
+  &--error {
+    border-color: $error-color;
+    
+    &:focus {
+      border-color: $error-color;
+      box-shadow: $admin-input-error-focus-shadow;
+    }
+  }
+  
+  // Estilos específicos para type="number"
+  &[type="number"] {
+    -moz-appearance: textfield;
+    
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+  }
+}
+
+// Mixin para AdminSearch
+@mixin adminSearch {
+  position: relative;
+  width: 100%;
+  max-width: $admin-search-width;
+  
+  &__icon {
+    position: absolute;
+    left: $spacing-sm;
+    top: 50%;
+    transform: translateY(-50%);
+    color: $text-color-secondary;
+    font-size: $admin-search-icon-size;
+  }
+  
+  &__input {
+    width: 100%;
+    height: $admin-search-height;
+    padding: $spacing-sm $spacing-xl $spacing-sm $spacing-xl;
+    border: 1px solid $border-color;
+    border-radius: $border-radius;
+    background-color: white;
+    font-size: $font-size-base;
+    color: $text-color;
+    
+    &:focus {
+      outline: none;
+      border-color: $primary-color;
+      box-shadow: 0 0 0 2px rgba($primary-color, 0.2);
+    }
+    
+    &::placeholder {
+      color: $text-color-tertiary;
+    }
+  }
+  
+  &__clear {
+    position: absolute;
+    right: $spacing-sm;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: $text-color-secondary;
+    font-size: $admin-search-icon-size;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    
+    &:hover {
+      color: $text-color;
+    }
+  }
+}
+
+// Mixin para AdminSelect
+@mixin adminSelect {
+  position: relative;
+  width: 100%;
+  
+  select {
+    width: 100%;
+    height: $admin-input-height;
+    padding: $spacing-sm $spacing-xl $spacing-sm $spacing-sm;
+    border: 1px solid $border-color;
+    border-radius: $border-radius;
+    background-color: white;
+    font-size: $font-size-base;
+    color: $text-color;
+    appearance: none;
+    cursor: pointer;
+    
+    &:focus {
+      outline: none;
+      border-color: $primary-color;
+      box-shadow: 0 0 0 2px rgba($primary-color, 0.2);
+    }
+    
+    &:disabled {
+      background-color: $tertiary-color;
+      cursor: not-allowed;
+      opacity: 0.7;
+    }
+    
+    &.error {
+      border-color: $error-color;
+      
+      &:focus {
+        border-color: $error-color;
+        box-shadow: 0 0 0 2px rgba($error-color, 0.2);
+      }
+    }
+  }
+  
+  &__icon {
+    position: absolute;
+    right: $spacing-sm;
+    top: 50%;
+    transform: translateY(-50%);
+    color: $admin-select-arrow-color;
+    pointer-events: none;
+    font-size: $admin-select-arrow-size;
+  }
+}
+
+// Mixin para AdminContent
+@mixin adminContent {
+  background-color: $admin-content-bg;
+  border-radius: $border-radius-lg;
+  box-shadow: $box-shadow;
+  overflow: hidden;
+  
+  &__filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $spacing-md;
+    padding: $admin-content-padding;
+    background-color: $admin-content-filters-bg;
+    border-bottom: 1px solid $border-color;
+  }
+  
+  &__main {
+    padding: $admin-content-padding;
+  }
+}
+
+// Mixin para AdminHeader
+@mixin adminHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $admin-header-margin-bottom;
+  flex-wrap: wrap;
+  gap: $spacing-md;
+  
+  &__title-container {
+    flex: 1;
+    min-width: 200px;
+  }
+  
+  &__title {
+    font-size: $font-size-xxl;
+    font-weight: $font-weight-bold;
+    margin: 0;
+    color: $text-color;
+  }
+  
+  &__subtitle {
+    font-size: $font-size-base;
+    color: $text-color-secondary;
+    margin: $spacing-xs 0 0 0;
+  }
+  
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: $spacing-md;
+    flex-wrap: wrap;
+  }
+}
+
+// Mixin para AdminFilter
+@mixin adminFilter {
+  display: flex;
+  flex-direction: column;
+  min-width: 200px;
+  
+  &__label {
+    font-size: $font-size-small;
+    color: $text-color-secondary;
+    margin-bottom: $spacing-xs;
+    font-weight: $font-weight-medium;
+  }
+  
+  &__content {
+    flex: 1;
+  }
+}
+
+// Mixin para AdminFormGroup
+@mixin adminFormGroup {
+  margin-bottom: $admin-form-group-margin-bottom;
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+  
+  &__header {
+    margin-bottom: $spacing-xs;
+  }
+  
+  &__label {
+    display: block;
+    font-weight: $font-weight-medium;
+    color: $text-color;
+    margin-bottom: $admin-form-group-label-margin;
+  }
+  
+  &__required {
+    color: $admin-form-group-required-color;
+    margin-left: 2px;
+  }
+  
+  &__description {
+    font-size: $admin-form-group-description-size;
+    color: $text-color-secondary;
+    margin-bottom: $spacing-xs;
+  }
+  
+  &__content {
+    width: 100%;
+  }
+  
+  &__error {
+    font-size: $admin-form-group-error-size;
+    color: $admin-form-group-error-color;
+    margin-top: $spacing-xs;
+  }
+}
+
+// Mixin para AdminTextarea
+@mixin adminTextarea {
+  width: 100%;
+  padding: $spacing-sm $spacing-md;
+  border: 1px solid $border-color;
+  border-radius: $border-radius;
+  background-color: white;
+  font-size: $font-size-base;
+  color: $text-color;
+  resize: vertical;
+  transition: border-color $transition-fast, box-shadow $transition-fast;
+  min-height: $admin-textarea-min-height;
+  font-family: inherit;
+  
+  &:focus {
+    outline: none;
+    border-color: $primary-color;
+    box-shadow: 0 0 0 2px rgba($primary-color, 0.2);
+  }
+  
+  &::placeholder {
+    color: $text-color-tertiary;
+  }
+  
+  &:disabled {
+    background-color: $tertiary-color;
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
+  
+  &--error {
+    border-color: $error-color;
+    
+    &:focus {
+      border-color: $error-color;
+      box-shadow: 0 0 0 2px rgba($error-color, 0.2);
+    }
+  }
+}
+
+// Mixin mejorado para AdminTable
+@mixin adminTable {
+  width: 100%;
+  border-collapse: collapse;
+  
+  th, td {
+    padding: $spacing-md;
+    text-align: left;
+    border-bottom: $admin-table-border;
+  }
+  
+  th {
+    font-weight: $font-weight-semibold;
+    color: $text-color;
+    background-color: $admin-table-header-bg;
+    white-space: nowrap;
+  }
+  
+  td {
+    color: $text-color-secondary;
+  }
+  
+  tbody tr {
+    transition: background-color $transition-fast;
+    
+    &:hover {
+      background-color: $admin-table-row-hover;
+    }
+  }
+  
+  &__loading,
+  &__empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: $spacing-xl;
+    color: $text-color-secondary;
+    text-align: center;
+  }
+  
+  &__spinner {
+    width: $admin-table-spinner-size;
+    height: $admin-table-spinner-size;
+    border: 3px solid rgba($primary-color, 0.3);
+    border-radius: 50%;
+    border-top-color: $primary-color;
+    animation: spin 1s linear infinite;
+    margin-bottom: $spacing-md;
+  }
+  
+  &__empty {
+    i {
+      font-size: $admin-table-empty-icon-size;
+      opacity: 0.3;
+      margin-bottom: $spacing-md;
+    }
+  }
+}
+
+// Mixin mejorado para AdminButton
+@mixin adminButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-sm $spacing-md;
+  border-radius: $border-radius;
+  font-weight: $font-weight-medium;
+  font-size: $font-size-base;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all $transition-fast;
+  background-color: $primary-color;
+  color: white;
+  
+  &:hover:not(:disabled) {
+    background-color: $primary-color-hover;
+  }
+  
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba($primary-color, 0.3);
+  }
+  
+  &--primary {
+    background-color: $primary-color;
+    color: white;
+    
+    &:hover:not(:disabled) {
+      background-color: $primary-color-hover;
+    }
+    
+    &:focus {
+      box-shadow: 0 0 0 3px rgba($primary-color, 0.3);
+    }
+  }
+  
+  &--secondary {
+    background-color: #f5f5f5;
+    color: $text-color;
+    border-color: $border-color;
+    
+    &:hover:not(:disabled) {
+      background-color: $secondary-button-hover;
+    }
+    
+    &:focus {
+      box-shadow: 0 0 0 3px rgba($text-color, 0.1);
+    }
+  }
+  
+  &--success {
+    background-color: $success-color;
+    color: white;
+    
+    &:hover:not(:disabled) {
+      background-color: darken($success-color, 10%);
+    }
+    
+    &:focus {
+      box-shadow: 0 0 0 3px rgba($success-color, 0.3);
+    }
+  }
+  
+  &--error {
+    background-color: $error-color;
+    color: white;
+    
+    &:hover:not(:disabled) {
+      background-color: $error-color-hover;
+    }
+    
+    &:focus {
+      box-shadow: 0 0 0 3px rgba($error-color, 0.3);
+    }
+  }
+  
+  &--warning {
+    background-color: $warning-color;
+    color: white;
+    
+    &:hover:not(:disabled) {
+      background-color: darken($warning-color, 10%);
+    }
+    
+    &:focus {
+      box-shadow: 0 0 0 3px rgba($warning-color, 0.3);
+    }
+  }
+  
+  &--info {
+    background-color: $info-color;
+    color: white;
+    
+    &:hover:not(:disabled) {
+      background-color: darken($info-color, 10%);
+    }
+    
+    &:focus {
+      box-shadow: 0 0 0 3px rgba($info-color, 0.3);
+    }
+  }
+  
+  &--link {
+    background-color: transparent;
+    color: $primary-color;
+    text-decoration: none;
+    padding: 0;
+    
+    &:hover:not(:disabled) {
+      text-decoration: underline;
+      background-color: transparent;
+    }
+    
+    &:focus {
+      box-shadow: none;
+    }
+  }
+  
+  &--sm {
+    padding: $spacing-xs $spacing-sm;
+    font-size: $font-size-small;
+  }
+  
+  &--lg {
+    padding: $spacing-md $spacing-lg;
+    font-size: $font-size-large;
+  }
+  
+  &--icon-only {
+    width: $admin-button-icon-only-size;
+    height: $admin-button-icon-only-size;
+    padding: 0;
+    
+    &.admin-button--sm {
+      width: $admin-button-icon-only-size-sm;
+      height: $admin-button-icon-only-size-sm;
+    }
+    
+    &.admin-button--lg {
+      width: $admin-button-icon-only-size-lg;
+      height: $admin-button-icon-only-size-lg;
+    }
+  }
+  
+  &--loading {
+    position: relative;
+    cursor: wait;
+    
+    .admin-button__text {
+      opacity: 0.7;
+    }
+  }
+  
+  &--disabled,
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  
+  &__icon {
+    margin-right: $admin-button-icon-margin;
+    
+    .admin-button--icon-only & {
+      margin-right: 0;
+    }
+  }
+  
+  &__spinner {
+    width: $admin-button-spinner-size;
+    height: $admin-button-spinner-size;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 1s linear infinite;
+    position: absolute;
+    right: $spacing-xs;
+    
+    .admin-button--icon-only & {
+      position: static;
+    }
+    
+    .admin-button--secondary & {
+      border: 2px solid rgba($text-color, 0.3);
+      border-top-color: $text-color;
+    }
+  }
+}
+
+// Mixin mejorado para AdminBadge
+@mixin adminBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  font-size: $admin-badge-font-size;
+  border-radius: $border-radius-sm;
+  font-weight: $font-weight-medium;
+  
+  &--rounded {
+    border-radius: 50px;
+  }
+  
+  &__icon {
+    margin-right: $admin-badge-icon-margin;
+  }
+  
+  &--default {
+    background-color: #f0f0f0;
+    color: $text-color;
+  }
+  
+  &--primary {
+    background-color: rgba($primary-color, 0.1);
+    color: $primary-color;
+  }
+  
+  &--success {
+    background-color: rgba($success-color, 0.1);
+    color: $success-color;
+  }
+  
+  &--error {
+    background-color: rgba($error-color, 0.1);
+    color: $error-color;
+  }
+  
+  &--warning {
+    background-color: rgba($warning-color, 0.1);
+    color: $warning-color;
+  }
+  
+  &--info {
+    background-color: rgba($info-color, 0.1);
+    color: $info-color;
+  }
+}
+
+// Mixin para AdminModal mejorado
+@mixin adminModalImproved {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: $admin-modal-backdrop;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: $z-index-modal;
+  padding: $spacing-md;
+  overflow-y: auto;
+  
+  &__content {
+    background-color: $admin-modal-bg;
+    border-radius: $border-radius-lg;
+    box-shadow: $box-shadow-lg;
+    width: 100%;
+    max-width: $admin-modal-max-width-md;
+    max-height: calc(100vh - #{$spacing-md * 2});
+    display: flex;
+    flex-direction: column;
+    
+    &--sm {
+      max-width: $admin-modal-max-width-sm;
+    }
+    
+    &--md {
+      max-width: $admin-modal-max-width-md;
+    }
+    
+    &--lg {
+      max-width: $admin-modal-max-width-lg;
+    }
+    
+    &--xl {
+      max-width: $admin-modal-max-width-xl;
+    }
+    
+    &--fullscreen {
+      max-width: 100%;
+      height: 100%;
+      border-radius: 0;
+    }
+    
+    &--scrollable {
+      .admin-modal__body {
+        overflow-y: auto;
+      }
+    }
+  }
+  
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: $admin-modal-header-padding;
+    border-bottom: 1px solid $admin-modal-border-color;
+  }
+  
+  &__title {
+    margin: 0;
+    font-size: $admin-modal-title-size;
+    font-weight: $font-weight-semibold;
+    color: $text-color;
+  }
+  
+  &__close {
+    background: none;
+    border: none;
+    color: $text-color-secondary;
+    font-size: $admin-modal-close-size;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: $admin-modal-close-size;
+    height: $admin-modal-close-size;
+    border-radius: 50%;
+    
+    &:hover {
+      background-color: $admin-modal-close-hover-bg;
+      color: $text-color;
+    }
+  }
+  
+  &__body {
+    padding: $admin-modal-padding;
+    flex: 1;
+  }
+  
+  &__footer {
+    padding: $spacing-md $admin-modal-padding;
+    border-top: 1px solid $admin-modal-border-color;
+    display: flex;
+    justify-content: flex-end;
+    gap: $spacing-md;
+  }
+  
+  // Animaciones
+  &-enter-active,
+  &-leave-active {
+    transition: opacity $admin-modal-animation-duration ease;
+    
+    .admin-modal__content {
+      transition: transform $admin-modal-animation-duration ease;
+    }
+  }
+  
+  &-enter-from,
+  &-leave-to {
+    opacity: 0;
+    
+    .admin-modal__content {
+      transform: scale(0.9);
+    }
+  }
+}
+
+// Keyframe para spinner
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }

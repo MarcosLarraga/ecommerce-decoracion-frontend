@@ -1,3 +1,4 @@
+<!-- Footer.vue (actualizado con acceso trabajadores) -->
 <template>
   <v-footer app class="footer">
     <v-container>
@@ -10,11 +11,11 @@
             <router-link to="/sobre-nosotros" class="footer__link">Sobre LM</router-link>
           </nav>
         </v-col>
-
+        
         <v-col cols="12" md="3" class="footer__section footer__logo">
           <LogoCanvasWhite class="footer__logo-img" />
         </v-col>
-
+        
         <v-col cols="12" md="3" class="footer__section footer__social">
           <v-btn icon class="footer__icon">
             <v-icon color="black">mdi-instagram</v-icon>
@@ -30,12 +31,19 @@
           </v-btn>
         </v-col>
       </v-row>
-
+      
       <v-divider class="footer__divider"></v-divider>
-
+      
       <v-row justify="center" class="footer__bottom">
-        <v-col cols="12" class="text-center footer__copyright">
-          2025 LM DECORACIONES. All rights reserved
+        <v-col cols="12" class="text-center">
+          <div class="footer__copyright">
+            2025 LM DECORACIONES. All rights reserved
+          </div>
+          <div class="footer__admin-access">
+            <router-link to="/admin-login" class="footer__link footer__link--admin">
+              Acceso trabajadores
+            </router-link>
+          </div>
         </v-col>
       </v-row>
     </v-container>
@@ -47,9 +55,8 @@ import LogoCanvasWhite from '../components/LogoCanvasWhite.vue'
 </script>
 
 <style lang="scss" scoped>
-@use '../styles/variables' as *;
-
-
+@use '@/styles/variables' as *;
+ 
 .v-footer {
   position: relative !important;
 }
@@ -61,24 +68,24 @@ import LogoCanvasWhite from '../components/LogoCanvasWhite.vue'
   text-align: center;
   width: 100%;
   margin-top: auto;
-
+  
   &__content {
     display: flex;
     justify-content: center;
     align-items: center;
   }
-
+  
   &__section {
     text-align: center;
   }
-
+  
   &__nav {
     display: flex;
     justify-content: center;
     gap: $spacing-md;
     margin-bottom: $spacing-md;
   }
-
+  
   &__link {
     text-decoration: none;
     color: $background-color;
@@ -95,18 +102,18 @@ import LogoCanvasWhite from '../components/LogoCanvasWhite.vue'
       }
     }
   }
-
+  
   &__logo-img {
     height: 50px;
     margin-bottom: $spacing-sm;
   }
-
+  
   &__social {
     display: flex;
     justify-content: center;
     gap: $spacing-md;
   }
-
+  
   &__icon {
     background-color: white;
     border-radius: 50%;
@@ -117,20 +124,30 @@ import LogoCanvasWhite from '../components/LogoCanvasWhite.vue'
       color: $primary-color;
     }
   }
-
+  
   &__divider {
     margin: $spacing-md auto;
     width: 90%;
     background-color: rgba(255, 255, 255, 0.2);
   }
-
+  
   &__bottom {
     margin-top: $spacing-md;
   }
-
+  
   &__copyright {
     font-size: $font-size-small;
+    margin-bottom: $spacing-sm;
   }
-
+  
+  &__admin-access {
+    margin-top: $spacing-xs;
+    opacity: 0.6;
+    transition: opacity 0.3s;
+    
+    &:hover {
+      opacity: 1;
+    }
+  }
 }
 </style>

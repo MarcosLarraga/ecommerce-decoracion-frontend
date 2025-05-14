@@ -1,12 +1,12 @@
-<!-- LoginView.vue (simplificado, sin modal de admin) -->
+<!-- @/views/admin/AdminLoginView.vue -->
 <template>
-  <div class="login-view">
+  <div class="admin-login-view">
     <!-- Imagen de fondo -->
     <div class="background-image"></div>
 
     <!-- Contenedor del contenido de la vista (formulario, etc.) -->
     <div class="auth">
-      <h1 class="auth__title">Iniciar Sesión</h1>
+      <h1 class="auth__title">Acceso Trabajadores</h1>
       <Alerta v-if="error" :mensaje="error" />
       <form class="auth__form" @submit.prevent="handleLogin">
         <div class="auth__group">
@@ -36,15 +36,11 @@
           </div>
         </div>
         <button type="submit" class="auth__button" :disabled="loading">
-          {{ loading ? 'Iniciando sesión...' : 'Iniciar Sesión' }}
+          {{ loading ? 'Verificando...' : 'Acceder' }}
         </button>
       </form>
       <div class="auth__links">
-        <router-link class="auth__link" to="/register">Registrarse</router-link>
-        <router-link class="auth__link" to="/forgot-password">Olvidé mi contraseña</router-link>
-      </div>
-      <div class="auth__google">
-        <BotonGoogle v-if="!loading" />
+        <router-link class="auth__link" to="/">Volver a la tienda</router-link>
       </div>
     </div>
   </div>
@@ -54,10 +50,9 @@
 import { ref } from 'vue';
 import { useVuelidate } from '@vuelidate/core';
 import { required, email as emailValidator } from '@vuelidate/validators';
-import { useUserStore } from '../stores/userStore';
-import { useRouter, useRoute } from 'vue-router';
-import Alerta from '../components/Alerta.vue';
-import BotonGoogle from '../components/BotonGoogle.vue';
+import { useUserStore } from '@/stores/userStore';
+import { useRouter } from 'vue-router';
+import Alerta from '@/components/Alerta.vue';
 
 const form = ref({
   email: '',
@@ -75,7 +70,6 @@ const loading = ref(false);
 const error = ref('');
 const userStore = useUserStore();
 const router = useRouter();
-const route = useRoute();
 
 const handleLogin = async () => {
   // Validamos el formulario
@@ -88,14 +82,38 @@ const handleLogin = async () => {
   loading.value = true;
   error.value = '';
   try {
-    await userStore.login(form.value.email, form.value.password);
+    console.log("Iniciando login de administrador...");
     
-    if (userStore.isAuthenticated) {
-      // Verificar si hay una redirección desde otra página
-      const redirectPath = route.query.redirect?.toString();
+    // Usar el método específico para administradores
+    let success = false;
+    
+    if (typeof userStore.adminLogin === 'function') {
+      // Si existe el método especializado, usarlo
+      success = await userStore.adminLogin(form.value.email, form.value.password);
+    } else {
+      // Si no, usar el método normal
+      await userStore.login(form.value.email, form.value.password);
       
-      // Redirigir a la página especificada o al inicio
-      router.push(redirectPath || '/');
+      // Verificar si tiene permisos de administrador
+      success = userStore.isAuthenticated && userStore.isAdmin;
+      
+      if (userStore.isAuthenticated && !userStore.isAdmin) {
+        error.value = 'No tienes permisos de administrador.';
+        userStore.logout(); // Cerrar sesión si no es administrador
+        success = false;
+      }
+    }
+    
+    console.log("Resultado del login:", success ? "Éxito" : "Fallido");
+    console.log("Estado de autenticación:", userStore.isAuthenticated);
+    console.log("Información del usuario:", userStore.user);
+    console.log("¿Es administrador?", userStore.isAdmin);
+    console.log("Información de depuración:", userStore.getDebugInfo());
+    
+    // Si todo fue exitoso, redirigir al panel de administración
+    if (success) {
+      console.log("Usuario es admin, redirigiendo a /admin");
+      router.push('/admin');
     }
   } catch (err) {
     console.error("Error en login:", err);
@@ -107,9 +125,9 @@ const handleLogin = async () => {
 </script>
 
 <style lang="scss" scoped>
-@use '../styles/variables' as *;
+@use '@/styles/variables' as *;
 
-.login-view {
+.admin-login-view {
   position: relative;
   min-height: 100vh;
   overflow: hidden;
@@ -127,6 +145,7 @@ const handleLogin = async () => {
   background: url('/fotos/login-register.jpg') no-repeat center center;
   background-size: cover;
   opacity: 0.3;
+  filter: grayscale(50%);
 }
 
 .auth {
@@ -135,17 +154,19 @@ const handleLogin = async () => {
   width: 90%;
   max-width: 400px;
   padding: $spacing-lg;
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.95);
   border-radius: $border-radius-lg;
+  box-shadow: $box-shadow-lg;
 }
 
 /* Resto de estilos del formulario */
 .auth {
   &__title {
     font-size: 2rem;
-    margin-bottom: 1rem;
-    color: $primary-color;
+    margin-bottom: 1.5rem;
+    color: $secondary-color;
     font-weight: bold;
+    text-align: center;
   }
 
   &__form {
@@ -167,29 +188,31 @@ const handleLogin = async () => {
   }
 
   &__input {
-    padding: 0.5rem;
+    padding: 0.75rem;
     border: 1px solid $border-color;
     border-radius: $border-radius;
     font-size: $font-size-base;
 
     &:focus {
       outline: none;
-      border-color: $primary-color;
+      border-color: $secondary-color;
+      box-shadow: 0 0 0 2px rgba($secondary-color, 0.2);
     }
   }
 
   &__button {
     padding: 0.75rem;
-    background-color: $primary-color;
+    background-color: $secondary-color;
     color: white;
     border: none;
     border-radius: $border-radius;
     cursor: pointer;
     transition: background-color $transition-fast;
     font-weight: bold;
+    margin-top: $spacing-md;
 
     &:hover {
-      background-color: $primary-color-hover;
+      background-color: darken($secondary-color, 10%);
     }
 
     &:disabled {
@@ -199,22 +222,18 @@ const handleLogin = async () => {
   }
 
   &__links {
-    margin-top: 1rem;
-    display: flex;
-    justify-content: space-around;
+    margin-top: 1.5rem;
+    text-align: center;
   }
 
   &__link {
-    color: $primary-color;
+    color: $secondary-color;
     text-decoration: none;
+    font-size: $font-size-small;
 
     &:hover {
       text-decoration: underline;
     }
-  }
-
-  &__google {
-    margin-top: 1.5rem;
   }
 }
 
@@ -231,8 +250,7 @@ const handleLogin = async () => {
 
 @media (min-width: 768px) {
   .auth {
-    padding: 2rem;
-    max-width: 400px;
+    padding: 2.5rem;
   }
 }
 </style>

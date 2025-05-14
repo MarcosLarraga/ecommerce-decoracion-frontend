@@ -1,3 +1,5 @@
+// variables.scss
+
 //Importa las fuentes utilizadas
 @import url('https://fonts.googleapis.com/css2?family=Phudu:wght@300..900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300..900&display=swap');
@@ -181,3 +183,179 @@ $status-completed-text: #ffffff;
 $status-shipped-text: #ffffff;
 $status-cancelled-text: #ffffff;
 $tertiary-color-hover: #e0e0e0;
+
+// NUEVAS VARIABLES PARA PANEL ADMIN
+$admin-header-height: 60px;
+$admin-sidebar-width: 250px;
+$admin-card-padding: $spacing-lg;
+$admin-table-row-hover: rgba($primary-color, 0.05);
+$admin-table-header-bg: rgba($primary-color, 0.1);
+$admin-card-border: 1px solid $tertiary-color;
+$admin-divider-color: $tertiary-color;
+$admin-section-margin: $spacing-xl;
+$admin-empty-msg-color: $text-color-secondary;
+$admin-badge-padding: 4px 8px;
+$admin-badge-border-radius: 12px;
+$admin-modal-backdrop: rgba(0, 0, 0, 0.5);
+$admin-modal-padding: $spacing-lg;
+$admin-modal-radius: $border-radius-lg;
+$admin-section-title-size: 1.5rem;
+$admin-section-subtitle-size: 1.2rem;
+$admin-filter-bg: rgba($primary-color, 0.03);
+$admin-success-badge-bg: rgba($success-color, 0.1);
+$admin-warning-badge-bg: rgba($warning-color, 0.1);
+$admin-error-badge-bg: rgba($error-color, 0.1);
+$admin-info-badge-bg: rgba($info-color, 0.1);
+
+// Variables para reemplazar los darken
+$primary-color-hover: #059447;        
+$secondary-button-hover: #e0e0e0;    
+$button-remove-hover: darkred;         
+$error-color-light: #f8d7da;        
+
+
+// Colores de texto adicionales
+$text-color-tertiary: #999999;  // Para textos de menor importancia como placeholders
+
+// Si necesitas gradaciones adicionales, podrías incluir también:
+$text-color-light: #bbbbbb;     // Aún más claro para elementos muy secundarios
+$text-color-dark: #111111;      // Más oscuro para textos muy importantes
+
+// Otras variables complementarias
+$text-color-inverse: #ffffff;   // Para texto sobre fondos oscuros
+$text-color-disabled: rgba($text-color, 0.5); // Para elementos deshabilitados
+
+// En variables.scss
+$primary-color-hover: #059447; 
+
+// Variables adicionales para colores hover y versiones claras
+$primary-color-hover: #059447; 
+$primary-color-light: #cce5da;  
+
+$error-color-hover: #c82333;   
+$error-color-light: #f8d7da;   
+$tertiary-color-hover: #e0e0e0; 
+
+$secondary-button-hover: #e0e0e0; 
+// Variables adicionales para reemplazar funciones lighten/darken
+$primary-color-light: #cce5da;  
+$error-color-light: #f8d7da;    
+$warning-color-light: #fff3cd;  
+$success-color-light: #d4edda;  
+$info-color-light: #d1ecf1;    
+
+
+// Versiones claras para fondos y estados deshabilitados
+$primary-color-light: #cce5da; 
+$error-color-light: #f8d7da;    
+$warning-color-light: #fff3cd;  
+$success-color-light: #d4edda;
+$info-color-light: #d1ecf1;     
+
+// Versiones oscuras para hover
+$primary-color-dark: #048a41;  
+$error-color-dark: #c82333;   
+
+// Variables para componentes AdminInput
+$admin-input-height: 40px;
+$admin-input-border: 1px solid $border-color;
+$admin-input-focus-shadow: 0 0 0 2px rgba($primary-color, 0.2);
+$admin-input-focus-border: $primary-color;
+$admin-input-error-focus-shadow: 0 0 0 2px rgba($error-color, 0.2);
+$admin-input-disabled-bg: $tertiary-color;
+$admin-input-placeholder-color: $text-color-tertiary;
+
+// Variables para AdminSearch
+$admin-search-icon-size: $font-size-small;
+$admin-search-width: 300px;
+$admin-search-height: 40px;
+
+// Variables para AdminSelect
+$admin-select-arrow-color: $text-color-secondary;
+$admin-select-arrow-size: $font-size-small;
+
+// Variables para AdminContent
+$admin-content-bg: white;
+$admin-content-padding: $spacing-md;
+$admin-content-filters-bg: rgba($tertiary-color, 0.5);
+
+// Variables para AdminTable
+$admin-table-header-bg: rgba($primary-color, 0.05);
+$admin-table-row-hover: rgba($tertiary-color, 0.3);
+$admin-table-border: 1px solid $border-color;
+$admin-table-spinner-size: 40px;
+$admin-table-empty-icon-size: $font-size-xxl;
+
+// Variables para AdminButton
+$admin-button-icon-margin: $spacing-xs;
+$admin-button-spinner-size: 16px;
+$admin-button-icon-only-size-sm: 28px;
+$admin-button-icon-only-size: 36px;
+$admin-button-icon-only-size-lg: 48px;
+
+// Variables para AdminHeader
+$admin-header-margin-bottom: $spacing-lg;
+
+// Variables para AdminBadge
+$admin-badge-icon-margin: 4px;
+$admin-badge-font-size: $font-size-small;
+
+// Variables para AdminModal
+$admin-modal-bg: white;
+$admin-modal-backdrop: rgba(0, 0, 0, 0.5);
+$admin-modal-padding: $spacing-lg;
+$admin-modal-header-padding: $spacing-md $spacing-lg;
+$admin-modal-title-size: $font-size-large;
+$admin-modal-close-size: $font-size-large;
+$admin-modal-close-hover-bg: rgba($tertiary-color, 0.5);
+$admin-modal-border-color: $border-color;
+$admin-modal-animation-duration: 0.3s;
+$admin-modal-max-width-sm: 400px;
+$admin-modal-max-width-md: 600px;
+$admin-modal-max-width-lg: 800px;
+$admin-modal-max-width-xl: 1000px;
+$admin-modal-close-size: 32px;
+
+// Variables para AdminFormGroup
+$admin-form-group-margin-bottom: $spacing-md;
+$admin-form-group-label-margin: $spacing-xs;
+$admin-form-group-description-size: $font-size-small;
+$admin-form-group-required-color: $error-color;
+$admin-form-group-error-size: $font-size-small;
+$admin-form-group-error-color: $error-color;
+
+// Variables para AdminTextarea
+$admin-textarea-min-height: 40px;
+
+// Variables adicionales para estados de botones (añadir a variables.scss)
+
+// Primary color variations
+$primary-color-hover: #059447;  // Ya existe en tu archivo
+$primary-color-dark: #048a41;   // Versión más oscura para :active
+
+// Success color variations
+$success-color-hover: #238b80;  // Verde más oscuro para hover
+$success-color-dark: #1d7d72;   // Verde aún más oscuro para active
+
+// Error color variations
+$error-color-hover: #c82333;    // Ya existe en tu archivo
+$error-color-dark: #b21f2d;     // Rojo más oscuro para active
+
+// Warning color variations
+$warning-color-hover: #e0b757;  // Amarillo más oscuro para hover
+$warning-color-dark: #d6a940;   // Amarillo aún más oscuro para active
+
+// Info color variations
+$info-color-hover: #3a6a8b;     // Azul más oscuro para hover
+$info-color-dark: #306181;      // Azul aún más oscuro para active
+
+// Tertiary color variations (solo si no existen ya)
+$tertiary-color-hover: #e0e0e0; // Ya existe en tu archivo
+
+$secondary-color-hover: #333333; 
+
+
+$placeholder-color: #999999; 
+// Variables para estados deshabilitados
+$disabled-bg: $tertiary-color;      // Fondo gris claro para elementos deshabilitados
+$disabled-text: $text-color-tertiary;  // Texto en color atenuado para elementos deshabilitados

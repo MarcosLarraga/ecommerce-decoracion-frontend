@@ -1,3 +1,4 @@
+// stores/adminStore.ts
 import { defineStore } from 'pinia';
 import axios from 'axios';
 
@@ -5,41 +6,91 @@ interface Usuario {
   id: number;
   nombre: string;
   email: string;
-  role: string;
+  esAdmin: boolean;
+  telefono?: string;
+  direccion?: string;
 }
 
 interface Producto {
   id: number;
   nombre: string;
   precio: number;
-  categoria: string;
+  categoriaId: number;
+  proveedorId: number | null;
+  urlImagen: string;
+  descripcion: string;
+  categoria?: {
+    id: number;
+    nombre: string;
+  };
+  proveedor?: {
+    id: number;
+    nombre: string;
+  };
+}
+
+interface Categoria {
+  id: number;
+  nombre: string;
+  descripcion: string;
+  urlImagen: string;
+}
+
+interface Proveedor {
+  id: number;
+  nombre: string;
+  direccion: string;
+  nif: string;
+  telefono: string;
+  email: string;
+  personaContacto: string;
 }
 
 interface DetallePedido {
+  id: number;
+  pedidoId: number;
   productoId: number;
-  nombreProducto: string;
   cantidad: number;
   precioUnitario: number;
+  producto?: Producto;
 }
 
 interface Pedido {
   id: number;
   usuarioId: number;
-  FechaPedido: Date;
+  fechaPedido: string;
   total: number;
   detalles?: DetallePedido[];
+  usuario?: Usuario;
 }
 
-function parseFechaPedido(dateStr: string): Date {
-  let date = new Date(dateStr);
-  if (isNaN(date.getTime())) {
-    // Intenta extraer el timestamp del formato .NET: /Date(1648763622000)/
+// Helper para parsear fechas
+function parseFechaPedido(dateStr: string): string {
+  if (!dateStr) return '';
+  
+  let date: Date;
+  // Si es un string de fecha ISO
+  if (typeof dateStr === 'string') {
+    // Verificar si es formato /Date(timestamp)/
     const match = dateStr.match(/\/Date\((\d+)\)\//);
     if (match) {
       date = new Date(parseInt(match[1]));
+    } else {
+      date = new Date(dateStr);
     }
+  } else {
+    date = new Date(dateStr);
   }
-  return date;
+  
+  if (isNaN(date.getTime())) return 'Fecha inválida';
+  
+  return date.toLocaleString('es-ES', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
 }
 
 export const useAdminStore = defineStore('admin', {
@@ -47,213 +98,411 @@ export const useAdminStore = defineStore('admin', {
     users: [] as Usuario[],
     products: [] as Producto[],
     orders: [] as Pedido[],
+    providers: [] as Proveedor[],
+    categories: [] as Categoria[],
     loading: false,
     error: null as string | null,
     token: localStorage.getItem('token') || ''
   }),
 
+  getters: {
+    getUserById: (state) => (id: number) => {
+      return state.users.find(u => u.id === id);
+    },
+    getProductById: (state) => (id: number) => {
+      return state.products.find(p => p.id === id);
+    },
+    getOrderById: (state) => (id: number) => {
+      return state.orders.find(o => o.id === id);
+    },
+    getProviderById: (state) => (id: number) => {
+      return state.providers.find(p => p.id === id);
+    },
+    getCategoryById: (state) => (id: number) => {
+      return state.categories.find(c => c.id === id);
+    }
+  },
+
   actions: {
-    //  MÉTODOS PARA USUARIOS
+    setAuthToken(token: string) {
+      this.token = token;
+    },
+
+    // ========== MÉTODOS PARA USUARIOS ==========
     async fetchAllUsers() {
       this.loading = true;
       this.error = null;
       try {
-        const response = await axios.get<any[]>('/api/Usuario', {
+        const response = await axios.get<Usuario[]>('/api/Usuario', {
           headers: { Authorization: `Bearer ${this.token}` }
         });
-        this.users = response.data.map(user => ({
-          id: user.id,
-          nombre: user.nombre,
-          email: user.email,
-          role: user.esAdmin ? 'Admin' : 'Usuario'
-        }));
-      } catch (error) {
+        this.users = response.data;
+      } catch (error: any) {
         console.error('Error fetching users:', error);
-        this.error = 'Error al obtener usuarios';
+        this.error = error.response?.data?.message || 'Error al obtener usuarios';
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async getUserDetails(id: number) {
+      this.loading = true;
+      this.error = null;
+      try {
+        const response = await axios.get<Usuario>(`/api/Usuario/${id}`, {
+          headers: { Authorization: `Bearer ${this.token}` }
+        });
+        return response.data;
+      } catch (error: any) {
+        console.error('Error fetching user details:', error);
+        this.error = error.response?.data?.message || `Error al obtener detalles del usuario ${id}`;
+        return null;
       } finally {
         this.loading = false;
       }
     },
 
     async updateUser(user: Usuario) {
+      this.loading = true;
       this.error = null;
       try {
-        // Preparamos el payload para la API:
-        // Convertimos el rol a booleano: 'Admin' -> true, de lo contrario false.
-        const payload = {
-          id: user.id,
-          nombre: user.nombre,
-          email: user.email,
-          esAdmin: user.role === 'Admin'
-        };
-        const response = await axios.put(`/api/Usuario/${user.id}`, payload, {
+        const response = await axios.put<Usuario>(`/api/Usuario/${user.id}`, user, {
           headers: { Authorization: `Bearer ${this.token}` }
         });
-        // Suponiendo que la API devuelve el usuario actualizado, mapeamos el campo booleano a string para la vista
-        const updatedUser = response.data;
-        const mappedUser = {
-          id: updatedUser.id,
-          nombre: updatedUser.nombre,
-          email: updatedUser.email,
-          role: updatedUser.esAdmin ? 'Admin' : 'Usuario'
-        };
+        
+        // Actualizar la lista local
         const index = this.users.findIndex(u => u.id === user.id);
         if (index !== -1) {
-          this.users[index] = mappedUser;
+          this.users[index] = response.data;
         }
-        return mappedUser;
-      } catch (error) {
+        
+        return response.data;
+      } catch (error: any) {
         console.error("Error updating user:", error);
-        this.error = "Error al actualizar usuario";
+        this.error = error.response?.data?.message || "Error al actualizar usuario";
         throw error;
+      } finally {
+        this.loading = false;
       }
-    }
-    ,
+    },
 
     async deleteUser(userId: number) {
+      this.loading = true;
       this.error = null;
       try {
         await axios.delete(`/api/Usuario/${userId}`, {
           headers: { Authorization: `Bearer ${this.token}` }
         });
+        
+        // Actualizar la lista local
         this.users = this.users.filter(u => u.id !== userId);
-      } catch (error) {
+        return true;
+      } catch (error: any) {
         console.error('Error deleting user:', error);
-        this.error = 'Error al eliminar usuario';
+        this.error = error.response?.data?.message || 'Error al eliminar usuario';
+        throw error;
+      } finally {
+        this.loading = false;
       }
     },
 
-    //  MÉTODOS PARA PRODUCTOS
+    // ========== MÉTODOS PARA PRODUCTOS ==========
     async fetchAllProducts() {
       this.loading = true;
       this.error = null;
       try {
-        const response = await axios.get<any[]>('/api/Producto', {
+        const response = await axios.get<Producto[]>('/api/Producto', {
           headers: { Authorization: `Bearer ${this.token}` }
         });
-        this.products = response.data.map(prod => ({
-          id: prod.id,
-          nombre: prod.nombre,
-          precio: prod.precio,
-          // Se contempla que la propiedad pueda venir en PascalCase o camelCase
-          categoria: prod.categoriaNombre || prod.CategoriaNombre || 'Sin Categoría',
-          descripcion: prod.descripcion || '',   // Agregamos descripción
-          urlImagen: prod.urlImagen || ''          // Agregamos URL de imagen
-        }));
-      } catch (error) {
+        this.products = response.data;
+      } catch (error: any) {
         console.error('Error fetching products:', error);
-        this.error = 'Error al obtener productos';
+        this.error = error.response?.data?.message || 'Error al obtener productos';
       } finally {
         this.loading = false;
       }
-    }
-    ,
+    },
 
-    async updateProduct(product: Producto) {
+    async getProductDetails(id: number) {
+      this.loading = true;
       this.error = null;
       try {
-        await axios.put(`/api/Producto/${product.id}`, product, {
+        const response = await axios.get<Producto>(`/api/Producto/${id}`, {
           headers: { Authorization: `Bearer ${this.token}` }
         });
+        return response.data;
+      } catch (error: any) {
+        console.error('Error fetching product details:', error);
+        this.error = error.response?.data?.message || `Error al obtener detalles del producto ${id}`;
+        return null;
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async createProduct(product: Omit<Producto, 'id'>) {
+      this.loading = true;
+      this.error = null;
+      try {
+        const response = await axios.post<Producto>('/api/Producto', product, {
+          headers: { Authorization: `Bearer ${this.token}` }
+        });
+        
+        // Añadir a la lista local
+        this.products.push(response.data);
+        
+        return response.data;
+      } catch (error: any) {
+        console.error('Error creating product:', error);
+        this.error = error.response?.data?.message || 'Error al crear producto';
+        throw error;
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async updateProduct(product: Producto) {
+      this.loading = true;
+      this.error = null;
+      try {
+        const response = await axios.put<Producto>(`/api/Producto/${product.id}`, product, {
+          headers: { Authorization: `Bearer ${this.token}` }
+        });
+        
+        // Actualizar la lista local
         const index = this.products.findIndex(p => p.id === product.id);
         if (index !== -1) {
-          this.products[index] = product;
+          this.products[index] = response.data;
         }
-      } catch (error) {
+        
+        return response.data;
+      } catch (error: any) {
         console.error('Error updating product:', error);
-        this.error = 'Error al actualizar producto';
+        this.error = error.response?.data?.message || 'Error al actualizar producto';
+        throw error;
+      } finally {
+        this.loading = false;
       }
     },
 
     async deleteProduct(productId: number) {
+      this.loading = true;
       this.error = null;
       try {
         await axios.delete(`/api/Producto/${productId}`, {
           headers: { Authorization: `Bearer ${this.token}` }
         });
+        
+        // Actualizar la lista local
         this.products = this.products.filter(p => p.id !== productId);
-      } catch (error) {
+        return true;
+      } catch (error: any) {
         console.error('Error deleting product:', error);
-        this.error = 'Error al eliminar producto';
-      }
-    },
-    async createNewProduct(productoParaEnviar: {
-      nombre: string;
-      precio: number;
-      categoriaId: number;
-      descripcion?: string;
-      urlImagen?: string;
-    }) {
-      this.error = null;
-      try {
-        await axios.post('/api/Producto', productoParaEnviar, {
-          headers: { Authorization: `Bearer ${this.token}` }
-        });
-        // Actualizamos la lista de productos
-        await this.fetchAllProducts();
-      } catch (error) {
-        console.error('Error creando producto:', error);
-        this.error = 'Error al crear producto';
+        this.error = error.response?.data?.message || 'Error al eliminar producto';
         throw error;
-      }
-    },
-    //  MÉTODOS PARA PEDIDOS
-    async fetchAllOrders() {
-      this.loading = true;
-      this.error = null;
-      try {
-        const response = await axios.get<any[]>('/api/Pedido', {
-          headers: { Authorization: `Bearer ${this.token}` }
-        });
-        this.orders = response.data.map((order: any) => ({
-          ...order,
-          // Se utiliza la función auxiliar para parsear la fecha
-          FechaPedido: parseFechaPedido(order.FechaPedido || order.fechaPedido)
-        }));
-      } catch (error) {
-        console.error('Error fetching orders:', error);
-        this.error = 'Error al obtener pedidos';
       } finally {
         this.loading = false;
       }
     },
 
-    async updateOrder(order: Pedido) {
+    // ========== MÉTODOS PARA CATEGORÍAS ==========
+    async fetchAllCategories() {
+      this.loading = true;
       this.error = null;
       try {
-        await axios.put(`/api/Pedido/${order.id}`, order, {
+        const response = await axios.get<Categoria[]>('/api/Categoria', {
           headers: { Authorization: `Bearer ${this.token}` }
         });
-        const index = this.orders.findIndex(o => o.id === order.id);
-        if (index !== -1) {
-          this.orders[index] = order;
-        }
-      } catch (error) {
-        console.error('Error updating order:', error);
-        this.error = 'Error al actualizar pedido';
+        this.categories = response.data;
+      } catch (error: any) {
+        console.error('Error fetching categories:', error);
+        this.error = error.response?.data?.message || 'Error al obtener categorías';
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    // ========== MÉTODOS PARA PEDIDOS ==========
+    async fetchAllOrders() {
+      this.loading = true;
+      this.error = null;
+      try {
+        const response = await axios.get<Pedido[]>('/api/Pedido', {
+          headers: { Authorization: `Bearer ${this.token}` }
+        });
+        
+        // Formatear fechas para visualización
+        this.orders = response.data.map(order => ({
+          ...order,
+          // Asegurar consistencia en el formato de la fecha
+          fechaFormateada: parseFechaPedido(order.fechaPedido)
+        }));
+      } catch (error: any) {
+        console.error('Error fetching orders:', error);
+        this.error = error.response?.data?.message || 'Error al obtener pedidos';
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async getOrderDetails(id: number) {
+      this.loading = true;
+      this.error = null;
+      try {
+        const response = await axios.get<Pedido>(`/api/Pedido/${id}`, {
+          headers: { Authorization: `Bearer ${this.token}` }
+        });
+        
+        // Incluir fecha formateada
+        const orderWithFormattedDate = {
+          ...response.data,
+          fechaFormateada: parseFechaPedido(response.data.fechaPedido)
+        };
+        
+        return orderWithFormattedDate;
+      } catch (error: any) {
+        console.error('Error fetching order details:', error);
+        this.error = error.response?.data?.message || `Error al obtener detalles del pedido ${id}`;
+        return null;
+      } finally {
+        this.loading = false;
       }
     },
 
     async deleteOrder(orderId: number) {
+      this.loading = true;
       this.error = null;
       try {
         await axios.delete(`/api/Pedido/${orderId}`, {
           headers: { Authorization: `Bearer ${this.token}` }
         });
+        
+        // Actualizar la lista local
         this.orders = this.orders.filter(o => o.id !== orderId);
-      } catch (error) {
-        if (error.response) {
-          // Extract the detailed error message from the response
-          const errorMessage = error.response.data;
-          console.error('Error deleting order:', errorMessage);
-          this.error = `Error al eliminar pedido: ${errorMessage}`;
-        } else {
-          console.error('Error deleting order:', error);
-          this.error = 'Error al eliminar pedido';
-        }
+        return true;
+      } catch (error: any) {
+        console.error('Error deleting order:', error);
+        this.error = error.response?.data?.message || 'Error al eliminar pedido';
         throw error;
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    // ========== MÉTODOS PARA PROVEEDORES ==========
+    async fetchAllProviders() {
+      this.loading = true;
+      this.error = null;
+      try {
+        const response = await axios.get<Proveedor[]>('/api/Proveedor', {
+          headers: { Authorization: `Bearer ${this.token}` }
+        });
+        this.providers = response.data;
+      } catch (error: any) {
+        console.error('Error fetching providers:', error);
+        this.error = error.response?.data?.message || 'Error al obtener proveedores';
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async getProviderDetails(id: number) {
+      this.loading = true;
+      this.error = null;
+      try {
+        const response = await axios.get<Proveedor>(`/api/Proveedor/${id}`, {
+          headers: { Authorization: `Bearer ${this.token}` }
+        });
+        return response.data;
+      } catch (error: any) {
+        console.error('Error fetching provider details:', error);
+        this.error = error.response?.data?.message || `Error al obtener detalles del proveedor ${id}`;
+        return null;
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async createProvider(provider: Omit<Proveedor, 'id'>) {
+      this.loading = true;
+      this.error = null;
+      try {
+        const response = await axios.post<Proveedor>('/api/Proveedor', provider, {
+          headers: { Authorization: `Bearer ${this.token}` }
+        });
+        
+        // Añadir a la lista local
+        this.providers.push(response.data);
+        
+        return response.data;
+      } catch (error: any) {
+        console.error('Error creating provider:', error);
+        this.error = error.response?.data?.message || 'Error al crear proveedor';
+        throw error;
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async updateProvider(provider: Proveedor) {
+      this.loading = true;
+      this.error = null;
+      try {
+        const response = await axios.put<Proveedor>(`/api/Proveedor/${provider.id}`, provider, {
+          headers: { Authorization: `Bearer ${this.token}` }
+        });
+        
+        // Actualizar la lista local
+        const index = this.providers.findIndex(p => p.id === provider.id);
+        if (index !== -1) {
+          this.providers[index] = response.data;
+        }
+        
+        return response.data;
+      } catch (error: any) {
+        console.error('Error updating provider:', error);
+        this.error = error.response?.data?.message || 'Error al actualizar proveedor';
+        throw error;
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async deleteProvider(providerId: number) {
+      this.loading = true;
+      this.error = null;
+      try {
+        await axios.delete(`/api/Proveedor/${providerId}`, {
+          headers: { Authorization: `Bearer ${this.token}` }
+        });
+        
+        // Actualizar la lista local
+        this.providers = this.providers.filter(p => p.id !== providerId);
+        return true;
+      } catch (error: any) {
+        console.error('Error deleting provider:', error);
+        this.error = error.response?.data?.message || 'Error al eliminar proveedor';
+        throw error;
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    // Método para inicializar todos los datos
+    async fetchAllData() {
+      try {
+        await Promise.all([
+          this.fetchAllUsers(),
+          this.fetchAllProducts(),
+          this.fetchAllOrders(),
+          this.fetchAllProviders(),
+          this.fetchAllCategories()
+        ]);
+        return true;
+      } catch (error) {
+        console.error('Error fetching all data:', error);
+        return false;
       }
     }
-
   }
 });
