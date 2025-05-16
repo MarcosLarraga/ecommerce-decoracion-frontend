@@ -2,12 +2,8 @@
 <template>
   <div class="admin-layout">
     <!-- Overlay para cerrar el menú en móvil -->
-    <div 
-      v-if="isMobileMenuOpen" 
-      class="admin-sidebar-overlay" 
-      @click="toggleMobileMenu"
-    ></div>
-    
+    <div v-if="isMobileMenuOpen" class="admin-sidebar-overlay" @click="toggleMobileMenu"></div>
+
     <!-- Header móvil -->
     <header class="admin-header-mobile">
       <button class="admin-header-mobile__menu-btn" @click="toggleMobileMenu">
@@ -31,54 +27,49 @@
           <i class="fas fa-times"></i>
         </button>
       </div>
-      
+
       <nav class="admin-sidebar__nav">
         <router-link to="/admin" custom v-slot="{ href, navigate, isExactActive }">
-          <a :href="href" @click="navigate; closeMobileMenuIfOpen()" 
-             class="admin-sidebar__link" 
-             :class="{ 'active': isExactActive }">
+          <a :href="href" @click="navigate; closeMobileMenuIfOpen()" class="admin-sidebar__link"
+            :class="{ 'active': isExactActive }">
             <i class="fas fa-tachometer-alt"></i>
             <span>Dashboard</span>
           </a>
         </router-link>
-        
+
         <router-link to="/admin/products" custom v-slot="{ href, navigate, isActive }">
-          <a :href="href" @click="navigate; closeMobileMenuIfOpen()" 
-             class="admin-sidebar__link" 
-             :class="{ 'active': isActive }">
+          <a :href="href" @click="navigate; closeMobileMenuIfOpen()" class="admin-sidebar__link"
+            :class="{ 'active': isActive }">
             <i class="fas fa-box"></i>
             <span>Productos</span>
           </a>
         </router-link>
-        
+
         <router-link to="/admin/orders" custom v-slot="{ href, navigate, isActive }">
-          <a :href="href" @click="navigate; closeMobileMenuIfOpen()" 
-             class="admin-sidebar__link" 
-             :class="{ 'active': isActive }">
+          <a :href="href" @click="navigate; closeMobileMenuIfOpen()" class="admin-sidebar__link"
+            :class="{ 'active': isActive }">
             <i class="fas fa-shopping-cart"></i>
             <span>Pedidos</span>
           </a>
         </router-link>
-        
+
         <router-link to="/admin/users" custom v-slot="{ href, navigate, isActive }">
-          <a :href="href" @click="navigate; closeMobileMenuIfOpen()" 
-             class="admin-sidebar__link" 
-             :class="{ 'active': isActive }">
+          <a :href="href" @click="navigate; closeMobileMenuIfOpen()" class="admin-sidebar__link"
+            :class="{ 'active': isActive }">
             <i class="fas fa-users"></i>
             <span>Usuarios</span>
           </a>
         </router-link>
-        
+
         <router-link to="/admin/providers" custom v-slot="{ href, navigate, isActive }">
-          <a :href="href" @click="navigate; closeMobileMenuIfOpen()" 
-             class="admin-sidebar__link" 
-             :class="{ 'active': isActive }">
+          <a :href="href" @click="navigate; closeMobileMenuIfOpen()" class="admin-sidebar__link"
+            :class="{ 'active': isActive }">
             <i class="fas fa-truck"></i>
             <span>Proveedores</span>
           </a>
         </router-link>
       </nav>
-      
+
       <div class="admin-sidebar__footer">
         <button class="admin-sidebar__logout" @click="logout">
           <i class="fas fa-sign-out-alt"></i>
@@ -86,7 +77,7 @@
         </button>
       </div>
     </div>
-    
+
     <!-- Contenido principal -->
     <div class="admin-main">
       <!-- Header con info del usuario (escritorio) -->
@@ -96,17 +87,17 @@
           <span class="admin-header__name">{{ userDisplayName }}</span>
         </div>
       </header>
-      
+
       <!-- Estado de carga -->
       <div v-if="loading" class="admin-loading">
         <div class="spinner"></div>
         <p>Cargando...</p>
       </div>
-      
+
       <!-- Contenido de las vistas hijas -->
       <div v-else class="admin-content">
         <router-view v-if="!error"></router-view>
-        
+
         <!-- Mensaje de error -->
         <div v-if="error" class="admin-error">
           <i class="fas fa-exclamation-triangle"></i>
@@ -143,7 +134,7 @@ const userDisplayName = computed(() => {
 const initializeAdmin = async () => {
   loading.value = true;
   error.value = null;
-  
+
   try {
     // Verificar autenticación
     if (!userStore.isAuthenticated) {
@@ -151,20 +142,20 @@ const initializeAdmin = async () => {
       router.push('/admin-login');
       return;
     }
-    
+
     // Verificar si es admin
     if (!userStore.isAdmin) {
       console.error("Usuario no es administrador");
       router.push('/unauthorized');
       return;
     }
-    
+
     // Pasar el token al adminStore
     adminStore.setAuthToken(userStore.token);
-    
+
     // Cargar datos iniciales básicos
     await adminStore.fetchAllCategories();
-    
+
     console.log("Panel de administración cargado correctamente");
   } catch (err: any) {
     console.error("Error al inicializar panel de administración:", err);
@@ -188,7 +179,7 @@ const logout = () => {
 // Manejar el menú móvil
 const toggleMobileMenu = () => {
   isMobileMenuOpen.value = !isMobileMenuOpen.value;
-  
+
   // Prevenir el scroll cuando el menú está abierto
   if (isMobileMenuOpen.value) {
     document.body.style.overflow = 'hidden';
@@ -207,7 +198,7 @@ const closeMobileMenuIfOpen = () => {
 // Manejar el cambio de tamaño de ventana
 const handleResize = () => {
   windowWidth.value = window.innerWidth;
-  
+
   // Si la pantalla es grande, cerrar el menú móvil
   if (windowWidth.value >= 992 && isMobileMenuOpen.value) {
     isMobileMenuOpen.value = false;
@@ -238,7 +229,7 @@ onBeforeUnmount(() => {
   background-color: #f5f7fb;
   display: flex;
   flex-direction: column;
-  
+
   @media (min-width: $breakpoint-md) {
     flex-direction: row;
   }
@@ -254,11 +245,11 @@ onBeforeUnmount(() => {
   background-color: $secondary-color;
   color: white;
   z-index: 100;
-  
+
   @media (min-width: $breakpoint-md) {
     display: none;
   }
-  
+
   &__menu-btn {
     background: none;
     border: none;
@@ -270,7 +261,7 @@ onBeforeUnmount(() => {
     justify-content: center;
     background-color: rgba(255, 255, 255, 0.2);
     border-radius: $border-radius;
-    
+
     .hamburger-icon {
       display: flex;
       flex-direction: column;
@@ -278,7 +269,7 @@ onBeforeUnmount(() => {
       width: 20px;
       height: 16px;
     }
-    
+
     .hamburger-line {
       display: block;
       width: 100%;
@@ -286,25 +277,25 @@ onBeforeUnmount(() => {
       background-color: white;
       border-radius: 2px;
     }
-    
+
     &:hover {
       background-color: rgba(255, 255, 255, 0.3);
     }
   }
-  
+
   &__title {
     font-size: $font-size-large;
     margin: 0;
     font-weight: $font-weight-semibold;
   }
-  
+
   &__user {
     width: 40px;
     height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
-    
+
     i {
       font-size: 24px;
     }
@@ -321,7 +312,7 @@ onBeforeUnmount(() => {
   background-color: rgba(0, 0, 0, 0.5);
   z-index: 900;
   display: block;
-  
+
   @media (min-width: $breakpoint-md) {
     display: none;
   }
@@ -342,40 +333,40 @@ onBeforeUnmount(() => {
   z-index: 1000;
   transform: translateX(-100%);
   transition: transform 0.3s ease;
-  
+
   &.active {
     transform: translateX(0);
   }
-  
+
   @media (min-width: $breakpoint-md) {
     position: static;
     width: 250px;
     transform: translateX(0);
     z-index: 10;
   }
-  
+
   &__header {
     padding: $spacing-md;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    
+
     @media (min-width: $breakpoint-md) {
       padding: 1.5rem;
     }
   }
-  
+
   &__title {
     font-size: $font-size-large;
     margin: 0;
     font-weight: $font-weight-semibold;
-    
+
     @media (min-width: $breakpoint-md) {
       font-size: 1.5rem;
     }
   }
-  
+
   &__close {
     display: block;
     background: none;
@@ -383,79 +374,79 @@ onBeforeUnmount(() => {
     color: white;
     font-size: $font-size-large;
     cursor: pointer;
-    
+
     @media (min-width: $breakpoint-md) {
       display: none;
     }
   }
-  
+
   &__nav {
     flex: 1;
     padding: $spacing-md 0;
     overflow-y: auto;
-    
+
     @media (min-width: $breakpoint-md) {
       padding: 1rem 0;
     }
   }
-  
+
   &__link {
     display: flex;
     align-items: center;
     padding: $spacing-sm $spacing-md;
-    color: rgba(255,255,255,0.8);
+    color: rgba(255, 255, 255, 0.8);
     text-decoration: none;
     transition: all 0.3s ease;
-    
+
     @media (min-width: $breakpoint-md) {
       padding: 0.75rem 1.5rem;
     }
-    
+
     i {
       margin-right: $spacing-md;
       font-size: 1.1rem;
       width: 20px;
       text-align: center;
     }
-    
+
     &.active {
-      background-color: rgba(255,255,255,0.1);
+      background-color: rgba(255, 255, 255, 0.1);
       color: white;
       border-left: 4px solid white;
     }
   }
-  
+
   &__footer {
     padding: $spacing-md;
-    border-top: 1px solid rgba(255,255,255,0.1);
-    
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+
     @media (min-width: $breakpoint-md) {
       padding: 1rem;
     }
   }
-  
+
   &__logout {
     display: flex;
     align-items: center;
     width: 100%;
     padding: $spacing-sm;
-    background-color: rgba(255,255,255,0.1);
+    background-color: rgba(255, 255, 255, 0.1);
     color: white;
     border: none;
     border-radius: $border-radius;
     cursor: pointer;
     transition: background-color 0.3s ease;
-    
+
     @media (min-width: $breakpoint-md) {
       padding: 0.75rem;
     }
-    
+
     i {
       margin-right: $spacing-md;
     }
-    
+
     &:hover {
-      background-color: rgba(255,255,255,0.2);
+      background-color: rgba(255, 255, 255, 0.2);
     }
   }
 }
@@ -471,7 +462,7 @@ onBeforeUnmount(() => {
 // Header escritorio
 .admin-header {
   display: none;
-  
+
   @media (min-width: $breakpoint-md) {
     height: 60px;
     background-color: white;
@@ -480,20 +471,20 @@ onBeforeUnmount(() => {
     align-items: center;
     justify-content: flex-end;
     padding: 0 $spacing-lg;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   }
-  
+
   &__user {
     display: flex;
     align-items: center;
     gap: $spacing-xs;
   }
-  
+
   &__welcome {
     font-weight: $font-weight-regular;
     color: $text-color-secondary;
   }
-  
+
   &__name {
     font-weight: $font-weight-semibold;
     color: $text-color;
@@ -505,7 +496,7 @@ onBeforeUnmount(() => {
   flex: 1;
   padding: $spacing-md;
   overflow-y: auto;
-  
+
   @media (min-width: $breakpoint-md) {
     padding: 1.5rem;
   }
@@ -519,7 +510,7 @@ onBeforeUnmount(() => {
   align-items: center;
   justify-content: center;
   padding: $spacing-lg;
-  
+
   .spinner {
     width: 40px;
     height: 40px;
@@ -528,15 +519,17 @@ onBeforeUnmount(() => {
     border-top-color: $secondary-color;
     animation: spin 1s ease-in-out infinite;
     margin-bottom: $spacing-md;
-    
+
     @media (min-width: $breakpoint-md) {
       width: 50px;
       height: 50px;
     }
   }
-  
+
   @keyframes spin {
-    to { transform: rotate(360deg); }
+    to {
+      transform: rotate(360deg);
+    }
   }
 }
 
@@ -549,22 +542,22 @@ onBeforeUnmount(() => {
   box-shadow: $box-shadow;
   max-width: 500px;
   margin: $spacing-lg auto;
-  
+
   i {
     font-size: 2.5rem;
     color: $error-color;
     margin-bottom: $spacing-md;
-    
+
     @media (min-width: $breakpoint-md) {
       font-size: 3rem;
     }
   }
-  
+
   h2 {
     margin-bottom: $spacing-md;
     color: $error-color;
   }
-  
+
   p {
     margin-bottom: $spacing-lg;
     color: $text-color;
@@ -580,14 +573,14 @@ onBeforeUnmount(() => {
   border-radius: $border-radius;
   cursor: pointer;
   font-size: $font-size-small;
-  
+
   @media (min-width: $breakpoint-md) {
     padding: 0.5rem 1rem;
     font-size: $font-size-base;
   }
-  
+
   &:hover {
-    background-color: darken($secondary-color, 10%);
+    background-color: $secondary-color-hover;
   }
 }
 </style>

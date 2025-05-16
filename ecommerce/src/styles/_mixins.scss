@@ -939,8 +939,48 @@
   }
 }
 
-// Mixin mejorado para AdminButton
-@mixin adminButton {
+// Versión corregida del mixin adminButton
+@mixin adminButton($bg-color: $primary-color, $text-color: white) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-sm $spacing-md;
+  background-color: $bg-color;
+  color: $text-color;
+  border: none;
+  border-radius: $button-radius;
+  font-weight: $font-weight-medium;
+  font-size: $font-size-base;
+  cursor: pointer;
+  transition: background-color $transition-fast, box-shadow $transition-fast;
+  
+  &:hover {
+    @if $bg-color == $primary-color {
+      background-color: $primary-color-hover;
+    } @else if $bg-color == $error-color {
+      background-color: $error-color-hover;
+    } @else if $bg-color == #f1f1f1 {
+      background-color: $secondary-button-hover;
+    } @else {
+      // Si es un color personalizado, usamos una variable de respaldo
+      background-color: $color-hover-boton;
+    }
+    box-shadow: $button-shadow;
+  }
+  
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    background-color: $color-boton-reserva-disabled;
+  }
+  
+  i, svg {
+    margin-right: $spacing-xs;
+  }
+}
+
+// Versión corregida del mixin adminButton mejorado
+@mixin adminButtonImproved {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -995,7 +1035,7 @@
     color: white;
     
     &:hover:not(:disabled) {
-      background-color: darken($success-color, 10%);
+      background-color: $success-color-hover;
     }
     
     &:focus {
@@ -1021,7 +1061,7 @@
     color: white;
     
     &:hover:not(:disabled) {
-      background-color: darken($warning-color, 10%);
+      background-color: $warning-color-hover;
     }
     
     &:focus {
@@ -1034,7 +1074,7 @@
     color: white;
     
     &:hover:not(:disabled) {
-      background-color: darken($info-color, 10%);
+      background-color: $info-color-hover;
     }
     
     &:focus {

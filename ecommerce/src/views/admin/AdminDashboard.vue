@@ -188,30 +188,36 @@ onMounted(async () => {
 
 <style lang="scss" scoped>
 @use '@/styles/variables' as *;
+@use '@/styles/mixins' as m;
+@use "sass:math";
 
 .admin-dashboard {
-  padding: 1rem;
+  padding: $padding-sm;
+  font-family: $font-family-secondary;
   
-  @media (min-width: 768px) {
-    padding: 2rem;
+  @include m.media-sm {
+    padding: $padding-md;
+  }
+  
+  @include m.media-md {
+    padding: $admin-content-padding;
   }
   
   &__title {
-    margin-bottom: 1rem;
-    font-size: 1.5rem;
+    margin-bottom: $spacing-md;
+    font-size: $admin-section-title-size;
     color: $text-color;
+    font-family: $font-family-primary;
     
-    @media (min-width: 768px) {
-      margin-bottom: 2rem;
-      font-size: 1.8rem;
+    @include m.media-md {
+      margin-bottom: $admin-header-margin-bottom;
     }
   }
   
   &__last-updated {
-    font-size: 0.75rem;
-    color: $text-color;
-    opacity: 0.7;
-    margin-bottom: 1rem;
+    font-size: $font-size-small;
+    color: $text-color-secondary;
+    margin-bottom: $spacing-md;
     text-align: right;
   }
   
@@ -222,23 +228,23 @@ onMounted(async () => {
     justify-content: center;
     min-height: 200px;
     
-    @media (min-width: 768px) {
+    @include m.media-md {
       min-height: 300px;
     }
     
     .spinner {
-      width: 30px;
-      height: 30px;
-      border: 2px solid rgba($secondary-color, 0.3);
-      border-radius: 50%;
-      border-top-color: $secondary-color;
-      animation: spin 1s ease-in-out infinite;
-      margin-bottom: 1rem;
+      width: calc($admin-table-spinner-size * 0.5);
+      height: calc($admin-table-spinner-size * 0.5);
+      border: $border-width solid rgba($primary-color, $opacity-light);
+      border-radius: $border-radius-circle;
+      border-top-color: $primary-color;
+      animation: spin $duration-normal linear infinite;
+      margin-bottom: $spacing-md;
       
-      @media (min-width: 768px) {
-        width: 40px;
-        height: 40px;
-        border-width: 3px;
+      @include m.media-md {
+        width: $admin-table-spinner-size;
+        height: $admin-table-spinner-size;
+        border-width: $border-width-md;
       }
     }
     
@@ -249,55 +255,51 @@ onMounted(async () => {
   
   &__error {
     p {
-      color: #dc3545;
-      margin-bottom: 1rem;
+      color: $error-color;
+      margin-bottom: $spacing-md;
       text-align: center;
     }
   }
   
   &__retry {
-    padding: 0.5rem 1rem;
-    background-color: $secondary-color;
-    color: white;
-    border: none;
-    border-radius: $border-radius;
-    cursor: pointer;
-    font-size: 0.9rem;
-    
-    &:hover {
-      background-color: darken($secondary-color, 10%);
-    }
+    @include m.adminButton;
   }
   
   &__content {
-    margin-bottom: 1.5rem;
+    margin-bottom: $admin-section-margin;
   }
 }
 
 .dashboard-stats {
   display: grid;
   grid-template-columns: repeat(1, 1fr);
-  gap: 1rem;
-  margin-bottom: 1.5rem;
+  gap: $spacing-md;
+  margin-bottom: $spacing-lg;
   
-  @media (min-width: 576px) {
+  @include m.media-xs {
     grid-template-columns: repeat(2, 1fr);
   }
   
-  @media (min-width: 992px) {
+  @include m.media-md {
     grid-template-columns: repeat(4, 1fr);
-    gap: 1.5rem;
-    margin-bottom: 2rem;
+    gap: $spacing-lg;
+    margin-bottom: $admin-section-margin;
   }
 }
 
 .dashboard-stat {
-  background-color: white;
-  padding: 1rem;
-  border-radius: $border-radius;
+  background-color: $background-color;
+  border-radius: $border-radius-lg;
   box-shadow: $box-shadow;
+  padding: $admin-card-padding;
+  border: $admin-card-border;
   display: flex;
   align-items: center;
+  
+  /* Evitar errores "mixed-decls" usando '& {}' */
+  & {
+    margin-bottom: 0;
+  }
   
   &__icon {
     display: flex;
@@ -305,16 +307,16 @@ onMounted(async () => {
     justify-content: center;
     width: 40px;
     height: 40px;
-    border-radius: 50%;
-    background-color: rgba($secondary-color, 0.1);
-    margin-right: 1rem;
-    color: $secondary-color;
-    font-size: 1.2rem;
+    border-radius: $border-radius-circle;
+    background-color: rgba($primary-color, $opacity-light);
+    margin-right: $spacing-md;
+    color: $primary-color;
+    font-size: $font-size-large;
     
-    @media (min-width: 768px) {
+    @include m.media-md {
       width: 50px;
       height: 50px;
-      font-size: 1.4rem;
+      font-size: $font-size-xl;
     }
   }
   
@@ -323,25 +325,25 @@ onMounted(async () => {
   }
   
   h3 {
-    font-size: 0.9rem;
-    color: $text-color;
-    margin-bottom: 0.25rem;
-    font-weight: 600;
+    font-size: $font-size-small;
+    color: $text-color-secondary;
+    margin-bottom: $spacing-xs;
+    font-weight: $font-weight-medium;
     
-    @media (min-width: 768px) {
-      font-size: 1rem;
-      margin-bottom: 0.5rem;
+    @include m.media-md {
+      font-size: $font-size-base;
+      margin-bottom: $spacing-sm;
     }
   }
   
   &__value {
-    font-size: 1.4rem;
-    font-weight: bold;
+    font-size: $font-size-large;
+    font-weight: $font-weight-bold;
     color: $secondary-color;
     margin: 0;
     
-    @media (min-width: 768px) {
-      font-size: 1.8rem;
+    @include m.media-md {
+      font-size: $font-size-xl;
     }
   }
 }
@@ -349,31 +351,37 @@ onMounted(async () => {
 .dashboard-sections {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 1.5rem;
+  gap: $spacing-lg;
   
-  @media (min-width: 992px) {
+  @include m.media-md {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
 .dashboard-section {
-  background-color: white;
-  border-radius: $border-radius;
+  background-color: $background-color;
+  border-radius: $border-radius-lg;
   box-shadow: $box-shadow;
+  padding: $admin-card-padding;
+  border: $admin-card-border;
   overflow: hidden;
   
+  /* Evitar errores "mixed-decls" usando '& {}' */
+  & {
+    margin-bottom: 0;
+  }
+  
   &__title {
-    padding: 1rem;
-    margin: 0;
-    background-color: rgba($secondary-color, 0.05);
-    border-bottom: 1px solid rgba($secondary-color, 0.1);
-    font-size: 1.1rem;
-    font-weight: 600;
+    font-size: $admin-section-subtitle-size;
+    font-weight: $font-weight-medium;
     color: $text-color;
+    margin: 0;
+    padding-bottom: $spacing-sm;
+    border-bottom: 1px solid $admin-divider-color;
+    margin-bottom: $spacing-md;
   }
   
   &__content {
-    padding: 1rem;
     min-height: 200px;
   }
 }
@@ -382,15 +390,15 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: rgba($secondary-color, 0.05);
+  background-color: $admin-filter-bg;
   border-radius: $border-radius;
-  padding: 1.5rem;
+  padding: $spacing-lg;
   text-align: center;
   height: 100%;
   min-height: 150px;
   
   p {
-    color: rgba($text-color, 0.6);
+    color: $admin-empty-msg-color;
     margin: 0;
   }
 }

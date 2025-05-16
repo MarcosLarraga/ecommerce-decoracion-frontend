@@ -11,26 +11,16 @@
       <form class="auth__form" @submit.prevent="handleLogin">
         <div class="auth__group">
           <label for="email" class="auth__label">Email</label>
-          <input
-            type="email"
-            id="email"
-            class="auth__input"
-            v-model="form.email"
-            :class="{ 'is-invalid': v$.email.$error }"
-          />
+          <input type="email" id="email" class="auth__input" v-model="form.email"
+            :class="{ 'is-invalid': v$.email.$error }" />
           <div v-if="v$.email.$error" class="error-message">
             Por favor, introduce un correo electrónico válido.
           </div>
         </div>
         <div class="auth__group">
           <label for="password" class="auth__label">Contraseña</label>
-          <input
-            type="password"
-            id="password"
-            class="auth__input"
-            v-model="form.password"
-            :class="{ 'is-invalid': v$.password.$error }"
-          />
+          <input type="password" id="password" class="auth__input" v-model="form.password"
+            :class="{ 'is-invalid': v$.password.$error }" />
           <div v-if="v$.password.$error" class="error-message">
             La contraseña es obligatoria.
           </div>
@@ -78,38 +68,38 @@ const handleLogin = async () => {
     error.value = "Por favor, corrija los errores del formulario.";
     return;
   }
-  
+
   loading.value = true;
   error.value = '';
   try {
     console.log("Iniciando login de administrador...");
-    
+
     // Usar el método específico para administradores
     let success = false;
-    
+
     if (typeof userStore.adminLogin === 'function') {
       // Si existe el método especializado, usarlo
       success = await userStore.adminLogin(form.value.email, form.value.password);
     } else {
       // Si no, usar el método normal
       await userStore.login(form.value.email, form.value.password);
-      
+
       // Verificar si tiene permisos de administrador
       success = userStore.isAuthenticated && userStore.isAdmin;
-      
+
       if (userStore.isAuthenticated && !userStore.isAdmin) {
         error.value = 'No tienes permisos de administrador.';
         userStore.logout(); // Cerrar sesión si no es administrador
         success = false;
       }
     }
-    
+
     console.log("Resultado del login:", success ? "Éxito" : "Fallido");
     console.log("Estado de autenticación:", userStore.isAuthenticated);
     console.log("Información del usuario:", userStore.user);
     console.log("¿Es administrador?", userStore.isAdmin);
     console.log("Información de depuración:", userStore.getDebugInfo());
-    
+
     // Si todo fue exitoso, redirigir al panel de administración
     if (success) {
       console.log("Usuario es admin, redirigiendo a /admin");
@@ -212,7 +202,7 @@ const handleLogin = async () => {
     margin-top: $spacing-md;
 
     &:hover {
-      background-color: darken($secondary-color, 10%);
+      background-color: $secondary-color-hover;
     }
 
     &:disabled {
