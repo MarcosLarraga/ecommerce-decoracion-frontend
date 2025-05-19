@@ -66,7 +66,7 @@ const addToCart = async (event: Event) => {
 <style lang="scss" scoped>
 @use '../styles/variables' as *;
 
-
+// Enfoque Mobile-first
 .product-card {
   position: relative;
   background-color: $background-color;
@@ -74,11 +74,13 @@ const addToCart = async (event: Event) => {
   box-shadow: $box-shadow;
   overflow: hidden;
   transition: transform $transition-fast, box-shadow $transition-fast;
-  height: 100%;
   display: flex;
   flex-direction: column;
-  max-width: 200px; 
-
+  
+  /* Dimensiones para móvil primero */
+  width: 160px;
+  height: 260px; /* Altura reducida */
+  
   &:hover {
     transform: translateY(-3px);
     box-shadow: $box-shadow-lg;
@@ -102,11 +104,11 @@ const addToCart = async (event: Event) => {
   
   &__image-wrapper {
     position: relative;
-    padding-top: 80%; 
     overflow: hidden;
     margin: 0 auto;
-    width: 90%;
-    margin-top: 10px;
+    width: 100%;
+    height: 150px; /* Altura fija para la imagen */
+    background-color: #f5f5f5;
   }
   
   &__image {
@@ -115,9 +117,9 @@ const addToCart = async (event: Event) => {
     left: 0;
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
     transition: transform $transition-normal;
-    border-radius: $border-radius-sm;
+    padding: 8px;
   }
   
   &__overlay {
@@ -132,16 +134,15 @@ const addToCart = async (event: Event) => {
     justify-content: center;
     opacity: 0;
     transition: opacity $transition-normal;
-    border-radius: $border-radius-sm;
   }
   
   &__view {
     background-color: $background-color;
     color: $text-color;
-    padding: $spacing-xs $spacing-sm;
+    padding: 6px 12px;
     border-radius: $border-radius-sm;
     font-weight: 500;
-    font-size: $font-size-small;
+    font-size: 12px;
     transform: translateY(5px);
     transition: transform $transition-normal, background-color $transition-fast;
     
@@ -156,40 +157,41 @@ const addToCart = async (event: Event) => {
   }
   
   &__info {
-    padding: $spacing-md;
-    flex-grow: 1;
+    padding: 10px;
+    flex: 1;
     display: flex;
     flex-direction: column;
+    height: 80px; /* Altura reducida para la sección de información */
   }
   
   &__title {
     font-family: $font-family-primary;
-    font-size: $font-size-small;
+    font-size: 13px;
     font-weight: 600;
-    margin: 0 0 $spacing-xs;
+    margin: 0 0 5px;
     color: $text-color;
-    line-height: $line-height-tight;
+    line-height: 1.3;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
-    height: 2.4em;
+    height: 2.6em;
   }
   
   &__price {
-    font-size: $font-size-base;
+    font-size: 14px;
     font-weight: 700;
     color: $primary-color;
-    margin: $spacing-xs 0 0;
+    margin: 5px 0 0;
   }
   
   &__cart-btn {
     position: absolute;
-    bottom: $spacing-sm;
-    right: $spacing-sm;
-    width: 32px;
-    height: 32px;
+    bottom: 10px;
+    right: 10px;
+    width: 30px;
+    height: 30px;
     border-radius: $border-radius-circle;
     background-color: $primary-color;
     color: $button-text-color;
@@ -199,7 +201,7 @@ const addToCart = async (event: Event) => {
     justify-content: center;
     cursor: pointer;
     transition: background-color $transition-fast, transform $transition-fast;
-    font-size: $font-size-small;
+    font-size: 12px;
     
     &:hover:not(:disabled) {
       background-color: $primary-color-hover;
@@ -213,9 +215,56 @@ const addToCart = async (event: Event) => {
   }
 }
 
+// Media queries para pantallas más grandes (enfoque mobile-first)
+@media (min-width: $breakpoint-sm) {
+  .product-card {
+    width: 180px;
+    height: 280px;
+    
+    &__title {
+      font-size: 14px;
+    }
+    
+    &__price {
+      font-size: 15px;
+    }
+    
+    &__cart-btn {
+      width: 32px;
+      height: 32px;
+      font-size: 14px;
+    }
+  }
+}
+
 @media (min-width: $breakpoint-md) {
   .product-card {
-    max-width: 220px;
+    width: 200px;
+    height: 300px;
+    
+    &__image-wrapper {
+      height: 160px;
+    }
+    
+    &__info {
+      padding: $spacing-md;
+      height: 90px;
+    }
+    
+    &__title {
+      font-size: $font-size-small;
+    }
+    
+    &__price {
+      font-size: $font-size-base;
+    }
+  }
+}
+
+@media (min-width: $breakpoint-lg) {
+  .product-card {
+    width: 220px;
+    height: 310px;
   }
 }
 </style>
