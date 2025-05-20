@@ -1,23 +1,24 @@
-<!-- @/views/admin/AdminProducts.vue con botones nativos y mobile first -->
+<!-- @/views/admin/AdminProducts.vue -->
 <template>
-  <div class="admin-products">
+  <div class="admin-view admin-products">
     <AdminHeader title="Gestión de Productos">
       <template #actions>
         <AdminSearch v-model="searchQuery" placeholder="Buscar productos..." />
         <button class="header-btn" @click="createProduct">
-          <span class="icon">➕</span>
+          <i class="fas fa-box-open"></i>
           <span class="text">Añadir Producto</span>
         </button>
       </template>
     </AdminHeader>
 
     <!-- Filtro de proveedor activo -->
-    <div v-if="currentProvider" class="provider-filter">
-      <h2 class="provider-filter__title">
-        Productos de <span class="provider-filter__name">{{ currentProvider.nombre }}</span>
+    <div v-if="currentProvider" class="filter-badge">
+      <h2 class="filter-badge__title">
+        Productos de <span class="filter-badge__name">{{ currentProvider.nombre }}</span>
       </h2>
-      <router-link to="/admin/providers" class="provider-filter__back">
-        <span class="arrow">←</span> Volver a proveedores
+      <router-link to="/admin/providers" class="filter-badge__back">
+        <i class="fas fa-arrow-left"></i>
+        Volver a proveedores
       </router-link>
     </div>
 
@@ -47,10 +48,10 @@
         <tr v-for="product in filteredProducts" :key="product.id">
           <td>#{{ product.id }}</td>
           <td>
-            <div class="product-image">
+            <div class="thumb-image">
               <img v-if="product.urlImagen" :src="product.urlImagen" :alt="product.nombre" />
-              <div v-else class="product-image__placeholder">
-                📦
+              <div v-else class="thumb-image__placeholder">
+                <i class="fas fa-box"></i>
               </div>
             </div>
           </td>
@@ -59,11 +60,11 @@
           <td>{{ getCategoryName(product.categoriaId) }}</td>
           <td>{{ getProviderName(product.proveedorId) }}</td>
           <td class="action-buttons">
-            <button class="btn-edit" @click="editProduct(product)" title="Editar producto">
-              ✏️
+            <button class="btn btn-edit" @click="editProduct(product)" title="Editar producto">
+              <i class="fas fa-edit"></i>
             </button>
-            <button class="btn-delete" @click="confirmDeleteProduct(product)" title="Eliminar producto">
-              🗑️
+            <button class="btn btn-delete" @click="confirmDeleteProduct(product)" title="Eliminar producto">
+              <i class="fas fa-trash-alt"></i>
             </button>
           </td>
         </tr>
@@ -136,29 +137,38 @@
 
       <template #footer>
         <button class="modal-btn secondary-btn" @click="cancelEdit" :disabled="loading">
-          Cancelar
+          <i class="fas fa-times"></i>
+          <span>Cancelar</span>
         </button>
         <button class="modal-btn primary-btn" @click="saveProduct" :disabled="loading">
-          {{ loading ? (isCreating ? 'Creando...' : 'Guardando...') : (isCreating ? 'Crear Producto' : 'Guardar Cambios') }}
+          <i v-if="loading" class="spinner"></i>
+          <i v-else class="fas fa-save"></i>
+          <span>{{ loading ? (isCreating ? 'Creando...' : 'Guardando...') : (isCreating ? 'Crear Producto' : 'Guardar Cambios') }}</span>
         </button>
       </template>
     </AdminModal>
 
     <!-- Modal de confirmación de eliminación -->
     <AdminModal v-model="showDeleteConfirmation" title="Confirmar Eliminación" size="sm" v-if="productToDelete">
-      <p class="admin-modal__message">
-        ¿Estás seguro de que deseas eliminar el producto
-        <strong>{{ productToDelete.nombre }}</strong>?
-        <br>
-        Esta acción no se puede deshacer.
-      </p>
+      <div class="confirm-message">
+        <i class="fas fa-exclamation-triangle"></i>
+        <p>
+          ¿Estás seguro de que deseas eliminar el producto
+          <strong>{{ productToDelete.nombre }}</strong>?
+          <br>
+          Esta acción no se puede deshacer.
+        </p>
+      </div>
 
       <template #footer>
         <button class="modal-btn secondary-btn" @click="cancelDelete" :disabled="loading">
-          Cancelar
+          <i class="fas fa-times"></i>
+          <span>Cancelar</span>
         </button>
         <button class="modal-btn error-btn" @click="deleteProduct" :disabled="loading">
-          {{ loading ? 'Eliminando...' : 'Eliminar Producto' }}
+          <i v-if="loading" class="spinner"></i>
+          <i v-else class="fas fa-trash-alt"></i>
+          <span>{{ loading ? 'Eliminando...' : 'Eliminar Producto' }}</span>
         </button>
       </template>
     </AdminModal>
@@ -369,7 +379,7 @@ const saveProduct = async () => {
   if (!editingProduct.value) return;
   
   if (!validateProduct()) {
-    toast.error('Por favor, corrige los errores del formulario');
+    toast.error('Por favor, corrija los errores del formulario');
     return;
   }
   
@@ -418,310 +428,11 @@ const deleteProduct = async () => {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 @use '@/styles/variables' as *;
-@use '@/styles/mixins' as *;
+@import '@/styles/admin-unified-styles.scss';
 
 .admin-products {
-  width: 100%;
-}
-
-// Filtro de proveedor activo
-.provider-filter {
-  background-color: rgba($primary-color, 0.05);
-  border-radius: $border-radius;
-  padding: $spacing-md;
-  margin: $spacing-md 0;
-  display: flex;
-  flex-direction: column;
-  gap: $spacing-sm;
-  
-  @media (min-width: $breakpoint-sm) {
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    margin: $spacing-md 0 $spacing-lg;
-  }
-  
-  &__title {
-    margin: 0;
-    font-size: $font-size-base;
-    
-    @media (min-width: $breakpoint-sm) {
-      font-size: $font-size-large;
-    }
-  }
-  
-  &__name {
-    color: $primary-color;
-    font-weight: $font-weight-semibold;
-  }
-  
-  &__back {
-    color: $primary-color;
-    text-decoration: none;
-    font-weight: $font-weight-medium;
-    display: flex;
-    align-items: center;
-    
-    .arrow {
-      margin-right: $spacing-xs;
-      transition: transform $transition-fast;
-    }
-    
-    &:hover .arrow {
-      transform: translateX(-3px);
-    }
-  }
-}
-
-// Botón de acción en el header
-.header-btn {
-  display: flex;
-  align-items: center;
-  background-color: $primary-color;
-  color: white;
-  border: none;
-  border-radius: $border-radius;
-  padding: 0 $spacing-sm;
-  height: 36px;
-  font-weight: $font-weight-medium;
-  cursor: pointer;
-  transition: all $transition-fast;
-  
-  .icon {
-    margin-right: $spacing-xs;
-    font-size: 14px;
-  }
-  
-  .text {
-    display: none; // Ocultar texto en móviles
-  }
-  
-  &:hover {
-    background-color: $primary-color-hover;
-  }
-  
-  @media (min-width: $breakpoint-sm) {
-    padding: 0 $spacing-md;
-    height: 40px;
-    
-    .text {
-      display: inline; // Mostrar texto en tablets y escritorio
-    }
-    
-    .icon {
-      font-size: 16px;
-    }
-    
-    &:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1);
-    }
-  }
-}
-
-// Botones de acción en la tabla
-.action-buttons {
-  display: flex;
-  justify-content: flex-end;
-  gap: $spacing-xs;
-  
-  button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 28px;
-    height: 28px;
-    border-radius: $border-radius-sm;
-    border: none;
-    cursor: pointer;
-    transition: all $transition-fast;
-    font-size: 14px;
-    
-    @media (min-width: $breakpoint-sm) {
-      width: 32px;
-      height: 32px;
-      border-radius: $border-radius-md;
-      font-size: 16px;
-    }
-  }
-  
-  .btn-edit {
-    background-color: $primary-color;
-    color: white;
-    
-    &:hover {
-      background-color: $primary-color-hover;
-    }
-    
-    @media (min-width: $breakpoint-sm) {
-      &:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1);
-      }
-    }
-  }
-  
-  .btn-delete {
-    background-color: $error-color;
-    color: white;
-    
-    &:hover {
-      background-color: $error-color-hover;
-    }
-    
-    @media (min-width: $breakpoint-sm) {
-      &:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1);
-      }
-    }
-  }
-}
-
-// Imagen del producto en la tabla
-.product-image {
-  width: 50px;
-  height: 50px;
-  border-radius: $border-radius;
-  overflow: hidden;
-  border: 1px solid $border-color;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  
-  @media (min-width: $breakpoint-sm) {
-    width: 60px;
-    height: 60px;
-  }
-  
-  img {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
-  }
-  
-  &__placeholder {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: $tertiary-color;
-    color: $text-color-secondary;
-    font-size: 20px;
-    
-    @media (min-width: $breakpoint-sm) {
-      font-size: 24px;
-    }
-  }
-}
-
-// Formulario
-.admin-form {
-  &__row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: $spacing-sm;
-    
-    @media (min-width: $breakpoint-sm) {
-      gap: $spacing-md;
-    }
-  }
-  
-  &__col {
-    flex: 1;
-    min-width: 100%;
-    
-    @media (min-width: $breakpoint-sm) {
-      min-width: 250px;
-    }
-    
-    &--full {
-      width: 100%;
-      flex-basis: 100%;
-    }
-  }
-  
-  &__image-preview {
-    margin-top: $spacing-sm;
-    padding: $spacing-sm;
-    border: 1px solid $border-color;
-    border-radius: $border-radius;
-    background-color: $tertiary-color;
-    text-align: center;
-    
-    @media (min-width: $breakpoint-sm) {
-      padding: $spacing-md;
-    }
-    
-    img {
-      max-width: 100%;
-      max-height: 150px;
-      object-fit: contain;
-      
-      @media (min-width: $breakpoint-sm) {
-        max-height: 200px;
-      }
-    }
-  }
-}
-
-// Botones en los modales
-.modal-btn {
-  padding: 6px 12px;
-  border-radius: $border-radius;
-  border: none;
-  font-weight: $font-weight-medium;
-  font-size: $font-size-small;
-  cursor: pointer;
-  transition: all $transition-fast;
-  
-  @media (min-width: $breakpoint-sm) {
-    padding: 8px 16px;
-    font-size: $font-size-base;
-  }
-  
-  &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
-  
-  &.primary-btn {
-    background-color: $primary-color;
-    color: white;
-    
-    &:hover:not(:disabled) {
-      background-color: $primary-color-hover;
-    }
-  }
-  
-  &.secondary-btn {
-    background-color: $tertiary-color;
-    color: $text-color;
-    border: 1px solid $border-color;
-    
-    &:hover:not(:disabled) {
-      background-color: $tertiary-color-hover;
-    }
-  }
-  
-  &.error-btn {
-    background-color: $error-color;
-    color: white;
-    
-    &:hover:not(:disabled) {
-      background-color: $error-color-hover;
-    }
-  }
-}
-
-// Mensajes en los modales
-.admin-modal {
-  &__message {
-    margin-bottom: $spacing-md;
-    line-height: 1.5;
-  }
+  /* Estilos específicos para la vista de productos, si son necesarios */
 }
 </style>

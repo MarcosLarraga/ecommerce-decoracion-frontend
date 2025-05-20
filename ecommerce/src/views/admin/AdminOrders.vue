@@ -1,6 +1,6 @@
-<!-- @/views/admin/AdminOrders.vue con botones nativos -->
+<!-- @/views/admin/AdminOrders.vue -->
 <template>
-  <div class="admin-orders">
+  <div class="admin-view admin-orders">
     <AdminHeader title="Gestión de Pedidos">
       <template #actions>
         <AdminSearch 
@@ -44,11 +44,11 @@
           <td>{{ formatCurrency(order.total) }}</td>
           <td>{{ getOrderProductsCount(order) }}</td>
           <td class="action-buttons">
-            <button class="btn-view" @click="viewOrderDetails(order)" title="Ver detalles">
-              👁️
+            <button class="btn btn-view" @click="viewOrderDetails(order)" title="Ver detalles">
+              <i class="fas fa-eye"></i>
             </button>
-            <button class="btn-delete" @click="confirmDeleteOrder(order)" title="Eliminar pedido">
-              🗑️
+            <button class="btn btn-delete" @click="confirmDeleteOrder(order)" title="Eliminar pedido">
+              <i class="fas fa-trash-alt"></i>
             </button>
           </td>
         </tr>
@@ -63,49 +63,75 @@
       v-if="selectedOrder"
     >
       <div class="order-details">
-        <div class="order-details__section">
-          <h3 class="order-details__subtitle">Información del Pedido</h3>
-          <div class="order-details__info">
-            <div class="order-details__info-item">
-              <span class="order-details__label">ID:</span>
-              <span class="order-details__value">#{{ selectedOrder.id }}</span>
-            </div>
-            <div class="order-details__info-item">
-              <span class="order-details__label">Fecha:</span>
-              <span class="order-details__value">{{ selectedOrder.fechaFormateada }}</span>
-            </div>
-            <div class="order-details__info-item">
-              <span class="order-details__label">Total:</span>
-              <span class="order-details__value order-details__value--highlight">{{ formatCurrency(selectedOrder.total) }}</span>
+        <div class="info-card">
+          <div class="info-card__header">
+            <h3 class="info-card__title">
+              <i class="fas fa-info-circle"></i>
+              Información del Pedido
+            </h3>
+          </div>
+          <div class="info-card__content">
+            <div class="info-card__grid">
+              <div class="info-card__item">
+                <i class="fas fa-hashtag"></i>
+                <span class="info-card__label">ID:</span>
+                <span class="info-card__value">#{{ selectedOrder.id }}</span>
+              </div>
+              <div class="info-card__item">
+                <i class="fas fa-calendar-alt"></i>
+                <span class="info-card__label">Fecha:</span>
+                <span class="info-card__value">{{ selectedOrder.fechaFormateada }}</span>
+              </div>
+              <div class="info-card__item">
+                <i class="fas fa-euro-sign"></i>
+                <span class="info-card__label">Total:</span>
+                <span class="info-card__value" style="color: var(--primary-color); font-weight: 600;">{{ formatCurrency(selectedOrder.total) }}</span>
+              </div>
             </div>
           </div>
         </div>
         
-        <div class="order-details__section">
-          <h3 class="order-details__subtitle">Cliente</h3>
-          <div class="order-details__info">
-            <div class="order-details__info-item">
-              <span class="order-details__label">Nombre:</span>
-              <span class="order-details__value">{{ getUserName(selectedOrder.usuarioId) }}</span>
-            </div>
-            <div class="order-details__info-item">
-              <span class="order-details__label">Email:</span>
-              <span class="order-details__value">{{ getUserEmail(selectedOrder.usuarioId) }}</span>
-            </div>
-            <div class="order-details__info-item" v-if="getUserPhone(selectedOrder.usuarioId)">
-              <span class="order-details__label">Teléfono:</span>
-              <span class="order-details__value">{{ getUserPhone(selectedOrder.usuarioId) }}</span>
-            </div>
-            <div class="order-details__info-item" v-if="getUserAddress(selectedOrder.usuarioId)">
-              <span class="order-details__label">Dirección:</span>
-              <span class="order-details__value">{{ getUserAddress(selectedOrder.usuarioId) }}</span>
+        <div class="info-card">
+          <div class="info-card__header">
+            <h3 class="info-card__title">
+              <i class="fas fa-user"></i>
+              Cliente
+            </h3>
+          </div>
+          <div class="info-card__content">
+            <div class="info-card__grid">
+              <div class="info-card__item">
+                <i class="fas fa-user"></i>
+                <span class="info-card__label">Nombre:</span>
+                <span class="info-card__value">{{ getUserName(selectedOrder.usuarioId) }}</span>
+              </div>
+              <div class="info-card__item">
+                <i class="fas fa-envelope"></i>
+                <span class="info-card__label">Email:</span>
+                <span class="info-card__value">{{ getUserEmail(selectedOrder.usuarioId) }}</span>
+              </div>
+              <div class="info-card__item" v-if="getUserPhone(selectedOrder.usuarioId)">
+                <i class="fas fa-phone"></i>
+                <span class="info-card__label">Teléfono:</span>
+                <span class="info-card__value">{{ getUserPhone(selectedOrder.usuarioId) }}</span>
+              </div>
+              <div class="info-card__item" v-if="getUserAddress(selectedOrder.usuarioId)">
+                <i class="fas fa-map-marker-alt"></i>
+                <span class="info-card__label">Dirección:</span>
+                <span class="info-card__value">{{ getUserAddress(selectedOrder.usuarioId) }}</span>
+              </div>
             </div>
           </div>
         </div>
         
-        <div class="order-details__section">
-          <h3 class="order-details__subtitle">Productos</h3>
-          <div class="order-details__products">
+        <div class="info-card">
+          <div class="info-card__header">
+            <h3 class="info-card__title">
+              <i class="fas fa-box"></i>
+              Productos
+            </h3>
+          </div>
+          <div class="info-card__content">
             <div v-if="loadingOrderDetails" class="order-details__loading">
               <div class="spinner"></div>
               <span>Cargando detalles...</span>
@@ -123,14 +149,14 @@
                 <tr v-for="item in orderDetails" :key="item.id">
                   <td>
                     <div class="order-details__product">
-                      <div class="order-details__product-image">
+                      <div class="thumb-image">
                         <img 
                           v-if="getProductImage(item.productoId)" 
                           :src="getProductImage(item.productoId)"
                           :alt="getProductName(item.productoId)"
                         >
-                        <div v-else class="order-details__no-image">
-                          📦
+                        <div v-else class="thumb-image__placeholder">
+                          <i class="fas fa-box"></i>
                         </div>
                       </div>
                       <div class="order-details__product-info">
@@ -165,10 +191,12 @@
       
       <template #footer>
         <button class="modal-btn secondary-btn" @click="closeOrderDetails">
-          Cerrar
+          <i class="fas fa-times"></i>
+          <span>Cerrar</span>
         </button>
         <button class="modal-btn error-btn" @click="confirmDeleteOrder(selectedOrder)">
-          Eliminar Pedido
+          <i class="fas fa-trash-alt"></i>
+          <span>Eliminar Pedido</span>
         </button>
       </template>
     </AdminModal>
@@ -180,23 +208,29 @@
       size="sm"
       v-if="orderToDelete"
     >
-      <p class="admin-modal__message">
-        ¿Estás seguro de que deseas eliminar el pedido
-        <strong>#{{ orderToDelete.id }}</strong>?
-        <br>
-        Esta acción no se puede deshacer.
-      </p>
+      <div class="confirm-message">
+        <i class="fas fa-exclamation-triangle"></i>
+        <p>
+          ¿Estás seguro de que deseas eliminar el pedido
+          <strong>#{{ orderToDelete.id }}</strong>?
+          <br>
+          Esta acción no se puede deshacer.
+        </p>
+      </div>
       
       <template #footer>
         <button class="modal-btn secondary-btn" @click="cancelDelete">
-          Cancelar
+          <i class="fas fa-times"></i>
+          <span>Cancelar</span>
         </button>
         <button 
           class="modal-btn error-btn" 
           @click="deleteOrder"
           :disabled="loading"
         >
-          {{ loading ? 'Eliminando...' : 'Eliminar Pedido' }}
+          <i v-if="loading" class="spinner"></i>
+          <i v-else class="fas fa-trash-alt"></i>
+          <span>{{ loading ? 'Eliminando...' : 'Eliminar Pedido' }}</span>
         </button>
       </template>
     </AdminModal>
@@ -441,252 +475,83 @@ const deleteOrder = async () => {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 @use '@/styles/variables' as *;
-@use '@/styles/mixins' as *;
+@use '@/styles/admin-unified-styles.scss';
 
-.action-buttons {
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-  
-  button {
+.admin-orders {
+  .order-details {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    border-radius: 6px;
-    border: none;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-size: 16px;
-  }
-  
-  .btn-view {
-    background-color: $info-color;
-    color: white;
+    flex-direction: column;
+    gap: $spacing-lg;
     
-    &:hover {
-      background-color: $info-color-hover;
-      transform: translateY(-2px);
-      box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1);
-    }
-  }
-  
-  .btn-delete {
-    background-color: $error-color;
-    color: white;
-    
-    &:hover {
-      background-color: $error-color-hover;
-      transform: translateY(-2px);
-      box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1);
-    }
-  }
-}
-
-// Estilos de los botones en los modales
-.modal-btn {
-  padding: 8px 16px;
-  border-radius: $border-radius;
-  border: none;
-  font-weight: $font-weight-medium;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  
-  &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
-  
-  &.primary-btn {
-    background-color: $primary-color;
-    color: white;
-    
-    &:hover:not(:disabled) {
-      background-color: $primary-color-hover;
-    }
-  }
-  
-  &.secondary-btn {
-    background-color: $tertiary-color;
-    color: $text-color;
-    border: 1px solid $border-color;
-    
-    &:hover:not(:disabled) {
-      background-color: $tertiary-color-hover;
-    }
-  }
-  
-  &.error-btn {
-    background-color: $error-color;
-    color: white;
-    
-    &:hover:not(:disabled) {
-      background-color: $error-color-hover;
-    }
-  }
-}
-
-// Spinner para estados de carga
-.spinner {
-  width: 24px;
-  height: 24px;
-  border: 2px solid rgba($primary-color, 0.2);
-  border-radius: 50%;
-  border-top-color: $primary-color;
-  animation: spin 1s linear infinite;
-  margin-right: $spacing-sm;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-.order-details {
-  &__section {
-    margin-bottom: $spacing-xl;
-    
-    &:last-child {
-      margin-bottom: 0;
-    }
-  }
-  
-  &__subtitle {
-    font-size: $font-size-large;
-    font-weight: $font-weight-semibold;
-    color: $text-color;
-    margin: 0 0 $spacing-md 0;
-    padding-bottom: $spacing-xs;
-    border-bottom: 1px solid $border-color;
-  }
-  
-  &__info {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: $spacing-md;
-  }
-  
-  &__info-item {
-    display: flex;
-    align-items: center;
-  }
-  
-  &__label {
-    font-weight: $font-weight-medium;
-    color: $text-color-secondary;
-    margin-right: $spacing-xs;
-    min-width: 80px;
-  }
-  
-  &__value {
-    color: $text-color;
-    
-    &--highlight {
-      font-weight: $font-weight-semibold;
-      color: $primary-color;
-    }
-  }
-  
-  &__products {
-    margin-top: $spacing-md;
-  }
-  
-  &__loading {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: $spacing-xl;
-    color: $text-color-secondary;
-  }
-  
-  &__table {
-    width: 100%;
-    border-collapse: collapse;
-    
-    th, td {
-      padding: $spacing-sm $spacing-md;
-      text-align: left;
-      border-bottom: 1px solid $border-color;
-    }
-    
-    th {
-      font-weight: $font-weight-semibold;
-      color: $text-color;
-      background-color: rgba($primary-color, 0.05);
-    }
-    
-    td {
+    &__loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: $spacing-xl;
+      gap: $spacing-md;
       color: $text-color-secondary;
     }
     
-    tfoot {
-      td {
-        border-top: 2px solid $border-color;
-        border-bottom: none;
-        font-weight: $font-weight-semibold;
+    &__product {
+      display: flex;
+      align-items: center;
+      gap: $spacing-md;
+    }
+    
+    &__product-info {
+      display: flex;
+      flex-direction: column;
+      gap: $spacing-xs;
+    }
+    
+    &__product-name {
+      font-weight: $font-weight-semibold;
+      color: $text-color;
+    }
+    
+    &__product-id {
+      font-size: $font-size-small;
+      color: $text-color-secondary;
+    }
+    
+    &__table {
+      width: 100%;
+      border-collapse: collapse;
+      border: 1px solid $border-color;
+      border-radius: $border-radius;
+      overflow: hidden;
+      
+      th, td {
+        padding: $spacing-sm;
+        text-align: left;
+        border-bottom: 1px solid $border-color;
       }
       
-      .order-details__total-label {
-        text-align: right;
+      th {
+        background-color: rgba($primary-color, 0.1);
+        font-weight: $font-weight-semibold;
         color: $text-color;
       }
       
-      .order-details__total-value {
-        color: $primary-color;
-        font-size: $font-size-large;
+      tfoot {
+        td {
+          font-weight: $font-weight-semibold;
+          background-color: $tertiary-color;
+        }
+        
+        .order-details__total-label {
+          text-align: right;
+          color: $text-color;
+        }
+        
+        .order-details__total-value {
+          color: $primary-color;
+          font-weight: $font-weight-bold;
+        }
       }
     }
-  }
-  
-  &__product {
-    display: flex;
-    align-items: center;
-  }
-  
-  &__product-image {
-    width: 60px;
-    height: 60px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    border-radius: $border-radius-sm;
-    border: 1px solid $border-color;
-    background-color: $tertiary-color;
-    margin-right: $spacing-md;
-    
-    img {
-      max-width: 100%;
-      max-height: 100%;
-      object-fit: contain;
-    }
-  }
-  
-  &__no-image {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    height: 100%;
-    color: $text-color-secondary;
-    font-size: $font-size-xl;
-  }
-  
-  &__product-info {
-    flex: 1;
-  }
-  
-  &__product-name {
-    font-weight: $font-weight-medium;
-    color: $text-color;
-    margin-bottom: $spacing-xs;
-  }
-  
-  &__product-id {
-    font-size: $font-size-small;
-    color: $text-color-secondary;
   }
 }
 </style>
