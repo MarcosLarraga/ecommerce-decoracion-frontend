@@ -69,9 +69,19 @@
         <div class="dashboard-section">
           <h2 class="dashboard-section__title">Ventas recientes</h2>
           <div class="dashboard-section__content">
-            <!-- Aquí irían las ventas recientes -->
-            <div class="placeholder-content">
-              <p>Información de ventas recientes se mostrará aquí</p>
+            <div v-if="recentOrders.length > 0" class="recent-orders">
+              <div v-for="order in recentOrders" :key="order.id" class="recent-order">
+                <div class="recent-order__details">
+                  <div class="recent-order__id">#{{ order.id }}</div>
+                  <div class="recent-order__user">{{ getUserName(order.usuarioId) }}</div>
+                  <div class="recent-order__date">{{ formatDate(order.fechaPedido) }}</div>
+                </div>
+                <div class="recent-order__price">{{ formatCurrency(order.total) }}</div>
+              </div>
+            </div>
+            <div v-else class="empty-placeholder">
+              <i class="fas fa-receipt"></i>
+              <p>No hay ventas recientes</p>
             </div>
           </div>
         </div>
@@ -80,9 +90,29 @@
         <div class="dashboard-section">
           <h2 class="dashboard-section__title">Productos más vendidos</h2>
           <div class="dashboard-section__content">
-            <!-- Aquí irían los productos más vendidos -->
-            <div class="placeholder-content">
-              <p>Los productos más vendidos aparecerán aquí</p>
+            <div v-if="topProducts.length > 0" class="top-products">
+              <div v-for="product in topProducts" :key="product.productoId" class="top-product">
+                <div class="top-product__image">
+                  <img v-if="product.urlImagen" :src="product.urlImagen" :alt="product.nombre">
+                  <div v-else class="top-product__image-placeholder">
+                    <i class="fas fa-box"></i>
+                  </div>
+                </div>
+                <div class="top-product__details">
+                  <div class="top-product__name">{{ product.nombre }}</div>
+                  <div class="top-product__price">{{ formatCurrency(product.totalVendido / product.cantidadVendida) }}</div>
+                  <div class="top-product__sold">
+                    <span class="top-product__sold-count">{{ product.cantidadVendida }}</span> unidades vendidas
+                  </div>
+                </div>
+                <div class="top-product__percentage">
+                  <div class="top-product__bar" :style="{ width: getPercentage(product.cantidadVendida) + '%' }"></div>
+                </div>
+              </div>
+            </div>
+            <div v-else class="empty-placeholder">
+              <i class="fas fa-chart-bar"></i>
+              <p>No hay datos de ventas disponibles</p>
             </div>
           </div>
         </div>
@@ -91,23 +121,23 @@
   </div>
 </template>
 
-<script lang="ts" setup>
+<script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
-import axios from 'axios';
 import { useUserStore } from '@/stores/userStore';
+import { useAdminStore } from '@/stores/adminStore';
+import { useDashboardStore } from '@/stores/dashboardStore';
 
 const userStore = useUserStore();
-const loading = ref(true);
-const error = ref('');
-const lastUpdateTime = ref(new Date());
-const stats = ref({
-  users: 0,
-  products: 0,
-  orders: 0,
-  revenue: 0
-});
+const adminStore = useAdminStore();
+const dashboardStore = useDashboardStore();
 
-// Fecha formateada
+const error = computed(() => dashboardStore.error);
+const loading = computed(() => dashboardStore.loading);
+const stats = computed(() => dashboardStore.getStats);
+const topProducts = computed(() => dashboardStore.getProductosMasVendidos);
+const recentOrders = ref<any[]>([]);
+
+// Formatear fecha
 const formattedUpdateTime = computed(() => {
   return new Intl.DateTimeFormat('es-ES', {
     day: '2-digit',
@@ -115,7 +145,7 @@ const formattedUpdateTime = computed(() => {
     year: 'numeric',
     hour: '2-digit',
     minute: '2-digit'
-  }).format(lastUpdateTime.value);
+  }).format(dashboardStore.getLastUpdateTime);
 });
 
 // Formatear moneda
@@ -126,62 +156,68 @@ const formatCurrency = (value: number) => {
   }).format(value);
 };
 
-// Cargar datos del dashboard
-const loadDashboardData = async () => {
-  loading.value = true;
-  error.value = '';
+// Formatear fecha más corta
+const formatDate = (dateString: string) => {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  return new Intl.DateTimeFormat('es-ES', { 
+    day: '2-digit',
+    month: '2-digit',
+    year: '2-digit'
+  }).format(date);
+};
+
+// Obtener nombre de usuario
+const getUserName = (userId: number) => {
+  const user = adminStore.getUserById(userId);
+  return user ? user.nombre : `Usuario #${userId}`;
+};
+
+// Calcular porcentaje para la barra visual
+const getPercentage = (vendidos: number) => {
+  if (topProducts.value.length === 0) return 0;
+  const maxVendidos = Math.max(...topProducts.value.map(p => p.cantidadVendida));
+  if (maxVendidos === 0) return 0;
+  return (vendidos / maxVendidos) * 100;
+};
+
+// Cargar datos recientes
+const loadRecentOrders = async () => {
+  if (adminStore.orders.length === 0) {
+    await adminStore.fetchAllOrders();
+  }
   
+  // Obtener pedidos recientes (últimos 5)
+  recentOrders.value = [...adminStore.orders]
+    .sort((a, b) => new Date(b.fechaPedido).getTime() - new Date(a.fechaPedido).getTime())
+    .slice(0, 5);
+};
+
+// Cargar datos para el dashboard
+const loadDashboardData = async () => {
   try {
-    // Primero intentar con una API real
-    const token = userStore.token;
+    // Iniciar carga de datos base
+    const loadPromises = [
+      dashboardStore.fetchDashboardData()
+    ];
     
-    if (!token) {
-      throw new Error("No hay token de autenticación");
+    // Cargar usuarios si no están ya cargados
+    if (adminStore.users.length === 0) {
+      loadPromises.push(adminStore.fetchAllUsers());
     }
     
-    try {
-      // Aquí harías una petición real a tu API
-      const response = await axios.get('/api/Dashboard', {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-      
-      // Ajustamos los datos al formato que espera nuestro componente
-      const data = response.data;
-      stats.value = {
-        users: data.totalUsuarios || 0,
-        products: data.totalProductos || 0,
-        orders: data.totalPedidos || 0,
-        revenue: data.ventasTotales || 0
-      };
-      
-      // Actualizar hora de actualización
-      lastUpdateTime.value = new Date();
-    } catch (apiError) {
-      console.warn("Error al obtener datos reales, usando datos de ejemplo:", apiError);
-      
-      // Si falla, usar datos de ejemplo para depuración
-      stats.value = {
-        users: 120,
-        products: 45,
-        orders: 67,
-        revenue: 12450.75
-      };
-      
-      // Actualizar hora de actualización
-      lastUpdateTime.value = new Date();
-    }
+    // Ejectuar todas las cargas en paralelo
+    await Promise.all(loadPromises);
+    
+    // Cargar pedidos recientes
+    await loadRecentOrders();
+    
   } catch (err: any) {
     console.error("Error al cargar datos del dashboard:", err);
-    error.value = err.message || "Error al cargar los datos del dashboard";
-  } finally {
-    loading.value = false;
   }
 };
 
 onMounted(async () => {
-  console.log("AdminDashboard montado");
   await loadDashboardData();
 });
 </script>
@@ -189,7 +225,6 @@ onMounted(async () => {
 <style lang="scss" scoped>
 @use '@/styles/variables' as *;
 @use '@/styles/mixins' as m;
-@use "sass:math";
 
 .admin-dashboard {
   padding: $padding-sm;
@@ -233,19 +268,13 @@ onMounted(async () => {
     }
     
     .spinner {
-      width: calc($admin-table-spinner-size * 0.5);
-      height: calc($admin-table-spinner-size * 0.5);
+      width: 40px;
+      height: 40px;
       border: $border-width solid rgba($primary-color, $opacity-light);
       border-radius: $border-radius-circle;
       border-top-color: $primary-color;
       animation: spin $duration-normal linear infinite;
       margin-bottom: $spacing-md;
-      
-      @include m.media-md {
-        width: $admin-table-spinner-size;
-        height: $admin-table-spinner-size;
-        border-width: $border-width-md;
-      }
     }
     
     @keyframes spin {
@@ -295,11 +324,6 @@ onMounted(async () => {
   border: $admin-card-border;
   display: flex;
   align-items: center;
-  
-  /* Evitar errores "mixed-decls" usando '& {}' */
-  & {
-    margin-bottom: 0;
-  }
   
   &__icon {
     display: flex;
@@ -366,11 +390,6 @@ onMounted(async () => {
   border: $admin-card-border;
   overflow: hidden;
   
-  /* Evitar errores "mixed-decls" usando '& {}' */
-  & {
-    margin-bottom: 0;
-  }
-  
   &__title {
     font-size: $admin-section-subtitle-size;
     font-weight: $font-weight-medium;
@@ -382,24 +401,194 @@ onMounted(async () => {
   }
   
   &__content {
-    min-height: 200px;
+    min-height: 300px;
   }
 }
 
-.placeholder-content {
+// Estilos para pedidos recientes
+.recent-orders {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+}
+
+.recent-order {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: $spacing-sm;
+  border-radius: $border-radius;
+  background-color: rgba($tertiary-color, 0.3);
+  border-left: 3px solid $primary-color;
+  transition: transform $transition-fast, box-shadow $transition-fast;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: $box-shadow-sm;
+    background-color: rgba($tertiary-color, 0.5);
+  }
+  
+  &__details {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+    
+    @include m.media-sm {
+      flex-direction: row;
+      gap: $spacing-md;
+      align-items: center;
+    }
+  }
+  
+  &__id {
+    font-weight: $font-weight-semibold;
+    color: $text-color;
+  }
+  
+  &__user {
+    color: $text-color-secondary;
+    font-size: $font-size-small;
+    
+    @include m.media-sm {
+      font-size: $font-size-base;
+    }
+  }
+  
+  &__date {
+    color: $text-color-tertiary;
+    font-size: $font-size-small;
+  }
+  
+  &__price {
+    font-weight: $font-weight-semibold;
+    color: $primary-color;
+  }
+}
+
+// Estilos para productos más vendidos
+.top-products {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.top-product {
   display: flex;
   align-items: center;
-  justify-content: center;
-  background-color: $admin-filter-bg;
+  gap: $spacing-md;
+  padding: $spacing-sm;
   border-radius: $border-radius;
-  padding: $spacing-lg;
-  text-align: center;
+  background-color: rgba($tertiary-color, 0.3);
+  transition: transform $transition-fast, box-shadow $transition-fast;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: $box-shadow-sm;
+    background-color: rgba($tertiary-color, 0.5);
+  }
+  
+  &__image {
+    width: 50px;
+    height: 50px;
+    border-radius: $border-radius-sm;
+    overflow: hidden;
+    background-color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid $border-color;
+    
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+    
+    &-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: $text-color-secondary;
+    }
+  }
+  
+  &__details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+  }
+  
+  &__name {
+    font-weight: $font-weight-semibold;
+    color: $text-color;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 150px;
+    
+    @include m.media-sm {
+      max-width: 250px;
+    }
+  }
+  
+  &__price {
+    color: $text-color-secondary;
+    font-size: $font-size-small;
+  }
+  
+  &__sold {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+    font-size: $font-size-small;
+    color: $text-color-tertiary;
+  }
+  
+  &__sold-count {
+    color: $primary-color;
+    font-weight: $font-weight-semibold;
+  }
+  
+  &__percentage {
+    width: 60px;
+    height: 8px;
+    background-color: rgba($primary-color, 0.1);
+    border-radius: $border-radius-pill;
+    overflow: hidden;
+    
+    @include m.media-sm {
+      width: 80px;
+    }
+  }
+  
+  &__bar {
+    height: 100%;
+    background-color: $primary-color;
+    border-radius: $border-radius-pill;
+  }
+}
+
+// Placeholder cuando no hay datos
+.empty-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   height: 100%;
-  min-height: 150px;
+  min-height: 200px;
+  color: $text-color-tertiary;
+  
+  i {
+    font-size: 40px;
+    margin-bottom: $spacing-md;
+    opacity: 0.5;
+  }
   
   p {
-    color: $admin-empty-msg-color;
-    margin: 0;
+    font-size: $font-size-small;
   }
 }
 </style>
