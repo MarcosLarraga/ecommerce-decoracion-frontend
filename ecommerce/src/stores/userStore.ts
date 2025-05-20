@@ -243,33 +243,80 @@ export const useUserStore = defineStore('user', {
       }
     },
 
-    async updateUserPhoneAndAddress(telefono: string, direccion: string) {
-      try {
-        const token = localStorage.getItem('token');
-        if (!token) {
-          toast.error("No se encontró token de autenticación.");
-          return;
-        }
-        const decoded: any = this.decodeToken(token);
-        if (!decoded?.sub) return;
-        const userId = decoded.sub;
-        await axios.put(`/api/usuario/${userId}`, { telefono, direccion }, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json"
-          }
-        });
+    // Corrección para el método updateUserPhoneAndAddress en userStore.ts
 
-        if (this.user) {
-          this.user.telefono = telefono;
-          this.user.direccion = direccion;
-          localStorage.setItem('user', JSON.stringify(this.user));
-        }
-      } catch (error: any) {
-        console.error('Error actualizando teléfono y dirección:', error);
-        toast.error(error.response?.data || "Error al actualizar teléfono y dirección.");
-      }
-    },
+async updateUserPhoneAndAddress(telefono: string, direccion: string) {
+  try {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      toast.error("No se encontró token de autenticación.");
+      return;
+    }
+    
+    // Decodificar el token para obtener el ID del usuario
+    const decoded: any = this.decodeToken(token);
+    if (!decoded?.sub) {
+      toast.error("No se pudo identificar al usuario.");
+      return;
+    }
+    
+    const userId = decoded.sub;
+    
+    // Configurar encabezados de autorización
+    const headers = {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json"
+    };
+    
+    // Crear el objeto con los datos a actualizar
+    const userData = {
+      telefono,
+      direccion
+    };
+    
+    console.log(`Actualizando datos de usuario ${userId}:`, userData);
+    
+    // Realizar la solicitud PUT
+    const response = await axios.put(
+      `/api/Usuario/${userId}`, 
+      userData, 
+      { headers }
+    );
+    
+    console.log("Respuesta de actualización:", response.data);
+    
+    // Actualizar el estado del usuario
+    if (this.user) {
+      this.user.telefono = telefono;
+      this.user.direccion = direccion;
+      localStorage.setItem('user', JSON.stringify(this.user));
+      
+      // Notificar al usuario del éxito
+      toast.success("Datos de contacto actualizados correctamente");
+    }
+    
+    return true;
+  } catch (error: any) {
+    console.error('Error actualizando teléfono y dirección:', error);
+    
+    // Mensaje de error detallado
+    const errorMessage = error.response?.data?.message || 
+                        error.response?.data || 
+                        "Error al actualizar teléfono y dirección.";
+                        
+    toast.error(errorMessage);
+    
+    // Registrar información adicional para diagnóstico
+    console.error("Detalles del error:", {
+      status: error.response?.status,
+      statusText: error.response?.statusText,
+      data: error.response?.data,
+      config: error.config
+    });
+    
+    throw error;
+  }
+},
 
     // Actualizamos este método para llamar al endpoint reset-password
     async changePassword(nuevaContraseña: string) {

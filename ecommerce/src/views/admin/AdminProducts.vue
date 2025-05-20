@@ -430,7 +430,7 @@ const deleteProduct = async () => {
 
 <style lang="scss">
 @use '@/styles/variables' as *;
-@import '@/styles/admin-unified-styles.scss';
+@use '@/styles/admin-unified-styles.scss';
 
 .admin-products {
   /* Estilos específicos para la vista de productos, si son necesarios */

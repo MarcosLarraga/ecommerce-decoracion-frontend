@@ -58,7 +58,6 @@ import { onMounted, ref, computed } from 'vue';
 import { useDetallePedidoStore } from '../stores/detallePedidoStore';
 import { useRoute } from 'vue-router';
 import { useToast } from 'vue-toastification';
-import axios from 'axios';
 
 const detallePedidoStore = useDetallePedidoStore();
 const route = useRoute();
@@ -115,7 +114,8 @@ const enviarCorreoConfirmacion = async () => {
   enviandoCorreo.value = true;
   
   try {
-    await axios.post(`/api/Pedido/enviar-confirmacion/${pedidoId}`);
+    // Ahora usamos el método del store
+    await detallePedidoStore.enviarCorreoConfirmacion(pedidoId);
     toast.success("Te hemos enviado al correo toda la información de tu pedido.");
   } catch (error) {
     console.error("Error al enviar correo:", error);

@@ -3,18 +3,39 @@
     <h1 class="pedido__title">Confirmar Pedido</h1>
 
     <div class="pedido__user-info">
-      <p><strong>Correo:</strong> {{ userStore.user.email }}</p>
+      <p><strong>Email:</strong> {{ userStore.user.email }}</p>
+      <p v-if="userStore.user.telefono"><strong>Teléfono:</strong> {{ userStore.user.telefono }}</p>
+      <p v-if="userStore.user.direccion"><strong>Dirección:</strong> {{ userStore.user.direccion }}</p>
     </div>
 
     <form class="pedido__form" @submit.prevent="confirmarPedido">
       <div class="pedido__form-group">
-        <label class="pedido__label">Dirección:</label>
-        <input v-model="direccion" type="text" required class="pedido__input" />
+        <label class="pedido__label">Dirección de envío:</label>
+        <input 
+          v-model="direccion" 
+          type="text" 
+          required 
+          class="pedido__input" 
+          :placeholder="userStore.user?.direccion ? 'Usar misma dirección guardada' : 'Introduce tu dirección'" 
+        />
       </div>
 
       <div class="pedido__form-group">
-        <label class="pedido__label">Teléfono:</label>
-        <input v-model="telefono" type="tel" required class="pedido__input" />
+        <label class="pedido__label">Teléfono de contacto:</label>
+        <input 
+          v-model="telefono" 
+          type="tel" 
+          required 
+          class="pedido__input" 
+          :placeholder="userStore.user?.telefono ? 'Usar mismo teléfono guardado' : 'Introduce tu teléfono'"
+        />
+      </div>
+
+      <div class="pedido__form-group" v-if="userStore.user.direccion || userStore.user.telefono">
+        <label class="pedido__checkbox">
+          <input type="checkbox" v-model="usarDatosGuardados" @change="actualizarDatosDesdeUsuario">
+          Usar datos guardados en mi perfil
+        </label>
       </div>
 
       <h2 class="pedido__subtitle">Productos en el pedido</h2>
@@ -31,7 +52,7 @@
 
       <h2 class="pedido__total">Total: {{ cartStore.cartTotal.toFixed(2) }} €</h2>
 
-      <button type="submit" class="pedido__confirm-btn" :disabled="isSubmitting">
+      <button type="submit" class="pedido__confirm-btn" :disabled="isSubmitting || !datosValidos">
         {{ isSubmitting ? 'Procesando...' : 'Confirmar Pedido' }}
       </button>
     </form>
@@ -39,7 +60,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useUserStore } from '../stores/userStore'
 import { usePedidoStore } from '../stores/pedidoStore'
 import { useDetallePedidoStore } from '../stores/detallePedidoStore'
@@ -54,10 +75,36 @@ const cartStore = useCartStore()
 const router = useRouter()
 const toast = useToast()
 
-const direccion = ref(userStore.user?.direccion || '');
-const telefono = ref(userStore.user?.telefono || '');
+// Inicializar con valores vacíos para forzar al usuario a confirmar los datos
+const direccion = ref('');
+const telefono = ref('');
+const usarDatosGuardados = ref(false);
+const isSubmitting = ref(false);
 
-const isSubmitting = ref(false)
+// Comprobar si los datos son válidos para habilitar el botón
+const datosValidos = computed(() => {
+  return direccion.value.trim() !== '' && telefono.value.trim() !== '';
+});
+
+// Función para cargar los datos del usuario en los campos
+const actualizarDatosDesdeUsuario = () => {
+  if (usarDatosGuardados.value) {
+    direccion.value = userStore.user?.direccion || '';
+    telefono.value = userStore.user?.telefono || '';
+  } else {
+    direccion.value = '';
+    telefono.value = '';
+  }
+};
+
+// Al montar el componente, verificar si hay datos guardados
+onMounted(() => {
+  // Si el usuario ya tiene dirección y teléfono, marcamos la casilla automáticamente
+  if (userStore.user?.direccion && userStore.user?.telefono) {
+    usarDatosGuardados.value = true;
+    actualizarDatosDesdeUsuario();
+  }
+});
 
 const confirmarPedido = async () => {
   if (cartStore.cart.length === 0) {
@@ -65,12 +112,17 @@ const confirmarPedido = async () => {
     return
   }
 
+  if (!datosValidos.value) {
+    toast.error("Por favor, introduce dirección y teléfono para continuar.")
+    return
+  }
+
   isSubmitting.value = true
 
   try {
-    // Actualizamos el teléfono y la dirección
+    // Primero actualizamos los datos de contacto
     await userStore.updateUserPhoneAndAddress(telefono.value, direccion.value)
-    console.log("Datos de contacto actualizados")
+    console.log("Datos de contacto actualizados correctamente")
 
     // Luego creamos el pedido
     const pedidoId = await pedidoStore.crearPedidoConDetalles(
@@ -86,7 +138,7 @@ const confirmarPedido = async () => {
     router.push(`/pedido-detalle/${pedidoId}`)
   } catch (error) {
     console.error("Error al confirmar el pedido:", error)
-    toast.error(error.message || "Error al procesar el pedido")
+    toast.error("Error al procesar el pedido. Por favor, inténtalo de nuevo.")
   } finally {
     isSubmitting.value = false
   }
@@ -139,7 +191,7 @@ const confirmarPedido = async () => {
     margin-bottom: $spacing-lg;
 
     p {
-      margin: 0;
+      margin: 0.5rem 0;
       font-size: $font-size-base;
 
       strong {
@@ -164,6 +216,16 @@ const confirmarPedido = async () => {
     font-weight: 600;
     font-size: $font-size-base;
     color: $text-color;
+  }
+
+  &__checkbox {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    
+    input[type="checkbox"] {
+      margin-right: $spacing-xs;
+    }
   }
 
   &__input {
