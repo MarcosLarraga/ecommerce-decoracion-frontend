@@ -65,23 +65,22 @@
       
       <!-- Secciones adicionales del dashboard -->
       <div class="dashboard-sections">
-        <!-- Ventas recientes -->
+        <!-- Ventas mensuales -->
         <div class="dashboard-section">
-          <h2 class="dashboard-section__title">Ventas recientes</h2>
+          <h2 class="dashboard-section__title">Ventas mensuales</h2>
           <div class="dashboard-section__content">
-            <div v-if="recentOrders.length > 0" class="recent-orders">
-              <div v-for="order in recentOrders" :key="order.id" class="recent-order">
-                <div class="recent-order__details">
-                  <div class="recent-order__id">#{{ order.id }}</div>
-                  <div class="recent-order__user">{{ getUserName(order.usuarioId) }}</div>
-                  <div class="recent-order__date">{{ formatDate(order.fechaPedido) }}</div>
+            <div v-if="ventasMensuales.length > 0" class="monthly-sales">
+              <div v-for="(venta, index) in ventasMensuales" :key="index" class="monthly-sale">
+                <div class="monthly-sale__month">{{ venta.mes }}</div>
+                <div class="monthly-sale__amount">{{ formatCurrency(venta.total) }}</div>
+                <div class="monthly-sale__bar-container">
+                  <div class="monthly-sale__bar" :style="{ width: getMonthlyPercentage(venta.total) + '%' }"></div>
                 </div>
-                <div class="recent-order__price">{{ formatCurrency(order.total) }}</div>
               </div>
             </div>
             <div v-else class="empty-placeholder">
-              <i class="fas fa-receipt"></i>
-              <p>No hay ventas recientes</p>
+              <i class="fas fa-chart-line"></i>
+              <p>No hay datos de ventas mensuales</p>
             </div>
           </div>
         </div>
@@ -122,20 +121,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue';
-import { useUserStore } from '@/stores/userStore';
-import { useAdminStore } from '@/stores/adminStore';
+import { onMounted, computed } from 'vue';
 import { useDashboardStore } from '@/stores/dashboardStore';
 
-const userStore = useUserStore();
-const adminStore = useAdminStore();
 const dashboardStore = useDashboardStore();
 
 const error = computed(() => dashboardStore.error);
 const loading = computed(() => dashboardStore.loading);
 const stats = computed(() => dashboardStore.getStats);
 const topProducts = computed(() => dashboardStore.getProductosMasVendidos);
-const recentOrders = ref<any[]>([]);
+const ventasMensuales = computed(() => dashboardStore.getVentasMensuales);
 
 // Formatear fecha
 const formattedUpdateTime = computed(() => {
@@ -156,24 +151,7 @@ const formatCurrency = (value: number) => {
   }).format(value);
 };
 
-// Formatear fecha más corta
-const formatDate = (dateString: string) => {
-  if (!dateString) return '';
-  const date = new Date(dateString);
-  return new Intl.DateTimeFormat('es-ES', { 
-    day: '2-digit',
-    month: '2-digit',
-    year: '2-digit'
-  }).format(date);
-};
-
-// Obtener nombre de usuario
-const getUserName = (userId: number) => {
-  const user = adminStore.getUserById(userId);
-  return user ? user.nombre : `Usuario #${userId}`;
-};
-
-// Calcular porcentaje para la barra visual
+// Calcular porcentaje para la barra visual de productos
 const getPercentage = (vendidos: number) => {
   if (topProducts.value.length === 0) return 0;
   const maxVendidos = Math.max(...topProducts.value.map(p => p.cantidadVendida));
@@ -181,37 +159,18 @@ const getPercentage = (vendidos: number) => {
   return (vendidos / maxVendidos) * 100;
 };
 
-// Cargar datos recientes
-const loadRecentOrders = async () => {
-  if (adminStore.orders.length === 0) {
-    await adminStore.fetchAllOrders();
-  }
-  
-  // Obtener pedidos recientes (últimos 5)
-  recentOrders.value = [...adminStore.orders]
-    .sort((a, b) => new Date(b.fechaPedido).getTime() - new Date(a.fechaPedido).getTime())
-    .slice(0, 5);
+// Calcular porcentaje para la barra visual de ventas mensuales
+const getMonthlyPercentage = (total: number) => {
+  if (ventasMensuales.value.length === 0) return 0;
+  const maxVenta = Math.max(...ventasMensuales.value.map(v => v.total));
+  if (maxVenta === 0) return 0;
+  return (total / maxVenta) * 100;
 };
 
 // Cargar datos para el dashboard
 const loadDashboardData = async () => {
   try {
-    // Iniciar carga de datos base
-    const loadPromises = [
-      dashboardStore.fetchDashboardData()
-    ];
-    
-    // Cargar usuarios si no están ya cargados
-    if (adminStore.users.length === 0) {
-      loadPromises.push(adminStore.fetchAllUsers());
-    }
-    
-    // Ejectuar todas las cargas en paralelo
-    await Promise.all(loadPromises);
-    
-    // Cargar pedidos recientes
-    await loadRecentOrders();
-    
+    await dashboardStore.fetchDashboardData();
   } catch (err: any) {
     console.error("Error al cargar datos del dashboard:", err);
   }
@@ -405,63 +364,49 @@ onMounted(async () => {
   }
 }
 
-// Estilos para pedidos recientes
-.recent-orders {
+.monthly-sales {
   display: flex;
   flex-direction: column;
-  gap: $spacing-sm;
+  gap: $spacing-md;
 }
 
-.recent-order {
+.monthly-sale {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  gap: $spacing-md;
   padding: $spacing-sm;
   border-radius: $border-radius;
   background-color: rgba($tertiary-color, 0.3);
-  border-left: 3px solid $primary-color;
-  transition: transform $transition-fast, box-shadow $transition-fast;
   
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: $box-shadow-sm;
     background-color: rgba($tertiary-color, 0.5);
   }
   
-  &__details {
-    display: flex;
-    flex-direction: column;
-    gap: $spacing-xs;
-    
-    @include m.media-sm {
-      flex-direction: row;
-      gap: $spacing-md;
-      align-items: center;
-    }
-  }
-  
-  &__id {
+  &__month {
+    width: 80px;
     font-weight: $font-weight-semibold;
     color: $text-color;
   }
   
-  &__user {
-    color: $text-color-secondary;
-    font-size: $font-size-small;
-    
-    @include m.media-sm {
-      font-size: $font-size-base;
-    }
-  }
-  
-  &__date {
-    color: $text-color-tertiary;
-    font-size: $font-size-small;
-  }
-  
-  &__price {
+  &__amount {
+    width: 100px;
+    text-align: right;
     font-weight: $font-weight-semibold;
     color: $primary-color;
+  }
+  
+  &__bar-container {
+    flex: 1;
+    height: 8px;
+    background-color: rgba($primary-color, 0.1);
+    border-radius: $border-radius-pill;
+    overflow: hidden;
+  }
+  
+  &__bar {
+    height: 100%;
+    background-color: $primary-color;
+    border-radius: $border-radius-pill;
   }
 }
 
