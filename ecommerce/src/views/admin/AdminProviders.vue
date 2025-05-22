@@ -11,76 +11,111 @@
       </template>
     </AdminHeader>
 
-    <div class="providers-grid">
-      <div v-for="provider in filteredProviders" :key="provider.id" class="info-card">
-        <div class="info-card__header">
-          <h3 class="info-card__title">
+    <div class="providers-container">
+      <div class="providers-grid">
+        <div v-for="provider in filteredProviders" :key="provider.id" class="provider-card">
+          <!-- Header de la tarjeta -->
+          <div class="provider-card__header">
+            <div class="provider-card__icon">
+              <i class="fas fa-building"></i>
+            </div>
+            <h3 class="provider-card__title">{{ provider.nombre }}</h3>
+            <div class="provider-card__actions">
+              <button class="action-btn action-btn--edit" @click="editProvider(provider)" title="Editar proveedor">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button class="action-btn action-btn--delete" @click="confirmDeleteProvider(provider)" title="Eliminar proveedor">
+                <i class="fas fa-trash-alt"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Contenido principal -->
+          <div class="provider-card__content">
+            <div class="provider-info">
+              <div class="provider-info__item">
+                <div class="provider-info__icon">
+                  <i class="fas fa-id-card"></i>
+                </div>
+                <div class="provider-info__details">
+                  <span class="provider-info__label">NIF</span>
+                  <span class="provider-info__value">{{ provider.nif }}</span>
+                </div>
+              </div>
+
+              <div class="provider-info__item">
+                <div class="provider-info__icon">
+                  <i class="fas fa-envelope"></i>
+                </div>
+                <div class="provider-info__details">
+                  <span class="provider-info__label">Email</span>
+                  <span class="provider-info__value">{{ provider.email }}</span>
+                </div>
+              </div>
+
+              <div class="provider-info__item">
+                <div class="provider-info__icon">
+                  <i class="fas fa-phone"></i>
+                </div>
+                <div class="provider-info__details">
+                  <span class="provider-info__label">Teléfono</span>
+                  <span class="provider-info__value">{{ provider.telefono }}</span>
+                </div>
+              </div>
+
+              <div class="provider-info__item provider-info__item--full">
+                <div class="provider-info__icon">
+                  <i class="fas fa-map-marker-alt"></i>
+                </div>
+                <div class="provider-info__details">
+                  <span class="provider-info__label">Dirección</span>
+                  <span class="provider-info__value">{{ provider.direccion }}</span>
+                </div>
+              </div>
+
+              <div class="provider-info__item" v-if="provider.personaContacto">
+                <div class="provider-info__icon">
+                  <i class="fas fa-user"></i>
+                </div>
+                <div class="provider-info__details">
+                  <span class="provider-info__label">Contacto</span>
+                  <span class="provider-info__value">{{ provider.personaContacto }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Footer con productos -->
+          <div class="provider-card__footer">
+            <div class="provider-products">
+              <div class="provider-products__info">
+                <i class="fas fa-box"></i>
+                <span class="provider-products__count">{{ getProviderProductsCount(provider.id) }} productos</span>
+              </div>
+              <router-link :to="`/admin/products?provider=${provider.id}`" class="provider-products__link">
+                Ver productos 
+                <i class="fas fa-arrow-right"></i>
+              </router-link>
+            </div>
+          </div>
+        </div>
+
+        <!-- Estado vacío -->
+        <div v-if="filteredProviders.length === 0" class="empty-state">
+          <div class="empty-state__icon">
             <i class="fas fa-building"></i>
-            {{ provider.nombre }}
+          </div>
+          <h3 class="empty-state__title">
+            {{ searchQuery ? 'Sin resultados' : 'No hay proveedores' }}
           </h3>
-          <div class="info-card__actions">
-            <button class="btn btn-edit" @click="editProvider(provider)" title="Editar proveedor">
-              <i class="fas fa-edit"></i>
-            </button>
-            <button class="btn btn-delete" @click="confirmDeleteProvider(provider)" title="Eliminar proveedor">
-              <i class="fas fa-trash-alt"></i>
-            </button>
-          </div>
+          <p class="empty-state__description">
+            {{ searchQuery ? 'No se encontraron proveedores con ese criterio' : 'Aún no tienes proveedores registrados en tu sistema' }}
+          </p>
+          <button class="empty-state__btn" @click="createProvider">
+            <i class="fas fa-plus"></i>
+            {{ searchQuery ? 'Limpiar búsqueda' : 'Añadir primer proveedor' }}
+          </button>
         </div>
-
-        <div class="info-card__content">
-          <div class="info-card__grid">
-            <div class="info-card__item">
-              <i class="fas fa-id-card"></i>
-              <span class="info-card__label">NIF:</span>
-              <span class="info-card__value">{{ provider.nif }}</span>
-            </div>
-
-            <div class="info-card__item">
-              <i class="fas fa-envelope"></i>
-              <span class="info-card__label">Email:</span>
-              <span class="info-card__value">{{ provider.email }}</span>
-            </div>
-
-            <div class="info-card__item">
-              <i class="fas fa-phone"></i>
-              <span class="info-card__label">Teléfono:</span>
-              <span class="info-card__value">{{ provider.telefono }}</span>
-            </div>
-
-            <div class="info-card__item">
-              <i class="fas fa-map-marker-alt"></i>
-              <span class="info-card__label">Dirección:</span>
-              <span class="info-card__value">{{ provider.direccion }}</span>
-            </div>
-
-            <div class="info-card__item" v-if="provider.personaContacto">
-              <i class="fas fa-user"></i>
-              <span class="info-card__label">Contacto:</span>
-              <span class="info-card__value">{{ provider.personaContacto }}</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="provider-footer">
-          <div class="provider-products">
-            <span class="provider-products__count">
-              <i class="fas fa-box"></i> {{ getProviderProductsCount(provider.id) }} productos
-            </span>
-            <router-link :to="`/admin/products?provider=${provider.id}`" class="provider-products__link">
-              Ver productos <i class="fas fa-arrow-right"></i>
-            </router-link>
-          </div>
-        </div>
-      </div>
-
-      <div v-if="filteredProviders.length === 0" class="empty-state">
-        <i class="fas fa-building"></i>
-        <p>{{ searchQuery ? 'No se encontraron proveedores con ese criterio' : 'No hay proveedores registrados' }}</p>
-        <button class="empty-btn" @click="createProvider">
-          <i class="fas fa-plus"></i>
-          Añadir el primer proveedor
-        </button>
       </div>
     </div>
 
@@ -354,103 +389,370 @@ const deleteProvider = async () => {
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 @use '@/styles/variables' as *;
 @use '@/styles/admin-unified-styles.scss';
 
 .admin-providers {
+  .providers-container {
+    padding: $spacing-sm;
+    
+    @media (min-width: $breakpoint-sm) {
+      padding: $spacing-md;
+    }
+    
+    @media (min-width: $breakpoint-lg) {
+      padding: $spacing-lg;
+    }
+  }
+
   .providers-grid {
     display: grid;
     grid-template-columns: 1fr;
     gap: $spacing-md;
-    margin-top: $spacing-md;
+    justify-items: center;
+    max-width: 1400px;
+    margin: 0 auto;
 
     @media (min-width: $breakpoint-sm) {
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
       gap: $spacing-lg;
-      margin-top: $spacing-lg;
     }
 
-    @media (min-width: $breakpoint-md) {
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    @media (min-width: $breakpoint-lg) {
+      grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+      gap: $spacing-xl;
     }
   }
 
-  .provider-footer {
-    border-top: 1px solid $border-color;
-    padding-top: $spacing-md;
-    margin-top: $spacing-md;
+  .provider-card {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    border-radius: $border-radius-lg;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba($border-color, 0.3);
+    overflow: hidden;
+    transition: all 0.3s ease;
+    width: 100%;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+
+    &:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+      border-color: rgba($primary-color, 0.3);
+    }
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, $primary-color 0%, #059447 50%, $primary-color 100%);
+    }
+
+    &__header {
+      padding: $spacing-lg $spacing-md $spacing-md;
+      text-align: center;
+      position: relative;
+      background: linear-gradient(135deg, rgba($primary-color, 0.05) 0%, rgba($primary-color, 0.02) 100%);
+
+      @media (min-width: $breakpoint-sm) {
+        padding: $spacing-xl $spacing-lg $spacing-lg;
+      }
+    }
+
+    &__icon {
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, $primary-color 0%, #059447 100%);
+      border-radius: $border-radius-circle;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto $spacing-md;
+      box-shadow: 0 4px 15px rgba($primary-color, 0.3);
+
+      i {
+        font-size: 24px;
+        color: white;
+      }
+
+      @media (min-width: $breakpoint-sm) {
+        width: 70px;
+        height: 70px;
+        
+        i {
+          font-size: 28px;
+        }
+      }
+    }
+
+    &__title {
+      font-size: $font-size-large;
+      font-weight: $font-weight-bold;
+      color: $text-color;
+      margin: 0 0 $spacing-sm;
+      line-height: 1.3;
+      text-align: center;
+
+      @media (min-width: $breakpoint-sm) {
+        font-size: $font-size-xl;
+      }
+    }
+
+    &__actions {
+      position: absolute;
+      top: $spacing-md;
+      right: $spacing-md;
+      display: flex;
+      gap: $spacing-xs;
+    }
+
+    &__content {
+      padding: 0 $spacing-md $spacing-md;
+      flex: 1;
+
+      @media (min-width: $breakpoint-sm) {
+        padding: 0 $spacing-lg $spacing-lg;
+      }
+    }
+
+    &__footer {
+      background-color: rgba($tertiary-color, 0.5);
+      padding: $spacing-md;
+      border-top: 1px solid rgba($border-color, 0.2);
+
+      @media (min-width: $breakpoint-sm) {
+        padding: $spacing-lg;
+      }
+    }
+  }
+
+  .action-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: $border-radius-circle;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 14px;
+
+    &--edit {
+      background-color: rgba($primary-color, 0.1);
+      color: $primary-color;
+
+      &:hover {
+        background-color: $primary-color;
+        color: white;
+        transform: scale(1.1);
+      }
+    }
+
+    &--delete {
+      background-color: rgba($error-color, 0.1);
+      color: $error-color;
+
+      &:hover {
+        background-color: $error-color;
+        color: white;
+        transform: scale(1.1);
+      }
+    }
+  }
+
+  .provider-info {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+
+    &__item {
+      display: flex;
+      align-items: flex-start;
+      gap: $spacing-sm;
+      padding: $spacing-sm;
+      background-color: rgba(white, 0.7);
+      border-radius: $border-radius;
+      border: 1px solid rgba($border-color, 0.1);
+      transition: all 0.2s ease;
+
+      &:hover {
+        background-color: rgba($primary-color, 0.02);
+        border-color: rgba($primary-color, 0.1);
+      }
+
+      &--full {
+        grid-column: 1 / -1;
+      }
+    }
+
+    &__icon {
+      width: 32px;
+      height: 32px;
+      background-color: rgba($primary-color, 0.1);
+      border-radius: $border-radius;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+
+      i {
+        font-size: 14px;
+        color: $primary-color;
+      }
+    }
+
+    &__details {
+      flex: 1;
+      min-width: 0;
+    }
+
+    &__label {
+      display: block;
+      font-size: $font-size-small;
+      font-weight: $font-weight-semibold;
+      color: $text-color-secondary;
+      margin-bottom: 2px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    &__value {
+      display: block;
+      font-size: $font-size-base;
+      color: $text-color;
+      word-break: break-word;
+      line-height: 1.4;
+    }
   }
 
   .provider-products {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: $spacing-sm;
 
-    &__count {
-      color: $text-color-secondary;
-      font-size: $font-size-small;
+    &__info {
       display: flex;
       align-items: center;
       gap: $spacing-xs;
+      color: $text-color-secondary;
+      font-size: $font-size-small;
+      font-weight: $font-weight-medium;
+
+      i {
+        color: $primary-color;
+        font-size: 16px;
+      }
+    }
+
+    &__count {
+      color: $text-color;
     }
 
     &__link {
       color: $primary-color;
       text-decoration: none;
-      font-weight: $font-weight-medium;
+      font-weight: $font-weight-semibold;
+      font-size: $font-size-small;
       display: flex;
       align-items: center;
       gap: $spacing-xs;
+      padding: $spacing-xs $spacing-sm;
+      border-radius: $border-radius;
+      background-color: rgba($primary-color, 0.05);
+      transition: all 0.2s ease;
 
-      i {
-        transition: transform $transition-fast;
+      &:hover {
+        background-color: rgba($primary-color, 0.1);
+        transform: translateX(2px);
+
+        i {
+          transform: translateX(3px);
+        }
       }
 
-      &:hover i {
-        transform: translateX(3px);
+      i {
+        font-size: 12px;
+        transition: transform 0.2s ease;
       }
     }
   }
 
   .empty-state {
     grid-column: 1 / -1;
-    background-color: white;
-    border-radius: $border-radius;
-    box-shadow: $box-shadow;
+    max-width: 500px;
+    width: 100%;
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    border-radius: $border-radius-lg;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 2px dashed rgba($primary-color, 0.2);
     padding: $spacing-xl;
     text-align: center;
+    margin: $spacing-xl auto;
 
-    i {
-      font-size: 3rem;
-      color: $text-color-secondary;
-      opacity: 0.3;
-      margin-bottom: $spacing-md;
-      display: block;
+    &__icon {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, rgba($primary-color, 0.1) 0%, rgba($primary-color, 0.05) 100%);
+      border-radius: $border-radius-circle;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto $spacing-lg;
+
+      i {
+        font-size: 36px;
+        color: rgba($primary-color, 0.6);
+      }
     }
 
-    p {
-      color: $text-color-secondary;
-      margin-bottom: $spacing-lg;
+    &__title {
+      font-size: $font-size-xl;
+      font-weight: $font-weight-bold;
+      color: $text-color;
+      margin: 0 0 $spacing-sm;
     }
 
-    .empty-btn {
+    &__description {
+      color: $text-color-secondary;
+      margin: 0 0 $spacing-xl;
+      line-height: 1.5;
+      max-width: 300px;
+      margin-left: auto;
+      margin-right: auto;
+      margin-bottom: $spacing-xl;
+    }
+
+    &__btn {
       display: inline-flex;
       align-items: center;
       gap: $spacing-sm;
-      background-color: $primary-color;
+      background: linear-gradient(135deg, $primary-color 0%, #059447 100%);
       color: white;
       border: none;
       border-radius: $border-radius;
-      padding: $spacing-sm $spacing-lg;
-      font-weight: $font-weight-medium;
+      padding: $spacing-md $spacing-lg;
+      font-weight: $font-weight-semibold;
+      font-size: $font-size-base;
       cursor: pointer;
-      transition: all $transition-fast;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba($primary-color, 0.3);
 
       &:hover {
-        background-color: $primary-color-hover;
-        transform: translateY(-2px);
-        box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1);
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba($primary-color, 0.4);
+      }
+
+      i {
+        font-size: 16px;
       }
     }
   }
