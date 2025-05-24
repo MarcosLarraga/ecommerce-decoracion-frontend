@@ -353,7 +353,6 @@ const filteredProducts = computed(() => {
 
   @media (min-width: $breakpoint-md) {
     max-width: 250px;
-    // Asegurar que ambos filtros tengan la misma altura base
     min-height: 120px;
   }
 
@@ -366,7 +365,6 @@ const filteredProducts = computed(() => {
     gap: $spacing-xs;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    // Altura fija para alinear las etiquetas
     height: 20px;
 
     i {
@@ -385,7 +383,6 @@ const filteredProducts = computed(() => {
 
 .custom-select {
   position: relative;
-  // Altura específica para el select
   height: 44px;
 
   .select-arrow {
