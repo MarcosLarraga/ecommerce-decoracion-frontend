@@ -103,13 +103,15 @@ const sections = ref([
 
 .about {
   .about__intro {
-    background: linear-gradient(135deg, rgba($primary-color, 0.05) 0%, rgba($primary-color, 0.02) 100%);
-    padding: $spacing-xl 0;
+    background: white;
+    padding: $spacing-lg 0;
     text-align: center;
-    margin-bottom: $spacing-lg;
+    margin: $spacing-lg 0;
+    border-radius: $border-radius-lg;
+    border: 2px solid rgba($primary-color, 0.1);
 
     &-content {
-      max-width: 700px;
+      max-width: 500px;
       margin: 0 auto;
       padding: 0 $spacing-md;
     }

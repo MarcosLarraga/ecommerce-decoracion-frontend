@@ -589,6 +589,5 @@ const filteredProducts = computed(() => {
 
 .product-wrapper {
   width: 100%;
-  
 }
 </style>
