@@ -396,6 +396,7 @@ const filteredProducts = computed(() => {
     color: $text-color-secondary;
     pointer-events: none;
     font-size: 12px;
+    margin-top: 10px;
   }
 }
 
@@ -412,6 +413,7 @@ const filteredProducts = computed(() => {
   appearance: none;
   transition: all 0.3s ease;
   font-weight: $font-weight-medium;
+  margin-top: 10px;
 
   &:focus {
     outline: none;
