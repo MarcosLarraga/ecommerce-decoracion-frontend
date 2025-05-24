@@ -1,9 +1,6 @@
 <template>
   <div class="shop">
-    <div class="shop__header">
-      <h1 class="shop__title">Descubre Nuestros Productos</h1>
-      <p class="shop__subtitle">Encuentra la decoración perfecta para tu hogar</p>
-    </div>
+    <PageHero title="Descubre Nuestros Productos" imageSrc="/fotos/PageHero.jpg" />
 
     <!-- Filtros -->
     <div class="shop__filters">
@@ -103,6 +100,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { useProductsStore } from '../stores/productsStore';
 import { useCategoriesStore } from '../stores/categoriesStore';
 import ProductCard from '../components/ProductCard.vue';
+import PageHero from '../components/PageHero.vue';
 
 const productsStore = useProductsStore();
 const categoriesStore = useCategoriesStore();
@@ -165,8 +163,10 @@ const updateUrlWithFilters = () => {
     delete query.maxPrice;
   }
 
-  // Usar replace en lugar de push para evitar scroll automático
-  router.replace({ query });
+  // Actualizar URL sin cambiar la ruta (sin router)
+  const newUrl = new URL(window.location);
+  newUrl.search = new URLSearchParams(query).toString();
+  window.history.replaceState({}, '', newUrl);
 };
 
 // Función para realizar la búsqueda según el query "search"
@@ -247,69 +247,18 @@ const filteredProducts = computed(() => {
 
 .shop {
   width: 100%;
-  padding: $spacing-sm;
-  margin: 0 auto;
-  max-width: 1400px;
   min-height: 100vh;
-
-  @media (min-width: $breakpoint-sm) {
-    padding: $spacing-md;
-  }
-
-  @media (min-width: $breakpoint-lg) {
-    padding: $spacing-lg;
-  }
-}
-
-.shop__header {
-  text-align: center;
-  margin-bottom: $spacing-xl;
-  padding: $spacing-lg 0;
-
-  @media (min-width: $breakpoint-md) {
-    margin-bottom: $spacing-xxl;
-    padding: $spacing-xl 0;
-  }
-}
-
-.shop__title {
-  font-size: $font-size-xl;
-  font-weight: $font-weight-bold;
-  margin: 0 0 $spacing-sm;
-  color: $text-color;
-  font-family: $font-family-primary;
-  background: linear-gradient(135deg, $primary-color 0%, #059447 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-
-  @media (min-width: $breakpoint-md) {
-    font-size: $font-size-xxl;
-  }
-
-  @media (min-width: $breakpoint-lg) {
-    font-size: 2.5rem;
-  }
-}
-
-.shop__subtitle {
-  font-size: $font-size-base;
-  color: $text-color-secondary;
-  margin: 0;
-  font-weight: $font-weight-regular;
-
-  @media (min-width: $breakpoint-md) {
-    font-size: $font-size-large;
-  }
 }
 
 .shop__filters {
-  margin-bottom: $spacing-xl;
+  margin: $spacing-xl auto;
   display: flex;
   justify-content: center;
+  padding: 0 $spacing-sm;
 
   @media (min-width: $breakpoint-md) {
-    margin-bottom: $spacing-xxl;
+    margin: $spacing-xxl auto;
+    padding: 0 $spacing-lg;
   }
 }
 
@@ -424,7 +373,6 @@ const filteredProducts = computed(() => {
 }
 
 .shop__filter--price {
-  // Alinear el contenido del filtro de precio
   justify-content: space-between;
   
   .shop__price-slider-container {
@@ -432,7 +380,6 @@ const filteredProducts = computed(() => {
     width: 100%;
     height: 40px;
     margin: $spacing-sm 0;
-    // Centrar verticalmente el slider
     display: flex;
     align-items: center;
   }
@@ -573,6 +520,15 @@ const filteredProducts = computed(() => {
 }
 
 .products-section {
+  padding: 0 $spacing-sm;
+  max-width: 1400px;
+  margin: 0 auto $spacing-xxl auto; // Añadido margen inferior
+  
+  @media (min-width: $breakpoint-md) {
+    padding: 0 $spacing-lg;
+    margin: 0 auto $spacing-xxl auto; // Margen inferior en desktop también
+  }
+
   .products-header {
     display: flex;
     justify-content: center;
@@ -633,24 +589,6 @@ const filteredProducts = computed(() => {
 
 .product-wrapper {
   width: 100%;
-  animation: fadeInUp 0.6s ease-out;
-  animation-fill-mode: both;
-
-  @for $i from 1 through 20 {
-    &:nth-child(#{$i}) {
-      animation-delay: #{$i * 0.05}s;
-    }
-  }
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  
 }
 </style>
