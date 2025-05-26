@@ -99,7 +99,6 @@
       </div>
     </section>
 
-    <!-- Newsletter Section -->
     <section class="home__newsletter">
       <div class="newsletter-card">
         <div class="newsletter-card__icon">
@@ -146,7 +145,6 @@ const productsStore = useProductsStore();
 const router = useRouter();
 const toast = useToast();
 
-// Estado para la newsletter
 const newsletterEmail = ref('');
 const isSubscribing = ref(false);
 
@@ -158,9 +156,7 @@ const slides = ref([
   { image: '/fotos/carrusel5.jpg', text: 'Encuentra la inspiración que necesitas' },
 ]);
 
-// Función para suscribirse a la newsletter usando localStorage
 const subscribeToNewsletter = async () => {
-  // Validar email
   if (!newsletterEmail.value || !isValidEmail(newsletterEmail.value)) {
     toast.error('Por favor, introduce un email válido');
     return;
@@ -169,13 +165,10 @@ const subscribeToNewsletter = async () => {
   isSubscribing.value = true;
 
   try {
-    // Simular delay de red para mejor UX
     await new Promise(resolve => setTimeout(resolve, 1200));
 
-    // Obtener suscripciones existentes
     const existingSubscriptions = JSON.parse(localStorage.getItem('lm_newsletter_subscribers') || '[]');
     
-    // Verificar si el email ya está suscrito
     const emailExists = existingSubscriptions.some(
       (subscription: any) => subscription.email.toLowerCase() === newsletterEmail.value.toLowerCase()
     );
@@ -186,7 +179,6 @@ const subscribeToNewsletter = async () => {
       return;
     }
 
-    // Crear nueva suscripción
     const newSubscription = {
       email: newsletterEmail.value.toLowerCase(),
       fecha: new Date().toISOString(),
@@ -201,13 +193,10 @@ const subscribeToNewsletter = async () => {
       activo: true
     };
 
-    // Agregar nueva suscripción
     existingSubscriptions.push(newSubscription);
     
-    // Guardar en localStorage
     localStorage.setItem('lm_newsletter_subscribers', JSON.stringify(existingSubscriptions));
     
-    // Guardar estadísticas
     const stats = JSON.parse(localStorage.getItem('lm_newsletter_stats') || '{}');
     stats.totalSuscripciones = (stats.totalSuscripciones || 0) + 1;
     stats.ultimaSuscripcion = newSubscription.fecha;
@@ -222,10 +211,8 @@ const subscribeToNewsletter = async () => {
       });
     }
 
-    // Mostrar mensaje de éxito personalizado
     toast.success('¡Te has suscrito correctamente! 🎉 Te mantendremos informado sobre nuestras últimas tendencias, ofertas exclusivas y novedades en decoración.');
     
-    // Limpiar el campo
     newsletterEmail.value = '';
 
   } catch (error) {
@@ -236,13 +223,11 @@ const subscribeToNewsletter = async () => {
   }
 };
 
-// Función para validar email
 const isValidEmail = (email: string): boolean => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailRegex.test(email);
 };
 
-// Manejar Enter en el input
 const handleNewsletterKeydown = (event: KeyboardEvent) => {
   if (event.key === 'Enter') {
     event.preventDefault();
@@ -271,7 +256,6 @@ const goToCategory = (categoryName: string) => {
   overflow-x: hidden;
 }
 
-// === HERO SECTION ===
 .home__hero {
   position: relative;
   height: 100vh;
@@ -450,7 +434,6 @@ const goToCategory = (categoryName: string) => {
   }
 }
 
-// === SECCIONES COMUNES ===
 .section-header {
   text-align: center;
   margin-bottom: 3rem;
@@ -485,7 +468,6 @@ const goToCategory = (categoryName: string) => {
   margin: 0 auto;
 }
 
-// === CATEGORÍAS ===
 .home__categories {
   padding: 4rem 0;
   background: linear-gradient(135deg, #f8fffe 0%, #f0f8f6 100%);
@@ -594,7 +576,6 @@ const goToCategory = (categoryName: string) => {
   letter-spacing: 0.05em;
 }
 
-// === PRODUCTOS DESTACADOS ===
 .home__products {
   padding: 4rem 0;
   background: white;
@@ -623,7 +604,6 @@ const goToCategory = (categoryName: string) => {
   text-align: center;
 }
 
-// === NEWSLETTER ===
 .home__newsletter {
   padding: 4rem 1rem;
   background: linear-gradient(135deg, $primary-color 0%, $primary-color-dark 100%);
@@ -761,7 +741,6 @@ const goToCategory = (categoryName: string) => {
   }
 }
 
-// === RESPONSIVE DESIGN (Tablets y Desktop) ===
 @media (min-width: $breakpoint-sm) {
   .home__slide-title {
     font-size: clamp(2.5rem, 6vw, 4rem);
@@ -785,7 +764,6 @@ const goToCategory = (categoryName: string) => {
     max-width: 500px;
   }
   
-  // Newsletter más ligero en desktop con transparencia
   .home__newsletter {
     background: linear-gradient(135deg, 
       rgba($primary-color, 0.85) 0%, 
@@ -820,13 +798,11 @@ const goToCategory = (categoryName: string) => {
     padding: 5rem 2rem;
   }
   
-  // Productos aún más grandes en pantallas grandes
   .home__products-grid {
     gap: 2.5rem;
     max-width: 1600px;
   }
   
-  // Newsletter con patrón sutil y más transparencia en pantallas grandes
   .home__newsletter {
     background: linear-gradient(135deg, 
       rgba($primary-color, 0.75) 0%, 
