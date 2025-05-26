@@ -32,10 +32,64 @@
         </AdminFilter>
       </template>
       
+      <!-- Vista móvil (cards) -->
+      <div class="mobile-orders-list" v-if="filteredOrders.length > 0">
+        <div 
+          v-for="order in filteredOrders" 
+          :key="order.id" 
+          class="mobile-order-card"
+          @click="viewOrderDetails(order)"
+        >
+          <div class="mobile-order-card__header">
+            <div class="mobile-order-card__id">
+              <i class="fas fa-hashtag"></i>
+              {{ order.id }}
+            </div>
+            <div class="mobile-order-card__total">
+              {{ formatCurrency(order.total) }}
+            </div>
+          </div>
+          
+          <div class="mobile-order-card__info">
+            <div class="mobile-order-card__client">
+              <i class="fas fa-user"></i>
+              {{ getUserName(order.usuarioId) }}
+            </div>
+            <div class="mobile-order-card__date">
+              <i class="fas fa-calendar-alt"></i>
+              {{ order.fechaFormateada }}
+            </div>
+            <div class="mobile-order-card__products" v-if="getOrderProductsCount(order) !== 'N/A'">
+              <i class="fas fa-box"></i>
+              {{ getOrderProductsCount(order) }} productos
+            </div>
+          </div>
+          
+          <div class="mobile-order-card__actions">
+            <button 
+              class="mobile-action-btn mobile-action-btn--view" 
+              @click.stop="viewOrderDetails(order)"
+              aria-label="Ver detalles"
+            >
+              <i class="fas fa-eye"></i>
+            </button>
+            <button 
+              class="mobile-action-btn mobile-action-btn--delete" 
+              @click.stop="confirmDeleteOrder(order)"
+              aria-label="Eliminar"
+            >
+              <i class="fas fa-trash-alt"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Vista desktop (tabla) -->
       <AdminTable 
         :columns="columns"
         :isEmpty="filteredOrders.length === 0"
         :emptyMessage="searchQuery || dateFilter !== 'all' ? 'No se encontraron pedidos con esos criterios' : 'No hay pedidos registrados'"
+        class="desktop-table"
       >
         <tr v-for="order in filteredOrders" :key="order.id">
           <td>#{{ order.id }}</td>
@@ -136,7 +190,53 @@
               <div class="spinner"></div>
               <span>Cargando detalles...</span>
             </div>
-            <table v-else class="order-details__table">
+            
+            <!-- Vista móvil de productos -->
+            <div v-else class="products-mobile-view">
+              <div 
+                v-for="item in orderDetails" 
+                :key="item.id"
+                class="product-mobile-card"
+              >
+                <div class="product-mobile-card__image">
+                  <div class="thumb-image">
+                    <img 
+                      v-if="getProductImage(item.productoId)" 
+                      :src="getProductImage(item.productoId)"
+                      :alt="getProductName(item.productoId)"
+                    >
+                    <div v-else class="thumb-image__placeholder">
+                      <i class="fas fa-box"></i>
+                    </div>
+                  </div>
+                </div>
+                <div class="product-mobile-card__info">
+                  <div class="product-mobile-card__name">
+                    {{ getProductName(item.productoId) }}
+                  </div>
+                  <div class="product-mobile-card__id">
+                    ID: {{ item.productoId }}
+                  </div>
+                  <div class="product-mobile-card__details">
+                    <span class="product-mobile-card__price">
+                      {{ formatCurrency(item.precioUnitario) }}
+                    </span>
+                    <span class="product-mobile-card__quantity">
+                      Cant: {{ item.cantidad }}
+                    </span>
+                    <span class="product-mobile-card__subtotal">
+                      {{ formatCurrency(item.precioUnitario * item.cantidad) }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div class="products-total">
+                <strong>Total: {{ formatCurrency(selectedOrder.total) }}</strong>
+              </div>
+            </div>
+            
+            <!-- Vista desktop de productos (tabla) -->
+            <table class="order-details__table">
               <thead>
                 <tr>
                   <th>Producto</th>
@@ -192,11 +292,11 @@
       <template #footer>
         <button class="modal-btn secondary-btn" @click="closeOrderDetails">
           <i class="fas fa-times"></i>
-          <span>Cerrar</span>
+          <span class="btn-text">Cerrar</span>
         </button>
         <button class="modal-btn error-btn" @click="confirmDeleteOrder(selectedOrder)">
           <i class="fas fa-trash-alt"></i>
-          <span>Eliminar Pedido</span>
+          <span class="btn-text">Eliminar</span>
         </button>
       </template>
     </AdminModal>
@@ -221,7 +321,7 @@
       <template #footer>
         <button class="modal-btn secondary-btn" @click="cancelDelete">
           <i class="fas fa-times"></i>
-          <span>Cancelar</span>
+          <span class="btn-text">Cancelar</span>
         </button>
         <button 
           class="modal-btn error-btn" 
@@ -230,7 +330,7 @@
         >
           <i v-if="loading" class="spinner"></i>
           <i v-else class="fas fa-trash-alt"></i>
-          <span>{{ loading ? 'Eliminando...' : 'Eliminar Pedido' }}</span>
+          <span class="btn-text">{{ loading ? 'Eliminando...' : 'Eliminar' }}</span>
         </button>
       </template>
     </AdminModal>
@@ -480,77 +580,434 @@ const deleteOrder = async () => {
 @use '@/styles/admin-unified-styles.scss';
 
 .admin-orders {
+  // MOBILE FIRST - Base styles (320px+)
+  
+  // Vista móvil - Cards en lugar de tabla
+  .mobile-orders-list {
+    display: block;
+    gap: $spacing-sm;
+  }
+  
+  .mobile-order-card {
+    background: white;
+    border-radius: $border-radius;
+    padding: $spacing-sm;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border: 1px solid $border-color;
+    margin-bottom: $spacing-sm;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+    
+    &__header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: $spacing-sm;
+      padding-bottom: $spacing-sm;
+      border-bottom: 1px solid $tertiary-color;
+    }
+    
+    &__id {
+      display: flex;
+      align-items: center;
+      gap: $spacing-xs;
+      font-weight: $font-weight-semibold;
+      color: $text-color;
+      font-size: $font-size-base;
+      
+      i {
+        color: $primary-color;
+        font-size: 12px;
+      }
+    }
+    
+    &__total {
+      font-weight: $font-weight-bold;
+      color: $primary-color;
+      font-size: $font-size-base;
+    }
+    
+    &__info {
+      display: flex;
+      flex-direction: column;
+      gap: $spacing-xs;
+      margin-bottom: $spacing-sm;
+    }
+    
+    &__client,
+    &__date,
+    &__products {
+      display: flex;
+      align-items: center;
+      gap: $spacing-xs;
+      font-size: $font-size-small;
+      color: $text-color-secondary;
+      
+      i {
+        color: $primary-color;
+        width: 14px;
+        font-size: 12px;
+      }
+    }
+    
+    &__client {
+      font-weight: $font-weight-medium;
+      color: $text-color;
+    }
+    
+    &__actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: $spacing-xs;
+    }
+  }
+  
+  .mobile-action-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: $border-radius-sm;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    
+    i {
+      font-size: 12px;
+    }
+    
+    &--view {
+      background: rgba($info-color, 0.1);
+      color: $info-color;
+      
+      &:hover {
+        background: $info-color;
+        color: white;
+      }
+    }
+    
+    &--delete {
+      background: rgba($error-color, 0.1);
+      color: $error-color;
+      
+      &:hover {
+        background: $error-color;
+        color: white;
+      }
+    }
+  }
+  
+  // Ocultar tabla en móvil
+  .desktop-table {
+    display: none;
+  }
+  
+  // Modal - Estilos móviles
   .order-details {
     display: flex;
     flex-direction: column;
-    gap: $spacing-lg;
+    gap: $spacing-md;
     
     &__loading {
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: $spacing-xl;
-      gap: $spacing-md;
+      padding: $spacing-lg;
+      gap: $spacing-sm;
       color: $text-color-secondary;
+      font-size: $font-size-small;
+    }
+  }
+  
+  // Vista móvil de productos dentro del modal
+  .products-mobile-view {
+    display: block;
+  }
+  
+  .product-mobile-card {
+    display: flex;
+    align-items: flex-start;
+    gap: $spacing-sm;
+    padding: $spacing-sm;
+    border: 1px solid $border-color;
+    border-radius: $border-radius;
+    margin-bottom: $spacing-sm;
+    background: $tertiary-color;
+    
+    &__image {
+      flex-shrink: 0;
     }
     
-    &__product {
-      display: flex;
-      align-items: center;
-      gap: $spacing-md;
+    &__info {
+      flex: 1;
+      min-width: 0;
     }
     
-    &__product-info {
+    &__name {
+      font-weight: $font-weight-medium;
+      color: $text-color;
+      font-size: $font-size-small;
+      line-height: 1.3;
+      margin-bottom: $spacing-xs;
+    }
+    
+    &__id {
+      font-size: 11px;
+      color: $text-color-secondary;
+      margin-bottom: $spacing-xs;
+    }
+    
+    &__details {
       display: flex;
       flex-direction: column;
-      gap: $spacing-xs;
+      gap: 2px;
+      font-size: 12px;
     }
     
-    &__product-name {
-      font-weight: $font-weight-semibold;
+    &__price {
       color: $text-color;
     }
     
-    &__product-id {
-      font-size: $font-size-small;
+    &__quantity {
       color: $text-color-secondary;
     }
     
-    &__table {
-      width: 100%;
-      border-collapse: collapse;
-      border: 1px solid $border-color;
-      border-radius: $border-radius;
-      overflow: hidden;
+    &__subtotal {
+      color: $primary-color;
+      font-weight: $font-weight-semibold;
+    }
+  }
+  
+  .products-total {
+    text-align: center;
+    padding: $spacing-sm;
+    background: rgba($primary-color, 0.1);
+    border-radius: $border-radius;
+    color: $primary-color;
+    font-size: $font-size-base;
+    margin-top: $spacing-sm;
+  }
+  
+  // Ocultar tabla de productos en móvil
+  .order-details__table {
+    display: none;
+  }
+  
+  // Botones del modal - solo iconos en móvil
+  .modal-btn {
+    .btn-text {
+      display: none;
+    }
+  }
+  
+  // TABLET - 768px y superior
+  @media (min-width: $breakpoint-md) {
+    // Mostrar tabla, ocultar vista móvil
+    .mobile-orders-list {
+      display: none;
+    }
+    
+    .desktop-table {
+      display: block;
+    }
+    
+    // Modal - Vista tablet/desktop
+    .order-details {
+      gap: $spacing-lg;
       
-      th, td {
-        padding: $spacing-sm;
-        text-align: left;
-        border-bottom: 1px solid $border-color;
+      &__loading {
+        padding: $spacing-xl;
+        gap: $spacing-md;
+        font-size: $font-size-base;
       }
       
-      th {
-        background-color: rgba($primary-color, 0.1);
+      &__product {
+        display: flex;
+        align-items: center;
+        gap: $spacing-md;
+      }
+      
+      &__product-info {
+        display: flex;
+        flex-direction: column;
+        gap: $spacing-xs;
+      }
+      
+      &__product-name {
         font-weight: $font-weight-semibold;
         color: $text-color;
       }
       
-      tfoot {
-        td {
-          font-weight: $font-weight-semibold;
-          background-color: $tertiary-color;
+      &__product-id {
+        font-size: $font-size-small;
+        color: $text-color-secondary;
+      }
+      
+      &__table {
+        display: table;
+        width: 100%;
+        border-collapse: collapse;
+        border: 1px solid $border-color;
+        border-radius: $border-radius;
+        overflow: hidden;
+        
+        th, td {
+          padding: $spacing-sm;
+          text-align: left;
+          border-bottom: 1px solid $border-color;
         }
         
-        .order-details__total-label {
-          text-align: right;
+        th {
+          background-color: rgba($primary-color, 0.1);
+          font-weight: $font-weight-semibold;
           color: $text-color;
         }
         
-        .order-details__total-value {
-          color: $primary-color;
-          font-weight: $font-weight-bold;
+        tfoot {
+          td {
+            font-weight: $font-weight-semibold;
+            background-color: $tertiary-color;
+          }
+          
+          .order-details__total-label {
+            text-align: right;
+            color: $text-color;
+          }
+          
+          .order-details__total-value {
+            color: $primary-color;
+            font-weight: $font-weight-bold;
+          }
         }
       }
+    }
+    
+    // Ocultar vista móvil de productos
+    .products-mobile-view {
+      display: none;
+    }
+    
+    // Mostrar texto en botones del modal
+    .modal-btn {
+      .btn-text {
+        display: inline;
+        margin-left: $spacing-xs;
+      }
+    }
+  }
+  
+  // DESKTOP - 1024px y superior
+  @media (min-width: $breakpoint-lg) {
+    .mobile-order-card {
+      &__header {
+        padding-bottom: $spacing-md;
+      }
+      
+      &__info {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: $spacing-sm;
+        margin-bottom: $spacing-md;
+      }
+      
+      &__products {
+        grid-column: span 2;
+      }
+    }
+    
+    .order-details {
+      &__table {
+        th, td {
+          padding: $spacing-md;
+        }
+      }
+      
+      &__product {
+        gap: $spacing-lg;
+      }
+      
+      &__loading {
+        padding: $spacing-xxl;
+      }
+    }
+    
+    .product-mobile-card {
+      padding: $spacing-md;
+      gap: $spacing-md;
+      
+      &__name {
+        font-size: $font-size-base;
+      }
+      
+      &__id {
+        font-size: $font-size-small;
+      }
+      
+      &__details {
+        font-size: $font-size-small;
+        gap: $spacing-xs;
+      }
+    }
+  }
+  
+  // LARGE DESKTOP - 1280px y superior  
+  @media (min-width: $breakpoint-xl) {
+    .mobile-order-card {
+      padding: $spacing-md;
+      
+      &__header {
+        margin-bottom: $spacing-md;
+      }
+      
+      &__id {
+        font-size: $font-size-large;
+      }
+      
+      &__total {
+        font-size: $font-size-large;
+      }
+      
+      &__client,
+      &__date,
+      &__products {
+        font-size: $font-size-base;
+        
+        i {
+          font-size: 14px;
+        }
+      }
+      
+      &__actions {
+        gap: $spacing-sm;
+      }
+    }
+    
+    .mobile-action-btn {
+      width: 36px;
+      height: 36px;
+      
+      i {
+        font-size: 14px;
+      }
+    }
+    
+    .order-details {
+      &__table {
+        th, td {
+          padding: $spacing-lg;
+        }
+      }
+    }
+    
+    .products-total {
+      font-size: $font-size-large;
+      padding: $spacing-md;
     }
   }
 }

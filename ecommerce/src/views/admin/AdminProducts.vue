@@ -22,54 +22,157 @@
       </router-link>
     </div>
 
-    <AdminContent>
-      <template #filters>
-        <AdminFilter label="Categoría:">
+    <!-- Vista Mobile/Tablet (Tarjetas) -->
+    <div class="admin-products__mobile-view">
+      <!-- Filtros Mobile -->
+      <div class="admin-products__filters">
+        <div class="admin-products__filter-group">
+          <label class="admin-products__filter-label">
+            <i class="fas fa-tags"></i>
+            Categoría
+          </label>
           <AdminSelect v-model="categoryFilter">
             <option value="">Todas las categorías</option>
             <option v-for="category in categories" :key="category.id" :value="category.id">
               {{ category.nombre }}
             </option>
           </AdminSelect>
-        </AdminFilter>
+        </div>
 
-        <AdminFilter v-if="!currentProvider" label="Proveedor:">
+        <div v-if="!currentProvider" class="admin-products__filter-group">
+          <label class="admin-products__filter-label">
+            <i class="fas fa-building"></i>
+            Proveedor
+          </label>
           <AdminSelect v-model="providerFilter">
             <option value="">Todos los proveedores</option>
             <option v-for="provider in providers" :key="provider.id" :value="provider.id">
               {{ provider.nombre }}
             </option>
           </AdminSelect>
-        </AdminFilter>
-      </template>
+        </div>
+      </div>
 
-      <AdminTable :columns="columns" :isEmpty="filteredProducts.length === 0"
-        :emptyMessage="searchQuery || categoryFilter || providerFilter ? 'No se encontraron productos con esos criterios' : 'No hay productos registrados'">
-        <tr v-for="product in filteredProducts" :key="product.id">
-          <td>#{{ product.id }}</td>
-          <td>
-            <div class="thumb-image">
-              <img v-if="product.urlImagen" :src="product.urlImagen" :alt="product.nombre" />
-              <div v-else class="thumb-image__placeholder">
-                <i class="fas fa-box"></i>
+      <!-- Grid de productos -->
+      <div class="admin-products__grid">
+        <div v-for="product in filteredProducts" :key="product.id" class="admin-products__card">
+          <!-- Header de la tarjeta -->
+          <div class="admin-products__card-header">
+            <div class="admin-products__card-info-section">
+              <div class="admin-products__card-image">
+                <img v-if="product.urlImagen" :src="product.urlImagen" :alt="product.nombre" />
+                <div v-else class="admin-products__card-image-placeholder">
+                  <i class="fas fa-box"></i>
+                </div>
+              </div>
+              <div class="admin-products__card-id">#{{ product.id }}</div>
+            </div>
+            <div class="admin-products__card-actions">
+              <button class="admin-products__action-btn admin-products__action-btn--edit" 
+                      @click="editProduct(product)" 
+                      title="Editar producto">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button class="admin-products__action-btn admin-products__action-btn--delete" 
+                      @click="confirmDeleteProduct(product)" 
+                      title="Eliminar producto">
+                <i class="fas fa-trash-alt"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Contenido de la tarjeta -->
+          <div class="admin-products__card-content">
+            <h3 class="admin-products__card-title">{{ product.nombre }}</h3>
+            <div class="admin-products__card-price">{{ formatCurrency(product.precio) }}</div>
+            
+            <div class="admin-products__card-info">
+              <div class="admin-products__info-item">
+                <span class="admin-products__info-label">Categoría:</span>
+                <span class="admin-products__info-value">{{ getCategoryName(product.categoriaId) }}</span>
+              </div>
+              <div class="admin-products__info-item">
+                <span class="admin-products__info-label">Proveedor:</span>
+                <span class="admin-products__info-value">{{ getProviderName(product.proveedorId) }}</span>
+              </div>
+              <div v-if="product.descripcion" class="admin-products__info-item admin-products__info-item--full">
+                <span class="admin-products__info-label">Descripción:</span>
+                <span class="admin-products__info-value">{{ product.descripcion }}</span>
               </div>
             </div>
-          </td>
-          <td>{{ product.nombre }}</td>
-          <td>{{ formatCurrency(product.precio) }}</td>
-          <td>{{ getCategoryName(product.categoriaId) }}</td>
-          <td>{{ getProviderName(product.proveedorId) }}</td>
-          <td class="action-buttons">
-            <button class="btn btn-edit" @click="editProduct(product)" title="Editar producto">
-              <i class="fas fa-edit"></i>
-            </button>
-            <button class="btn btn-delete" @click="confirmDeleteProduct(product)" title="Eliminar producto">
-              <i class="fas fa-trash-alt"></i>
-            </button>
-          </td>
-        </tr>
-      </AdminTable>
-    </AdminContent>
+          </div>
+        </div>
+
+        <!-- Estado vacío -->
+        <div v-if="filteredProducts.length === 0" class="admin-products__empty">
+          <div class="admin-products__empty-icon">
+            <i class="fas fa-box-open"></i>
+          </div>
+          <h3 class="admin-products__empty-title">
+            {{ searchQuery || categoryFilter || providerFilter ? 'Sin resultados' : 'No hay productos' }}
+          </h3>
+          <p class="admin-products__empty-description">
+            {{ searchQuery || categoryFilter || providerFilter ? 'No se encontraron productos con esos criterios' : 'No hay productos registrados' }}
+          </p>
+          <button class="admin-products__empty-btn" @click="createProduct">
+            <i class="fas fa-plus"></i>
+            Añadir producto
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vista Desktop (Tabla) -->
+    <div class="admin-products__desktop-view">
+      <AdminContent>
+        <template #filters>
+          <AdminFilter label="Categoría:">
+            <AdminSelect v-model="categoryFilter">
+              <option value="">Todas las categorías</option>
+              <option v-for="category in categories" :key="category.id" :value="category.id">
+                {{ category.nombre }}
+              </option>
+            </AdminSelect>
+          </AdminFilter>
+
+          <AdminFilter v-if="!currentProvider" label="Proveedor:">
+            <AdminSelect v-model="providerFilter">
+              <option value="">Todos los proveedores</option>
+              <option v-for="provider in providers" :key="provider.id" :value="provider.id">
+                {{ provider.nombre }}
+              </option>
+            </AdminSelect>
+          </AdminFilter>
+        </template>
+
+        <AdminTable :columns="columns" :isEmpty="filteredProducts.length === 0"
+          :emptyMessage="searchQuery || categoryFilter || providerFilter ? 'No se encontraron productos con esos criterios' : 'No hay productos registrados'">
+          <tr v-for="product in filteredProducts" :key="product.id">
+            <td>#{{ product.id }}</td>
+            <td>
+              <div class="thumb-image">
+                <img v-if="product.urlImagen" :src="product.urlImagen" :alt="product.nombre" />
+                <div v-else class="thumb-image__placeholder">
+                  <i class="fas fa-box"></i>
+                </div>
+              </div>
+            </td>
+            <td>{{ product.nombre }}</td>
+            <td>{{ formatCurrency(product.precio) }}</td>
+            <td>{{ getCategoryName(product.categoriaId) }}</td>
+            <td>{{ getProviderName(product.proveedorId) }}</td>
+            <td class="action-buttons">
+              <button class="btn btn-edit" @click="editProduct(product)" title="Editar producto">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button class="btn btn-delete" @click="confirmDeleteProduct(product)" title="Eliminar producto">
+                <i class="fas fa-trash-alt"></i>
+              </button>
+            </td>
+          </tr>
+        </AdminTable>
+      </AdminContent>
+    </div>
 
     <!-- Modal para crear/editar producto -->
     <AdminModal v-model="showProductModal" :title="isCreating ? 'Crear Producto' : 'Editar Producto'"
@@ -428,11 +531,365 @@ const deleteProduct = async () => {
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 @use '@/styles/variables' as *;
 @use '@/styles/admin-unified-styles.scss';
 
 .admin-products {
-  /* Estilos específicos para la vista de productos, si son necesarios */
+  // Vista mobile (por defecto visible)
+  &__mobile-view {
+    display: block;
+    
+    @media (min-width: $breakpoint-xl) {
+      display: none;
+    }
+  }
+
+  // Vista desktop (oculta en móvil/tablet)
+  &__desktop-view {
+    display: none;
+    
+    @media (min-width: $breakpoint-xl) {
+      display: block;
+    }
+  }
+
+  // Filtros mobile first
+  &__filters {
+    background: white;
+    border-radius: $border-radius-lg;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba($border-color, 0.2);
+    padding: $spacing-md;
+    margin: $spacing-md;
+    margin-bottom: $spacing-lg;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+    
+    @media (min-width: $breakpoint-sm) {
+      flex-direction: row;
+      gap: $spacing-lg;
+      padding: $spacing-lg;
+      margin: $spacing-lg;
+    }
+  }
+
+  &__filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+    width: 100%;
+    
+    @media (min-width: $breakpoint-sm) {
+      max-width: 250px;
+    }
+  }
+
+  &__filter-label {
+    font-size: $font-size-small;
+    font-weight: $font-weight-semibold;
+    color: $text-color;
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+    
+    i {
+      color: $primary-color;
+      font-size: 12px;
+    }
+  }
+
+  // Grid de productos mobile first
+  &__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: $spacing-md;
+    padding: $spacing-sm;
+    justify-items: center;
+    
+    @media (min-width: $breakpoint-sm) {
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: $spacing-lg;
+      padding: $spacing-md;
+    }
+    
+    @media (min-width: $breakpoint-lg) {
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: $spacing-xl;
+      padding: $spacing-lg;
+    }
+  }
+
+  // Tarjetas de producto
+  &__card {
+    background: white;
+    border-radius: $border-radius-lg;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba($border-color, 0.3);
+    overflow: hidden;
+    transition: all 0.3s ease;
+    width: 100%;
+    max-width: 400px;
+    
+    &:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+    }
+
+    &-header {
+      padding: $spacing-md;
+      background: linear-gradient(135deg, rgba($primary-color, 0.05) 0%, rgba($primary-color, 0.02) 100%);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: $spacing-sm;
+      
+      @media (min-width: $breakpoint-sm) {
+        padding: $spacing-lg;
+        gap: $spacing-md;
+      }
+    }
+
+    &-info-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: $spacing-xs;
+    }
+
+    &-image {
+      width: 60px;
+      height: 60px;
+      border-radius: $border-radius;
+      overflow: hidden;
+      border: 1px solid $border-color;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: white;
+      
+      @media (min-width: $breakpoint-sm) {
+        width: 80px;
+        height: 80px;
+      }
+      
+      img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+      }
+    }
+
+    &-image-placeholder {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      color: $text-color-secondary;
+      font-size: 20px;
+      
+      @media (min-width: $breakpoint-sm) {
+        font-size: 28px;
+      }
+    }
+
+    &-id {
+      background: rgba($primary-color, 0.1);
+      color: $primary-color;
+      padding: 2px 6px;
+      border-radius: $border-radius-sm;
+      font-size: $font-size-small;
+      font-weight: $font-weight-medium;
+      align-self: flex-start;
+      margin-top: $spacing-xs;
+    }
+
+    &-actions {
+      display: flex;
+      gap: $spacing-xs;
+      flex-shrink: 0;
+    }
+
+    &-content {
+      padding: $spacing-md;
+      
+      @media (min-width: $breakpoint-sm) {
+        padding: $spacing-lg;
+      }
+    }
+
+    &-title {
+      font-size: $font-size-large;
+      font-weight: $font-weight-bold;
+      color: $text-color;
+      margin: 0 0 $spacing-sm;
+      text-align: center;
+      
+      @media (min-width: $breakpoint-sm) {
+        font-size: $font-size-xl;
+      }
+    }
+
+    &-price {
+      font-size: $font-size-xl;
+      font-weight: $font-weight-bold;
+      color: $primary-color;
+      text-align: center;
+      margin-bottom: $spacing-md;
+      
+      @media (min-width: $breakpoint-sm) {
+        font-size: $font-size-xxl;
+      }
+    }
+
+    &-info {
+      display: flex;
+      flex-direction: column;
+      gap: $spacing-sm;
+    }
+  }
+
+  // Botones de acción
+  &__action-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: $border-radius-circle;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 12px;
+    
+    // Mejor área táctil en móvil
+    @media (max-width: $breakpoint-sm - 1px) {
+      width: 40px;
+      height: 40px;
+      font-size: 14px;
+    }
+
+    &--edit {
+      background-color: rgba($primary-color, 0.1);
+      color: $primary-color;
+
+      &:hover {
+        background-color: $primary-color;
+        color: white;
+        transform: scale(1.1);
+      }
+    }
+
+    &--delete {
+      background-color: rgba($error-color, 0.1);
+      color: $error-color;
+
+      &:hover {
+        background-color: $error-color;
+        color: white;
+        transform: scale(1.1);
+      }
+    }
+  }
+
+  // Items de información
+  &__info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: $spacing-xs;
+    background: rgba($tertiary-color, 0.5);
+    border-radius: $border-radius-sm;
+    
+    &--full {
+      grid-column: 1 / -1;
+      
+      .admin-products__info-value {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+  }
+
+  &__info-label {
+    font-size: $font-size-small;
+    font-weight: $font-weight-semibold;
+    color: $text-color-secondary;
+  }
+
+  &__info-value {
+    font-size: $font-size-base;
+    color: $text-color;
+    word-break: break-word;
+  }
+
+  // Estado vacío
+  &__empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: $spacing-xl;
+    background: white;
+    border-radius: $border-radius-lg;
+    border: 2px dashed rgba($primary-color, 0.2);
+    max-width: 400px;
+    margin: 0 auto;
+
+    &-icon {
+      width: 60px;
+      height: 60px;
+      background: rgba($primary-color, 0.1);
+      border-radius: $border-radius-circle;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto $spacing-md;
+
+      i {
+        font-size: 24px;
+        color: $primary-color;
+      }
+    }
+
+    &-title {
+      font-size: $font-size-large;
+      font-weight: $font-weight-bold;
+      color: $text-color;
+      margin: 0 0 $spacing-sm;
+    }
+
+    &-description {
+      color: $text-color-secondary;
+      margin: 0 0 $spacing-lg;
+      line-height: 1.5;
+    }
+
+    &-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: $spacing-sm;
+      background: $primary-color;
+      color: white;
+      border: none;
+      border-radius: $border-radius;
+      padding: $spacing-sm $spacing-md;
+      font-weight: $font-weight-semibold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+
+      &:hover {
+        background-color: $primary-color-hover;
+        transform: translateY(-2px);
+      }
+
+      i {
+        font-size: 14px;
+      }
+    }
+  }
 }
 </style>
