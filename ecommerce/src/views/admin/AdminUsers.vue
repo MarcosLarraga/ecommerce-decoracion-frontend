@@ -3,7 +3,7 @@
   <div class="admin-view admin-users">
     <!-- Header móvil optimizado -->
     <div class="admin-users__header">
-      <h1 class="admin-users__title">Usuarios</h1>
+      <h1 class="admin-users__title">Gestión de Usuarios</h1>
       
       <!-- Búsqueda -->
       <div class="admin-users__search">
@@ -504,6 +504,11 @@ const deleteUser = async () => {
     cursor: pointer;
     font-weight: $font-weight-medium;
     transition: all $transition-fast;
+    max-width: 50px;
+    
+    @media (min-width: $breakpoint-sm) {
+      max-width: none;
+    }
     
     &:hover {
       background: $primary-color-hover;
