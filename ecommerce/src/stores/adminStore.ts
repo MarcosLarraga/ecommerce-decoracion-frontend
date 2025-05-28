@@ -162,18 +162,30 @@ export const useAdminStore = defineStore('admin', {
       }
     },
 
+    // Método updateUser corregido en adminStore.ts
+
     async updateUser(user: Usuario) {
       this.loading = true;
       this.error = null;
       try {
+        console.log('Actualizando usuario:', user);
+
         const response = await axios.put<Usuario>(`/api/Usuario/${user.id}`, user, {
           headers: { Authorization: `Bearer ${this.token}` }
         });
 
-        // Actualizar la lista local
+        console.log('Respuesta del servidor:', response.data);
+
+        // Actualizar la lista local con los datos devueltos por el servidor
         const index = this.users.findIndex(u => u.id === user.id);
         if (index !== -1) {
-          this.users[index] = response.data;
+          // Usar los datos del servidor, no los del formulario
+          this.users[index] = { ...response.data };
+          console.log('Usuario actualizado en la lista local:', this.users[index]);
+        } else {
+          console.warn('No se encontró el usuario en la lista local');
+          // Si no se encuentra, recargar toda la lista
+          await this.fetchAllUsers();
         }
 
         return response.data;

@@ -9,6 +9,11 @@
       <div class="product-detail__container">
         <div class="product-detail__image-wrapper">
           <img :src="product?.urlImagen" :alt="product?.nombre" class="product-detail__image" />
+          
+          <!-- Visor 3D -->
+          <div class="product-detail__3d-viewer">
+            <Product2DViewer v-if="product" :producto="product" />
+          </div>
         </div>
 
         <div class="product-detail__info">
@@ -137,6 +142,7 @@ import { useCartStore } from '../stores/cartStore';
 import { useReseñaStore } from '../stores/reseñaStore';
 import { useUserStore } from '../stores/userStore';
 import { useToast } from 'vue-toastification';
+import Product2DViewer from '../components/Product2DViewer.vue';
 
 const route = useRoute();
 const cartStore = useCartStore();
@@ -251,11 +257,8 @@ const getUserPlaceholder = (userId: number): string => {
 };
 </script>
 
-
-
 <style lang="scss" scoped>
 @use '../styles/variables' as *;
-
 
 .product-detail {
   width: 100%;
@@ -279,6 +282,7 @@ const getUserPlaceholder = (userId: number): string => {
     width: 100%;
     max-width: 500px;
     margin: 0 auto;
+    position: relative;
 
     @media (min-width: 768px) {
       margin: 0;
@@ -291,6 +295,12 @@ const getUserPlaceholder = (userId: number): string => {
     border-radius: $border-radius;
     object-fit: cover;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  &__3d-viewer {
+    margin-top: $spacing-md;
+    display: flex;
+    justify-content: center;
   }
 
   &__info {
@@ -366,6 +376,34 @@ const getUserPlaceholder = (userId: number): string => {
       transform: translateY(-2px);
     }
   }
+}
+
+// Loading
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  
+  .loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid rgba($primary-color, 0.2);
+    border-radius: 50%;
+    border-top-color: $primary-color;
+    animation: spin 1s linear infinite;
+    margin-bottom: $spacing-md;
+  }
+  
+  p {
+    color: $text-color-secondary;
+    font-size: $font-size-base;
+  }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
 /* Sección de Reseñas Mejorada */
