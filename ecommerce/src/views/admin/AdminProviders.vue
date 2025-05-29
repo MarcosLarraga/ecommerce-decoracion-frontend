@@ -314,6 +314,7 @@ const validateProvider = (): boolean => {
 };
 
 const createProvider = () => {
+  console.log('Creando nuevo proveedor...');
   editingProvider.value = {
     nombre: '',
     direccion: '',
@@ -326,18 +327,25 @@ const createProvider = () => {
 };
 
 const editProvider = (provider: Proveedor) => {
+  console.log('Editando proveedor:', provider);
   editingProvider.value = { ...provider };
   showProviderModal.value = true;
 };
 
 const cancelEdit = () => {
+  console.log('Cancelando edición...');
   showProviderModal.value = false;
   editingProvider.value = null;
   validationErrors.value = {};
 };
 
 const saveProvider = async () => {
-  if (!editingProvider.value) return;
+  console.log('Guardando proveedor...', editingProvider.value);
+  
+  if (!editingProvider.value) {
+    toast.error('No hay datos de proveedor para guardar');
+    return;
+  }
 
   if (!validateProvider()) {
     toast.error('Por favor, corrija los errores del formulario');
@@ -347,15 +355,30 @@ const saveProvider = async () => {
   loading.value = true;
   try {
     if (isCreating.value) {
+      // Crear nuevo proveedor
+      console.log('Creando proveedor:', editingProvider.value);
       await adminStore.createProvider(editingProvider.value as Omit<Proveedor, 'id'>);
       toast.success('Proveedor creado correctamente');
     } else {
+      // Actualizar proveedor existente
+      console.log('Actualizando proveedor:', editingProvider.value);
       await adminStore.updateProvider(editingProvider.value as Proveedor);
+      
+      // SOLUCIÓN: Recargar todos los proveedores para asegurar sincronización
+      console.log('Recargando lista de proveedores...');
+      await adminStore.fetchAllProviders();
+      
       toast.success('Proveedor actualizado correctamente');
     }
+    
     showProviderModal.value = false;
     editingProvider.value = null;
+    validationErrors.value = {};
+    
+    console.log('Operación completada. Total proveedores:', adminStore.providers.length);
+    
   } catch (error: any) {
+    console.error('Error al guardar proveedor:', error);
     toast.error(`Error: ${error.message || 'Ha ocurrido un error'}`);
   } finally {
     loading.value = false;
@@ -363,25 +386,45 @@ const saveProvider = async () => {
 };
 
 const confirmDeleteProvider = (provider: Proveedor) => {
+  console.log('Confirmando eliminación de proveedor:', provider);
   providerToDelete.value = provider;
   showDeleteConfirmation.value = true;
 };
 
 const cancelDelete = () => {
+  console.log('Cancelando eliminación');
   showDeleteConfirmation.value = false;
   providerToDelete.value = null;
 };
 
 const deleteProvider = async () => {
-  if (!providerToDelete.value) return;
+  console.log('Eliminando proveedor...', providerToDelete.value);
+  
+  if (!providerToDelete.value) {
+    toast.error('No hay proveedor seleccionado para eliminar');
+    return;
+  }
 
   loading.value = true;
   try {
     await adminStore.deleteProvider(providerToDelete.value.id);
+    
+    // SOLUCIÓN: Recargar todos los proveedores después de eliminar
+    console.log('Recargando lista de proveedores después de eliminar...');
+    await adminStore.fetchAllProviders();
+    
+    // También recargar productos ya que pueden haberse afectado
+    console.log('Recargando productos afectados...');
+    await adminStore.fetchAllProducts();
+    
     toast.success('Proveedor eliminado correctamente');
     showDeleteConfirmation.value = false;
     providerToDelete.value = null;
+    
+    console.log('Eliminación completada. Total proveedores:', adminStore.providers.length);
+    
   } catch (error: any) {
+    console.error('Error al eliminar proveedor:', error);
     toast.error(`Error: ${error.message || 'Ha ocurrido un error'}`);
   } finally {
     loading.value = false;

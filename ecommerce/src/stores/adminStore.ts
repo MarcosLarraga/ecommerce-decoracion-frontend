@@ -166,18 +166,19 @@ export const useAdminStore = defineStore('admin', {
       }
     },
 
-    async createUser(userData: { 
-      nombre: string; 
-      email: string; 
-      password: string; 
-      esAdmin: boolean; 
-      telefono?: string; 
+    async createUser(userData: {
+      nombre: string;
+      email: string;
+      password: string;
+      esAdmin: boolean;
+      telefono?: string;
       direccion?: string;
     }) {
       this.loading = true;
       this.error = null;
       try {
-        console.log('Creando usuario:', userData);
+        console.log('Creando usuario desde admin:', userData);
+
         const response = await axios.post('/api/Auth/register', {
           nombre: userData.nombre,
           email: userData.email,
@@ -193,8 +194,10 @@ export const useAdminStore = defineStore('admin', {
         });
 
         console.log('Usuario creado:', response.data);
-        
-        // Recargar la lista de usuarios para incluir el nuevo usuario
+
+        // CRÍTICO: Siempre recargar la lista completa después de crear
+        // Esto asegura que tenemos todos los datos actualizados del usuario
+        console.log('Recargando lista de usuarios para obtener datos completos...');
         await this.fetchAllUsers();
 
         return response.data;
@@ -212,7 +215,7 @@ export const useAdminStore = defineStore('admin', {
       this.error = null;
       try {
         console.log('Actualizando usuario:', user);
-        
+
         const response = await axios.put<Usuario>(`/api/Usuario/${user.id}`, user, {
           headers: { Authorization: `Bearer ${this.token}` }
         });
@@ -245,7 +248,7 @@ export const useAdminStore = defineStore('admin', {
       this.error = null;
       try {
         console.log('Eliminando usuario con ID:', userId);
-        
+
         await axios.delete(`/api/Usuario/${userId}`, {
           headers: { Authorization: `Bearer ${this.token}` }
         });
@@ -429,7 +432,7 @@ export const useAdminStore = defineStore('admin', {
           ...order,
           fechaFormateada: parseFechaPedido(order.fechaPedido)
         }));
-        
+
         console.log('Pedidos cargados:', this.orders.length);
       } catch (error: any) {
         console.error('Error fetching orders:', error);
@@ -468,7 +471,7 @@ export const useAdminStore = defineStore('admin', {
       this.error = null;
       try {
         console.log('Eliminando pedido con ID:', orderId);
-        
+
         await axios.delete(`/api/Pedido/${orderId}`, {
           headers: { Authorization: `Bearer ${this.token}` }
         });
@@ -535,7 +538,7 @@ export const useAdminStore = defineStore('admin', {
       this.error = null;
       try {
         console.log('Creando proveedor:', provider);
-        
+
         const response = await axios.post<Proveedor>('/api/Proveedor', provider, {
           headers: { Authorization: `Bearer ${this.token}` }
         });
@@ -560,7 +563,7 @@ export const useAdminStore = defineStore('admin', {
       this.error = null;
       try {
         console.log('Actualizando proveedor:', provider);
-        
+
         const response = await axios.put<Proveedor>(`/api/Proveedor/${provider.id}`, provider, {
           headers: { Authorization: `Bearer ${this.token}` }
         });
@@ -593,7 +596,7 @@ export const useAdminStore = defineStore('admin', {
       this.error = null;
       try {
         console.log('Eliminando proveedor con ID:', providerId);
-        
+
         await axios.delete(`/api/Proveedor/${providerId}`, {
           headers: { Authorization: `Bearer ${this.token}` }
         });

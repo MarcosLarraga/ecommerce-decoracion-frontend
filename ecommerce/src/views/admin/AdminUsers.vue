@@ -433,6 +433,11 @@ const saveUser = async () => {
       };
       
       await adminStore.createUser(userData);
+      
+      // SOLUCIÓN: Recargar todos los usuarios después de crear
+      console.log('Recargando lista de usuarios después de crear...');
+      await adminStore.fetchAllUsers();
+      
       toast.success('Usuario creado correctamente');
     } else {
       // Actualizar usuario existente
@@ -472,25 +477,40 @@ const saveUser = async () => {
 };
 
 const confirmDeleteUser = (user: Usuario) => {
+  console.log('Confirmando eliminación de usuario:', user);
   userToDelete.value = user;
   showDeleteModal.value = true;
 };
 
 const cancelDelete = () => {
+  console.log('Cancelando eliminación');
   showDeleteModal.value = false;
   userToDelete.value = null;
 };
 
 const deleteUser = async () => {
-  if (!userToDelete.value?.id) return;
+  console.log('Eliminando usuario...', userToDelete.value);
+  
+  if (!userToDelete.value?.id) {
+    toast.error('No hay usuario seleccionado para eliminar');
+    return;
+  }
 
   loading.value = true;
 
   try {
     await adminStore.deleteUser(userToDelete.value.id);
+    
+    // SOLUCIÓN: Recargar todos los usuarios después de eliminar
+    console.log('Recargando lista de usuarios después de eliminar...');
+    await adminStore.fetchAllUsers();
+    
     toast.success('Usuario eliminado correctamente');
     showDeleteModal.value = false;
     userToDelete.value = null;
+    
+    console.log('Eliminación completada. Total usuarios:', adminStore.users.length);
+    
   } catch (error: any) {
     console.error('Error al eliminar usuario:', error);
     toast.error(error.message || 'Error al eliminar usuario');
