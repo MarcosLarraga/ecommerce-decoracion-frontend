@@ -9,6 +9,7 @@ interface Usuario {
   esAdmin: boolean;
   telefono?: string;
   direccion?: string;
+  fechaRegistro?: string;
 }
 
 interface Producto {
@@ -62,6 +63,7 @@ interface Pedido {
   total: number;
   detalles?: DetallePedido[];
   usuario?: Usuario;
+  fechaFormateada?: string;
 }
 
 // Helper para parsear fechas
@@ -133,10 +135,12 @@ export const useAdminStore = defineStore('admin', {
       this.loading = true;
       this.error = null;
       try {
+        console.log('Cargando usuarios...');
         const response = await axios.get<Usuario[]>('/api/Usuario', {
           headers: { Authorization: `Bearer ${this.token}` }
         });
         this.users = response.data;
+        console.log('Usuarios cargados:', this.users.length);
       } catch (error: any) {
         console.error('Error fetching users:', error);
         this.error = error.response?.data?.message || 'Error al obtener usuarios';
@@ -162,14 +166,53 @@ export const useAdminStore = defineStore('admin', {
       }
     },
 
-    // Método updateUser corregido en adminStore.ts
+    async createUser(userData: { 
+      nombre: string; 
+      email: string; 
+      password: string; 
+      esAdmin: boolean; 
+      telefono?: string; 
+      direccion?: string;
+    }) {
+      this.loading = true;
+      this.error = null;
+      try {
+        console.log('Creando usuario:', userData);
+        const response = await axios.post('/api/Auth/register', {
+          nombre: userData.nombre,
+          email: userData.email,
+          password: userData.password,
+          esAdmin: userData.esAdmin,
+          telefono: userData.telefono || '',
+          direccion: userData.direccion || ''
+        }, {
+          headers: {
+            Authorization: `Bearer ${this.token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        console.log('Usuario creado:', response.data);
+        
+        // Recargar la lista de usuarios para incluir el nuevo usuario
+        await this.fetchAllUsers();
+
+        return response.data;
+      } catch (error: any) {
+        console.error('Error creating user:', error);
+        this.error = error.response?.data?.message || 'Error al crear usuario';
+        throw error;
+      } finally {
+        this.loading = false;
+      }
+    },
 
     async updateUser(user: Usuario) {
       this.loading = true;
       this.error = null;
       try {
         console.log('Actualizando usuario:', user);
-
+        
         const response = await axios.put<Usuario>(`/api/Usuario/${user.id}`, user, {
           headers: { Authorization: `Bearer ${this.token}` }
         });
@@ -179,7 +222,6 @@ export const useAdminStore = defineStore('admin', {
         // Actualizar la lista local con los datos devueltos por el servidor
         const index = this.users.findIndex(u => u.id === user.id);
         if (index !== -1) {
-          // Usar los datos del servidor, no los del formulario
           this.users[index] = { ...response.data };
           console.log('Usuario actualizado en la lista local:', this.users[index]);
         } else {
@@ -202,12 +244,23 @@ export const useAdminStore = defineStore('admin', {
       this.loading = true;
       this.error = null;
       try {
+        console.log('Eliminando usuario con ID:', userId);
+        
         await axios.delete(`/api/Usuario/${userId}`, {
           headers: { Authorization: `Bearer ${this.token}` }
         });
 
-        // Actualizar la lista local
-        this.users = this.users.filter(u => u.id !== userId);
+        // Remover el usuario de la lista local
+        const index = this.users.findIndex(u => u.id === userId);
+        if (index !== -1) {
+          this.users.splice(index, 1);
+          console.log('Usuario eliminado de la lista local');
+        } else {
+          console.warn('No se encontró el usuario en la lista local');
+          // Si no se encuentra, recargar toda la lista
+          await this.fetchAllUsers();
+        }
+
         return true;
       } catch (error: any) {
         console.error('Error deleting user:', error);
@@ -223,10 +276,12 @@ export const useAdminStore = defineStore('admin', {
       this.loading = true;
       this.error = null;
       try {
+        console.log('Cargando productos...');
         const response = await axios.get<Producto[]>('/api/Producto', {
           headers: { Authorization: `Bearer ${this.token}` }
         });
         this.products = response.data;
+        console.log('Productos cargados:', this.products.length);
       } catch (error: any) {
         console.error('Error fetching products:', error);
         this.error = error.response?.data?.message || 'Error al obtener productos';
@@ -256,17 +311,21 @@ export const useAdminStore = defineStore('admin', {
       this.loading = true;
       this.error = null;
       try {
+        console.log('Creando producto:', product);
+
         const response = await axios.post<Producto>('/api/Producto', product, {
           headers: { Authorization: `Bearer ${this.token}` }
         });
 
-        // Añadir a la lista local
+        console.log('Producto creado:', response.data);
+
+        // Agregar el nuevo producto a la lista local
         this.products.push(response.data);
 
         return response.data;
       } catch (error: any) {
-        console.error('Error creating product:', error);
-        this.error = error.response?.data?.message || 'Error al crear producto';
+        console.error("Error creating product:", error);
+        this.error = error.response?.data?.message || "Error al crear producto";
         throw error;
       } finally {
         this.loading = false;
@@ -277,20 +336,29 @@ export const useAdminStore = defineStore('admin', {
       this.loading = true;
       this.error = null;
       try {
+        console.log('Actualizando producto:', product);
+
         const response = await axios.put<Producto>(`/api/Producto/${product.id}`, product, {
           headers: { Authorization: `Bearer ${this.token}` }
         });
 
-        // Actualizar la lista local
+        console.log('Respuesta del servidor:', response.data);
+
+        // Actualizar la lista local con los datos devueltos por el servidor
         const index = this.products.findIndex(p => p.id === product.id);
         if (index !== -1) {
-          this.products[index] = response.data;
+          this.products[index] = { ...response.data };
+          console.log('Producto actualizado en la lista local:', this.products[index]);
+        } else {
+          console.warn('No se encontró el producto en la lista local');
+          // Si no se encuentra, recargar toda la lista
+          await this.fetchAllProducts();
         }
 
         return response.data;
       } catch (error: any) {
-        console.error('Error updating product:', error);
-        this.error = error.response?.data?.message || 'Error al actualizar producto';
+        console.error("Error updating product:", error);
+        this.error = error.response?.data?.message || "Error al actualizar producto";
         throw error;
       } finally {
         this.loading = false;
@@ -301,16 +369,26 @@ export const useAdminStore = defineStore('admin', {
       this.loading = true;
       this.error = null;
       try {
+        console.log('Eliminando producto con ID:', productId);
+
         await axios.delete(`/api/Producto/${productId}`, {
           headers: { Authorization: `Bearer ${this.token}` }
         });
 
-        // Actualizar la lista local
-        this.products = this.products.filter(p => p.id !== productId);
-        return true;
+        // Remover el producto de la lista local
+        const index = this.products.findIndex(p => p.id === productId);
+        if (index !== -1) {
+          this.products.splice(index, 1);
+          console.log('Producto eliminado de la lista local');
+        } else {
+          console.warn('No se encontró el producto en la lista local');
+          // Si no se encuentra, recargar toda la lista
+          await this.fetchAllProducts();
+        }
+
       } catch (error: any) {
-        console.error('Error deleting product:', error);
-        this.error = error.response?.data?.message || 'Error al eliminar producto';
+        console.error("Error deleting product:", error);
+        this.error = error.response?.data?.message || "Error al eliminar producto";
         throw error;
       } finally {
         this.loading = false;
@@ -322,10 +400,12 @@ export const useAdminStore = defineStore('admin', {
       this.loading = true;
       this.error = null;
       try {
+        console.log('Cargando categorías...');
         const response = await axios.get<Categoria[]>('/api/Categoria', {
           headers: { Authorization: `Bearer ${this.token}` }
         });
         this.categories = response.data;
+        console.log('Categorías cargadas:', this.categories.length);
       } catch (error: any) {
         console.error('Error fetching categories:', error);
         this.error = error.response?.data?.message || 'Error al obtener categorías';
@@ -339,6 +419,7 @@ export const useAdminStore = defineStore('admin', {
       this.loading = true;
       this.error = null;
       try {
+        console.log('Cargando pedidos...');
         const response = await axios.get<Pedido[]>('/api/Pedido', {
           headers: { Authorization: `Bearer ${this.token}` }
         });
@@ -346,9 +427,10 @@ export const useAdminStore = defineStore('admin', {
         // Formatear fechas para visualización
         this.orders = response.data.map(order => ({
           ...order,
-          // Asegurar consistencia en el formato de la fecha
           fechaFormateada: parseFechaPedido(order.fechaPedido)
         }));
+        
+        console.log('Pedidos cargados:', this.orders.length);
       } catch (error: any) {
         console.error('Error fetching orders:', error);
         this.error = error.response?.data?.message || 'Error al obtener pedidos';
@@ -385,12 +467,23 @@ export const useAdminStore = defineStore('admin', {
       this.loading = true;
       this.error = null;
       try {
+        console.log('Eliminando pedido con ID:', orderId);
+        
         await axios.delete(`/api/Pedido/${orderId}`, {
           headers: { Authorization: `Bearer ${this.token}` }
         });
 
-        // Actualizar la lista local
-        this.orders = this.orders.filter(o => o.id !== orderId);
+        // Remover el pedido de la lista local
+        const index = this.orders.findIndex(o => o.id === orderId);
+        if (index !== -1) {
+          this.orders.splice(index, 1);
+          console.log('Pedido eliminado de la lista local');
+        } else {
+          console.warn('No se encontró el pedido en la lista local');
+          // Si no se encuentra, recargar toda la lista
+          await this.fetchAllOrders();
+        }
+
         return true;
       } catch (error: any) {
         console.error('Error deleting order:', error);
@@ -406,10 +499,12 @@ export const useAdminStore = defineStore('admin', {
       this.loading = true;
       this.error = null;
       try {
+        console.log('Cargando proveedores...');
         const response = await axios.get<Proveedor[]>('/api/Proveedor', {
           headers: { Authorization: `Bearer ${this.token}` }
         });
         this.providers = response.data;
+        console.log('Proveedores cargados:', this.providers.length);
       } catch (error: any) {
         console.error('Error fetching providers:', error);
         this.error = error.response?.data?.message || 'Error al obtener proveedores';
@@ -439,9 +534,13 @@ export const useAdminStore = defineStore('admin', {
       this.loading = true;
       this.error = null;
       try {
+        console.log('Creando proveedor:', provider);
+        
         const response = await axios.post<Proveedor>('/api/Proveedor', provider, {
           headers: { Authorization: `Bearer ${this.token}` }
         });
+
+        console.log('Proveedor creado:', response.data);
 
         // Añadir a la lista local
         this.providers.push(response.data);
@@ -460,14 +559,23 @@ export const useAdminStore = defineStore('admin', {
       this.loading = true;
       this.error = null;
       try {
+        console.log('Actualizando proveedor:', provider);
+        
         const response = await axios.put<Proveedor>(`/api/Proveedor/${provider.id}`, provider, {
           headers: { Authorization: `Bearer ${this.token}` }
         });
 
-        // Actualizar la lista local
+        console.log('Respuesta del servidor:', response.data);
+
+        // Actualizar la lista local con los datos devueltos por el servidor
         const index = this.providers.findIndex(p => p.id === provider.id);
         if (index !== -1) {
-          this.providers[index] = response.data;
+          this.providers[index] = { ...response.data };
+          console.log('Proveedor actualizado en la lista local:', this.providers[index]);
+        } else {
+          console.warn('No se encontró el proveedor en la lista local');
+          // Si no se encuentra, recargar toda la lista
+          await this.fetchAllProviders();
         }
 
         return response.data;
@@ -484,12 +592,23 @@ export const useAdminStore = defineStore('admin', {
       this.loading = true;
       this.error = null;
       try {
+        console.log('Eliminando proveedor con ID:', providerId);
+        
         await axios.delete(`/api/Proveedor/${providerId}`, {
           headers: { Authorization: `Bearer ${this.token}` }
         });
 
-        // Actualizar la lista local
-        this.providers = this.providers.filter(p => p.id !== providerId);
+        // Remover el proveedor de la lista local
+        const index = this.providers.findIndex(p => p.id === providerId);
+        if (index !== -1) {
+          this.providers.splice(index, 1);
+          console.log('Proveedor eliminado de la lista local');
+        } else {
+          console.warn('No se encontró el proveedor en la lista local');
+          // Si no se encuentra, recargar toda la lista
+          await this.fetchAllProviders();
+        }
+
         return true;
       } catch (error: any) {
         console.error('Error deleting provider:', error);
@@ -500,42 +619,10 @@ export const useAdminStore = defineStore('admin', {
       }
     },
 
-    async createUser(userData: { nombre: string; email: string; password: string; esAdmin: boolean; telefono?: string; direccion?: string }) {
-      this.loading = true;
-      this.error = null;
-      try {
-        // Usar el endpoint de registro pero con datos de admin
-        const response = await axios.post('/api/Auth/register', {
-          nombre: userData.nombre,
-          email: userData.email,
-          password: userData.password,
-          // Incluir campos adicionales si el backend los acepta
-          esAdmin: userData.esAdmin,
-          telefono: userData.telefono,
-          direccion: userData.direccion
-        }, {
-          headers: {
-            Authorization: `Bearer ${this.token}`,
-            'Content-Type': 'application/json'
-          }
-        });
-
-        // Recargar la lista de usuarios para incluir el nuevo usuario
-        await this.fetchAllUsers();
-
-        return response.data;
-      } catch (error: any) {
-        console.error('Error creating user:', error);
-        this.error = error.response?.data?.message || 'Error al crear usuario';
-        throw error;
-      } finally {
-        this.loading = false;
-      }
-    },
-
     // Método para inicializar todos los datos
     async fetchAllData() {
       try {
+        console.log('Cargando todos los datos del admin...');
         await Promise.all([
           this.fetchAllUsers(),
           this.fetchAllProducts(),
@@ -543,6 +630,7 @@ export const useAdminStore = defineStore('admin', {
           this.fetchAllProviders(),
           this.fetchAllCategories()
         ]);
+        console.log('Todos los datos cargados correctamente');
         return true;
       } catch (error) {
         console.error('Error fetching all data:', error);

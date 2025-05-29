@@ -479,7 +479,12 @@ const cancelEdit = () => {
 };
 
 const saveProduct = async () => {
-  if (!editingProduct.value) return;
+  console.log('Guardando producto...', editingProduct.value);
+  
+  if (!editingProduct.value) {
+    toast.error('No hay datos de producto para guardar');
+    return;
+  }
   
   if (!validateProduct()) {
     toast.error('Por favor, corrija los errores del formulario');
@@ -489,41 +494,71 @@ const saveProduct = async () => {
   loading.value = true;
   try {
     if (isCreating.value) {
+      // Crear nuevo producto
+      console.log('Creando producto:', editingProduct.value);
       await adminStore.createProduct(editingProduct.value as Omit<Producto, 'id'>);
       toast.success('Producto creado correctamente');
     } else {
+      // Actualizar producto existente
+      console.log('Actualizando producto:', editingProduct.value);
       await adminStore.updateProduct(editingProduct.value as Producto);
+      
+      // SOLUCIÓN: Recargar todos los productos para asegurar sincronización
+      console.log('Recargando lista de productos...');
+      await adminStore.fetchAllProducts();
+      
       toast.success('Producto actualizado correctamente');
     }
+    
+    // Cerrar modal y limpiar formulario
     showProductModal.value = false;
     editingProduct.value = null;
+    validationErrors.value = {};
+    
+    console.log('Operación completada. Total productos:', adminStore.products.length);
+    
   } catch (error: any) {
+    console.error('Error al guardar producto:', error);
     toast.error(`Error: ${error.message || 'Ha ocurrido un error'}`);
   } finally {
     loading.value = false;
   }
 };
 
+// MÉTODOS DE ELIMINACIÓN CORREGIDOS
 const confirmDeleteProduct = (product: Producto) => {
+  console.log('Confirmando eliminación de producto:', product);
   productToDelete.value = product;
   showDeleteConfirmation.value = true;
 };
 
 const cancelDelete = () => {
+  console.log('Cancelando eliminación');
   showDeleteConfirmation.value = false;
   productToDelete.value = null;
 };
 
 const deleteProduct = async () => {
+  console.log('Eliminando producto...', productToDelete.value);
+  
   if (!productToDelete.value) return;
   
   loading.value = true;
   try {
     await adminStore.deleteProduct(productToDelete.value.id);
+    
+    // SOLUCIÓN: Recargar todos los productos después de eliminar
+    console.log('Recargando lista de productos después de eliminar...');
+    await adminStore.fetchAllProducts();
+    
     toast.success('Producto eliminado correctamente');
     showDeleteConfirmation.value = false;
     productToDelete.value = null;
+    
+    console.log('Eliminación completada. Total productos:', adminStore.products.length);
+    
   } catch (error: any) {
+    console.error('Error al eliminar producto:', error);
     toast.error(`Error: ${error.message || 'Ha ocurrido un error'}`);
   } finally {
     loading.value = false;
@@ -792,104 +827,4 @@ const deleteProduct = async () => {
         transform: scale(1.1);
       }
     }
-  }
-
-  // Items de información
-  &__info-item {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    padding: $spacing-xs;
-    background: rgba($tertiary-color, 0.5);
-    border-radius: $border-radius-sm;
-    
-    &--full {
-      grid-column: 1 / -1;
-      
-      .admin-products__info-value {
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-    }
-  }
-
-  &__info-label {
-    font-size: $font-size-small;
-    font-weight: $font-weight-semibold;
-    color: $text-color-secondary;
-  }
-
-  &__info-value {
-    font-size: $font-size-base;
-    color: $text-color;
-    word-break: break-word;
-  }
-
-  // Estado vacío
-  &__empty {
-    grid-column: 1 / -1;
-    text-align: center;
-    padding: $spacing-xl;
-    background: white;
-    border-radius: $border-radius-lg;
-    border: 2px dashed rgba($primary-color, 0.2);
-    max-width: 400px;
-    margin: 0 auto;
-
-    &-icon {
-      width: 60px;
-      height: 60px;
-      background: rgba($primary-color, 0.1);
-      border-radius: $border-radius-circle;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto $spacing-md;
-
-      i {
-        font-size: 24px;
-        color: $primary-color;
-      }
-    }
-
-    &-title {
-      font-size: $font-size-large;
-      font-weight: $font-weight-bold;
-      color: $text-color;
-      margin: 0 0 $spacing-sm;
-    }
-
-    &-description {
-      color: $text-color-secondary;
-      margin: 0 0 $spacing-lg;
-      line-height: 1.5;
-    }
-
-    &-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: $spacing-sm;
-      background: $primary-color;
-      color: white;
-      border: none;
-      border-radius: $border-radius;
-      padding: $spacing-sm $spacing-md;
-      font-weight: $font-weight-semibold;
-      cursor: pointer;
-      transition: all 0.3s ease;
-
-      &:hover {
-        background-color: $primary-color-hover;
-        transform: translateY(-2px);
-      }
-
-      i {
-        font-size: 14px;
-      }
-    }
-  }
-}
-</style>
+  }}</style>
