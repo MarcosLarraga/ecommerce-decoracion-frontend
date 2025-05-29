@@ -175,106 +175,155 @@
     </div>
 
     <!-- Modal para crear/editar producto -->
-    <AdminModal v-model="showProductModal" :title="isCreating ? 'Crear Producto' : 'Editar Producto'"
-      v-if="editingProduct">
-      <AdminForm @submit="saveProduct">
-        <div class="admin-form__row">
-          <div class="admin-form__col" v-if="!isCreating">
-            <AdminFormGroup label="ID">
-              <AdminInput :value="editingProduct.id" disabled />
-            </AdminFormGroup>
-          </div>
-
-          <div class="admin-form__col admin-form__col--full">
-            <AdminFormGroup label="Nombre" required :error="validationErrors.nombre">
-              <AdminInput v-model="editingProduct.nombre" :error="!!validationErrors.nombre" required />
-            </AdminFormGroup>
-          </div>
-
-          <div class="admin-form__col">
-            <AdminFormGroup label="Precio" required :error="validationErrors.precio">
-              <AdminInput type="number" v-model.number="editingProduct.precio" step="0.01" min="0"
-                :error="!!validationErrors.precio" required />
-            </AdminFormGroup>
-          </div>
-
-          <div class="admin-form__col">
-            <AdminFormGroup label="Categoría" required :error="validationErrors.categoriaId">
-              <AdminSelect v-model="editingProduct.categoriaId" :error="!!validationErrors.categoriaId" required>
-                <option value="">Seleccionar categoría</option>
-                <option v-for="category in categories" :key="category.id" :value="category.id">
-                  {{ category.nombre }}
-                </option>
-              </AdminSelect>
-            </AdminFormGroup>
-          </div>
-
-          <div class="admin-form__col">
-            <AdminFormGroup label="Proveedor" required :error="validationErrors.proveedorId">
-              <AdminSelect v-model="editingProduct.proveedorId" :error="!!validationErrors.proveedorId" required>
-                <option value="">Seleccionar proveedor</option>
-                <option v-for="provider in providers" :key="provider.id" :value="provider.id">
-                  {{ provider.nombre }}
-                </option>
-              </AdminSelect>
-            </AdminFormGroup>
-          </div>
-
-          <div class="admin-form__col admin-form__col--full">
-            <AdminFormGroup label="URL de Imagen">
-              <AdminInput v-model="editingProduct.urlImagen" />
-
-              <div v-if="editingProduct.urlImagen" class="admin-form__image-preview">
-                <img :src="editingProduct.urlImagen" alt="Vista previa" />
-              </div>
-            </AdminFormGroup>
-          </div>
-
-          <div class="admin-form__col admin-form__col--full">
-            <AdminFormGroup label="Descripción">
-              <AdminTextarea v-model="editingProduct.descripcion" rows="4" />
-            </AdminFormGroup>
-          </div>
+    <div v-if="showProductModal" class="admin-products__modal-overlay" @click="handleOverlayClick">
+      <div class="admin-products__modal" @click.stop>
+        <div class="admin-products__modal-header">
+          <h2 class="admin-products__modal-title">
+            {{ isCreating ? 'Crear Producto' : 'Editar Producto' }}
+          </h2>
+          <button class="admin-products__modal-close" @click="cancelEdit">
+            <i class="fas fa-times"></i>
+          </button>
         </div>
-      </AdminForm>
 
-      <template #footer>
-        <button class="modal-btn secondary-btn" @click="cancelEdit" :disabled="loading">
-          <i class="fas fa-times"></i>
-          <span>Cancelar</span>
-        </button>
-        <button class="modal-btn primary-btn" @click="saveProduct" :disabled="loading">
-          <i v-if="loading" class="spinner"></i>
-          <i v-else class="fas fa-save"></i>
-          <span>{{ loading ? (isCreating ? 'Creando...' : 'Guardando...') : (isCreating ? 'Crear Producto' : 'Guardar Cambios') }}</span>
-        </button>
-      </template>
-    </AdminModal>
+        <div class="admin-products__modal-body">
+          <form class="admin-products__form" @submit.prevent="saveProduct">
+            <div class="admin-products__form-grid">
+              <!-- Campo ID solo en edición -->
+              <div v-if="!isCreating" class="admin-products__form-group">
+                <label class="admin-products__form-label">ID</label>
+                <input class="admin-products__form-input" :value="editingProduct?.id" disabled readonly />
+              </div>
+
+              <!-- Campo Nombre -->
+              <div class="admin-products__form-group" :class="{ 'admin-products__form-group--full': isCreating }">
+                <label class="admin-products__form-label">
+                  Nombre <span class="admin-products__form-required">*</span>
+                </label>
+                <input v-model="editingProduct.nombre" class="admin-products__form-input"
+                  :class="{ 'admin-products__form-input--error': validationErrors.nombre }"
+                  placeholder="Nombre del producto" required />
+                <div v-if="validationErrors.nombre" class="admin-products__form-error">
+                  {{ validationErrors.nombre }}
+                </div>
+              </div>
+
+              <!-- Campo Precio -->
+              <div class="admin-products__form-group" :class="{ 'admin-products__form-group--full': isCreating }">
+                <label class="admin-products__form-label">
+                  Precio <span class="admin-products__form-required">*</span>
+                </label>
+                <input v-model.number="editingProduct.precio" type="number" step="0.01" min="0"
+                  class="admin-products__form-input"
+                  :class="{ 'admin-products__form-input--error': validationErrors.precio }"
+                  placeholder="0.00" required />
+                <div v-if="validationErrors.precio" class="admin-products__form-error">
+                  {{ validationErrors.precio }}
+                </div>
+              </div>
+
+              <!-- Campo Categoría -->
+              <div class="admin-products__form-group">
+                <label class="admin-products__form-label">
+                  Categoría <span class="admin-products__form-required">*</span>
+                </label>
+                <select v-model="editingProduct.categoriaId" class="admin-products__form-select"
+                  :class="{ 'admin-products__form-input--error': validationErrors.categoriaId }" required>
+                  <option value="">Seleccionar categoría</option>
+                  <option v-for="category in categories" :key="category.id" :value="category.id">
+                    {{ category.nombre }}
+                  </option>
+                </select>
+                <div v-if="validationErrors.categoriaId" class="admin-products__form-error">
+                  {{ validationErrors.categoriaId }}
+                </div>
+              </div>
+
+              <!-- Campo Proveedor -->
+              <div class="admin-products__form-group">
+                <label class="admin-products__form-label">
+                  Proveedor <span class="admin-products__form-required">*</span>
+                </label>
+                <select v-model="editingProduct.proveedorId" class="admin-products__form-select"
+                  :class="{ 'admin-products__form-input--error': validationErrors.proveedorId }" required>
+                  <option value="">Seleccionar proveedor</option>
+                  <option v-for="provider in providers" :key="provider.id" :value="provider.id">
+                    {{ provider.nombre }}
+                  </option>
+                </select>
+                <div v-if="validationErrors.proveedorId" class="admin-products__form-error">
+                  {{ validationErrors.proveedorId }}
+                </div>
+              </div>
+
+              <!-- Campo URL de Imagen -->
+              <div class="admin-products__form-group admin-products__form-group--full">
+                <label class="admin-products__form-label">URL de Imagen</label>
+                <input v-model="editingProduct.urlImagen" type="url" class="admin-products__form-input"
+                  placeholder="https://ejemplo.com/imagen.jpg" />
+                
+                <!-- Vista previa de imagen -->
+                <div v-if="editingProduct.urlImagen" class="admin-products__form-image-preview">
+                  <img :src="editingProduct.urlImagen" alt="Vista previa" />
+                </div>
+              </div>
+
+              <!-- Campo Descripción -->
+              <div class="admin-products__form-group admin-products__form-group--full">
+                <label class="admin-products__form-label">Descripción</label>
+                <textarea v-model="editingProduct.descripcion" class="admin-products__form-textarea" rows="4"
+                  placeholder="Descripción detallada del producto"></textarea>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <div class="admin-products__modal-footer">
+          <button class="admin-products__modal-btn admin-products__modal-btn--secondary" @click="cancelEdit"
+            :disabled="loading">
+            Cancelar
+          </button>
+          <button class="admin-products__modal-btn admin-products__modal-btn--primary" @click="saveProduct"
+            :disabled="loading || !isFormValid">
+            <i v-if="loading" class="admin-products__spinner"></i>
+            {{ loading ? (isCreating ? 'Creando...' : 'Guardando...') : (isCreating ? 'Crear Producto' : 'Guardar Cambios') }}
+          </button>
+        </div>
+      </div>
+    </div>
 
     <!-- Modal de confirmación de eliminación -->
-    <AdminModal v-model="showDeleteConfirmation" title="Confirmar Eliminación" size="sm" v-if="productToDelete">
-      <div class="confirm-message">
-        <i class="fas fa-exclamation-triangle"></i>
-        <p>
-          ¿Estás seguro de que deseas eliminar el producto
-          <strong>{{ productToDelete.nombre }}</strong>?
-          <br>
-          Esta acción no se puede deshacer.
-        </p>
-      </div>
+    <div v-if="showDeleteConfirmation" class="admin-products__modal-overlay" @click="cancelDelete">
+      <div class="admin-products__modal admin-products__modal--small" @click.stop>
+        <div class="admin-products__modal-header">
+          <h2 class="admin-products__modal-title">Confirmar Eliminación</h2>
+          <button class="admin-products__modal-close" @click="cancelDelete">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
 
-      <template #footer>
-        <button class="modal-btn secondary-btn" @click="cancelDelete" :disabled="loading">
-          <i class="fas fa-times"></i>
-          <span>Cancelar</span>
-        </button>
-        <button class="modal-btn error-btn" @click="deleteProduct" :disabled="loading">
-          <i v-if="loading" class="spinner"></i>
-          <i v-else class="fas fa-trash-alt"></i>
-          <span>{{ loading ? 'Eliminando...' : 'Eliminar Producto' }}</span>
-        </button>
-      </template>
-    </AdminModal>
+        <div class="admin-products__modal-body">
+          <div class="admin-products__confirm">
+            <i class="fas fa-exclamation-triangle admin-products__confirm-icon"></i>
+            <p class="admin-products__confirm-text">
+              ¿Eliminar el producto <strong>{{ productToDelete?.nombre }}</strong>?
+              <br>Esta acción no se puede deshacer.
+            </p>
+          </div>
+        </div>
+
+        <div class="admin-products__modal-footer">
+          <button class="admin-products__modal-btn admin-products__modal-btn--secondary" @click="cancelDelete"
+            :disabled="loading">
+            Cancelar
+          </button>
+          <button class="admin-products__modal-btn admin-products__modal-btn--danger" @click="deleteProduct" :disabled="loading">
+            <i v-if="loading" class="admin-products__spinner"></i>
+            {{ loading ? 'Eliminando...' : 'Eliminar Producto' }}
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -291,11 +340,6 @@ import AdminContent from '@/components/admin/AdminContent.vue';
 import AdminFilter from '@/components/admin/AdminFilter.vue';
 import AdminSelect from '@/components/admin/AdminSelect.vue';
 import AdminTable from '@/components/admin/AdminTable.vue';
-import AdminModal from '@/components/admin/AdminModal.vue';
-import AdminForm from '@/components/admin/AdminForm.vue';
-import AdminFormGroup from '@/components/admin/AdminFormGroup.vue';
-import AdminInput from '@/components/admin/AdminInput.vue';
-import AdminTextarea from '@/components/admin/AdminTextarea.vue';
 
 interface Producto {
   id: number;
@@ -315,7 +359,14 @@ const searchQuery = ref('');
 const categoryFilter = ref('');
 const providerFilter = ref('');
 const loading = ref(false);
-const editingProduct = ref<Partial<Producto> | null>(null);
+const editingProduct = ref<Partial<Producto>>({
+  nombre: '',
+  precio: 0,
+  categoriaId: '',
+  proveedorId: '',
+  urlImagen: '',
+  descripcion: ''
+});
 const productToDelete = ref<Producto | null>(null);
 const validationErrors = ref<Record<string, string>>({});
 const showProductModal = ref(false);
@@ -347,6 +398,17 @@ const columns = [
 const isCreating = computed(() => !editingProduct.value?.id);
 const categories = computed(() => adminStore.categories);
 const providers = computed(() => adminStore.providers);
+
+const isFormValid = computed(() => {
+  if (!editingProduct.value) return false;
+
+  const hasName = editingProduct.value.nombre?.trim();
+  const hasPrice = editingProduct.value.precio && editingProduct.value.precio > 0;
+  const hasCategory = editingProduct.value.categoriaId;
+  const hasProvider = editingProduct.value.proveedorId;
+
+  return hasName && hasPrice && hasCategory && hasProvider && Object.keys(validationErrors.value).length === 0;
+});
 
 // Obtener información del proveedor actual si viene de la página de proveedores
 const currentProvider = computed(() => {
@@ -383,6 +445,31 @@ const filteredProducts = computed(() => {
   }
   
   return result;
+});
+
+// Watchers para validación en tiempo real
+watch(() => editingProduct.value.nombre, (newValue) => {
+  if (validationErrors.value.nombre && newValue?.trim()) {
+    delete validationErrors.value.nombre;
+  }
+});
+
+watch(() => editingProduct.value.precio, (newValue) => {
+  if (validationErrors.value.precio && newValue && newValue > 0) {
+    delete validationErrors.value.precio;
+  }
+});
+
+watch(() => editingProduct.value.categoriaId, (newValue) => {
+  if (validationErrors.value.categoriaId && newValue) {
+    delete validationErrors.value.categoriaId;
+  }
+});
+
+watch(() => editingProduct.value.proveedorId, (newValue) => {
+  if (validationErrors.value.proveedorId && newValue) {
+    delete validationErrors.value.proveedorId;
+  }
 });
 
 onMounted(async () => {
@@ -455,7 +542,7 @@ const validateProduct = (): boolean => {
   return Object.keys(validationErrors.value).length === 0;
 };
 
-const createProduct = () => {
+const resetForm = () => {
   editingProduct.value = {
     nombre: '',
     precio: 0,
@@ -464,18 +551,43 @@ const createProduct = () => {
     urlImagen: '',
     descripcion: ''
   };
+  validationErrors.value = {};
+};
+
+const createProduct = () => {
+  console.log('Creando nuevo producto...');
+  resetForm();
   showProductModal.value = true;
 };
 
 const editProduct = (product: Producto) => {
-  editingProduct.value = { ...product };
+  console.log('Editando producto:', product);
+  
+  // Crear una copia profunda del producto
+  editingProduct.value = {
+    id: product.id,
+    nombre: product.nombre || '',
+    precio: product.precio || 0,
+    categoriaId: product.categoriaId || '',
+    proveedorId: product.proveedorId || '',
+    urlImagen: product.urlImagen || '',
+    descripcion: product.descripcion || ''
+  };
+  
+  validationErrors.value = {};
   showProductModal.value = true;
+  
+  console.log('Producto para editar:', editingProduct.value);
+};
+
+const handleOverlayClick = () => {
+  cancelEdit();
 };
 
 const cancelEdit = () => {
+  console.log('Cancelando edición...');
   showProductModal.value = false;
-  editingProduct.value = null;
-  validationErrors.value = {};
+  resetForm();
 };
 
 const saveProduct = async () => {
@@ -496,14 +608,40 @@ const saveProduct = async () => {
     if (isCreating.value) {
       // Crear nuevo producto
       console.log('Creando producto:', editingProduct.value);
-      await adminStore.createProduct(editingProduct.value as Omit<Producto, 'id'>);
+      
+      const productData = {
+        nombre: editingProduct.value.nombre.trim(),
+        precio: editingProduct.value.precio,
+        categoriaId: Number(editingProduct.value.categoriaId),
+        proveedorId: Number(editingProduct.value.proveedorId),
+        urlImagen: editingProduct.value.urlImagen?.trim() || '',
+        descripcion: editingProduct.value.descripcion?.trim() || ''
+      };
+      
+      await adminStore.createProduct(productData);
+      
+      // Recargar todos los productos después de crear
+      console.log('Recargando lista de productos después de crear...');
+      await adminStore.fetchAllProducts();
+      
       toast.success('Producto creado correctamente');
     } else {
       // Actualizar producto existente
       console.log('Actualizando producto:', editingProduct.value);
-      await adminStore.updateProduct(editingProduct.value as Producto);
       
-      // SOLUCIÓN: Recargar todos los productos para asegurar sincronización
+      const productData = {
+        id: editingProduct.value.id!,
+        nombre: editingProduct.value.nombre.trim(),
+        precio: editingProduct.value.precio,
+        categoriaId: Number(editingProduct.value.categoriaId),
+        proveedorId: Number(editingProduct.value.proveedorId),
+        urlImagen: editingProduct.value.urlImagen?.trim() || '',
+        descripcion: editingProduct.value.descripcion?.trim() || ''
+      };
+      
+      await adminStore.updateProduct(productData);
+      
+      // Recargar todos los productos para asegurar sincronización
       console.log('Recargando lista de productos...');
       await adminStore.fetchAllProducts();
       
@@ -512,20 +650,18 @@ const saveProduct = async () => {
     
     // Cerrar modal y limpiar formulario
     showProductModal.value = false;
-    editingProduct.value = null;
-    validationErrors.value = {};
+    resetForm();
     
     console.log('Operación completada. Total productos:', adminStore.products.length);
     
   } catch (error: any) {
     console.error('Error al guardar producto:', error);
-    toast.error(`Error: ${error.message || 'Ha ocurrido un error'}`);
+    toast.error(error.message || 'Error al guardar producto');
   } finally {
     loading.value = false;
   }
 };
 
-// MÉTODOS DE ELIMINACIÓN CORREGIDOS
 const confirmDeleteProduct = (product: Producto) => {
   console.log('Confirmando eliminación de producto:', product);
   productToDelete.value = product;
@@ -541,13 +677,17 @@ const cancelDelete = () => {
 const deleteProduct = async () => {
   console.log('Eliminando producto...', productToDelete.value);
   
-  if (!productToDelete.value) return;
-  
+  if (!productToDelete.value?.id) {
+    toast.error('No hay producto seleccionado para eliminar');
+    return;
+  }
+
   loading.value = true;
+
   try {
     await adminStore.deleteProduct(productToDelete.value.id);
     
-    // SOLUCIÓN: Recargar todos los productos después de eliminar
+    // Recargar todos los productos después de eliminar
     console.log('Recargando lista de productos después de eliminar...');
     await adminStore.fetchAllProducts();
     
@@ -559,7 +699,7 @@ const deleteProduct = async () => {
     
   } catch (error: any) {
     console.error('Error al eliminar producto:', error);
-    toast.error(`Error: ${error.message || 'Ha ocurrido un error'}`);
+    toast.error(error.message || 'Error al eliminar producto');
   } finally {
     loading.value = false;
   }
@@ -568,9 +708,21 @@ const deleteProduct = async () => {
 
 <style lang="scss" scoped>
 @use '@/styles/variables' as *;
-@use '@/styles/admin-unified-styles.scss';
 
 .admin-products {
+  // Base móvil
+  padding: $spacing-sm;
+  min-height: 100vh;
+  background-color: $tertiary-color;
+  
+  @media (min-width: $breakpoint-sm) {
+    padding: $spacing-md;
+  }
+  
+  @media (min-width: $breakpoint-md) {
+    padding: $spacing-lg;
+  }
+
   // Vista mobile (por defecto visible)
   &__mobile-view {
     display: block;
@@ -786,6 +938,82 @@ const deleteProduct = async () => {
     }
   }
 
+  &__info-item {
+    display: flex;
+    align-items: flex-start;
+    gap: $spacing-xs;
+    font-size: $font-size-small;
+    
+    &--full {
+      flex-direction: column;
+      gap: $spacing-xs;
+    }
+  }
+
+  &__info-label {
+    font-weight: $font-weight-semibold;
+    color: $text-color-secondary;
+    min-width: 80px;
+    flex-shrink: 0;
+  }
+
+  &__info-value {
+    color: $text-color;
+    word-break: break-word;
+  }
+
+  // Estado vacío
+  &__empty {
+    text-align: center;
+    padding: $spacing-xl;
+    color: $text-color-secondary;
+    background: white;
+    border-radius: $border-radius-lg;
+    box-shadow: $box-shadow;
+    grid-column: 1 / -1;
+    
+    &-icon {
+      font-size: 4rem;
+      margin-bottom: $spacing-md;
+      opacity: 0.5;
+      
+      i {
+        color: $text-color-tertiary;
+      }
+    }
+    
+    &-title {
+      font-size: $font-size-large;
+      font-weight: $font-weight-semibold;
+      margin: 0 0 $spacing-sm;
+      color: $text-color;
+    }
+    
+    &-description {
+      margin: 0 0 $spacing-lg;
+      color: $text-color-secondary;
+    }
+    
+    &-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: $spacing-xs;
+      padding: $spacing-sm $spacing-md;
+      background: $primary-color;
+      color: white;
+      border: none;
+      border-radius: $border-radius;
+      cursor: pointer;
+      font-weight: $font-weight-medium;
+      transition: all $transition-fast;
+      
+      &:hover {
+        background: $primary-color-hover;
+        transform: translateY(-1px);
+      }
+    }
+  }
+
   // Botones de acción
   &__action-btn {
     width: 32px;
@@ -827,4 +1055,300 @@ const deleteProduct = async () => {
         transform: scale(1.1);
       }
     }
-  }}</style>
+  }
+
+  // Modal
+  &__modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: $z-index-modal;
+    padding: $spacing-md;
+    backdrop-filter: blur(2px);
+  }
+
+  &__modal {
+    background: white;
+    border-radius: $border-radius-lg;
+    box-shadow: $box-shadow-xl;
+    width: 100%;
+    max-width: 700px;
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: modalFadeIn 0.3s ease;
+    
+    &--small {
+      max-width: 400px;
+    }
+  }
+
+  &__modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: $spacing-lg;
+    border-bottom: 1px solid $tertiary-color;
+    background: white;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+
+  &__modal-title {
+    font-size: $font-size-large;
+    font-weight: $font-weight-semibold;
+    margin: 0;
+    color: $text-color;
+  }
+
+  &__modal-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: none;
+    border-radius: $border-radius;
+    cursor: pointer;
+    color: $text-color-secondary;
+    transition: all $transition-fast;
+    
+    &:hover {
+      background: $tertiary-color;
+      color: $text-color;
+    }
+  }
+
+  &__modal-body {
+    padding: $spacing-lg;
+    background: white;
+  }
+
+  &__modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: $spacing-md;
+    padding: $spacing-lg;
+    border-top: 1px solid $tertiary-color;
+    background: white;
+    position: sticky;
+    bottom: 0;
+  }
+
+  // Form
+  &__form-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: $spacing-md;
+    
+    @media (min-width: $breakpoint-sm) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  &__form-group {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+    
+    &--full {
+      @media (min-width: $breakpoint-sm) {
+        grid-column: 1 / -1;
+      }
+    }
+  }
+
+  &__form-label {
+    font-weight: $font-weight-medium;
+    color: $text-color;
+    font-size: $font-size-small;
+    margin-bottom: $spacing-xs;
+  }
+
+  &__form-required {
+    color: $error-color;
+  }
+
+  &__form-input,
+  &__form-select,
+  &__form-textarea {
+    padding: $spacing-sm $spacing-md;
+    border: 1px solid $border-color;
+    border-radius: $border-radius;
+    font-size: $font-size-base;
+    transition: border-color $transition-fast, box-shadow $transition-fast;
+    
+    &:focus {
+      outline: none;
+      border-color: $primary-color;
+      box-shadow: 0 0 0 2px rgba($primary-color, 0.2);
+    }
+    
+    &::placeholder {
+      color: $text-color-tertiary;
+    }
+    
+    &--error {
+      border-color: $error-color;
+      
+      &:focus {
+        border-color: $error-color;
+        box-shadow: 0 0 0 2px rgba($error-color, 0.2);
+      }
+    }
+    
+    &:disabled,
+    &[readonly] {
+      background: $tertiary-color;
+      cursor: not-allowed;
+      opacity: 0.7;
+    }
+  }
+
+  &__form-select {
+    cursor: pointer;
+    
+    &:disabled {
+      cursor: not-allowed;
+    }
+  }
+
+  &__form-textarea {
+    resize: vertical;
+    font-family: inherit;
+    min-height: 100px;
+  }
+
+  &__form-error {
+    color: $error-color;
+    font-size: $font-size-small;
+    margin-top: $spacing-xs;
+  }
+
+  &__form-image-preview {
+    margin-top: $spacing-sm;
+    padding: $spacing-sm;
+    border: 1px solid $border-color;
+    border-radius: $border-radius;
+    background: $tertiary-color;
+    text-align: center;
+    
+    img {
+      max-width: 100%;
+      max-height: 200px;
+      object-fit: contain;
+      border-radius: $border-radius-sm;
+    }
+  }
+
+  // Modal buttons
+  &__modal-btn {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+    padding: $spacing-sm $spacing-md;
+    border: none;
+    border-radius: $border-radius;
+    cursor: pointer;
+    font-weight: $font-weight-medium;
+    transition: all $transition-fast;
+    min-width: 100px;
+    justify-content: center;
+    
+    &--primary {
+      background: $primary-color;
+      color: white;
+      
+      &:hover:not(:disabled) {
+        background: $primary-color-hover;
+        transform: translateY(-1px);
+      }
+    }
+    
+    &--secondary {
+      background: $tertiary-color;
+      color: $text-color;
+      border: 1px solid $border-color;
+      
+      &:hover:not(:disabled) {
+        background: $tertiary-color-hover;
+      }
+    }
+    
+    &--danger {
+      background: $error-color;
+      color: white;
+      
+      &:hover:not(:disabled) {
+        background: $error-color-hover;
+        transform: translateY(-1px);
+      }
+    }
+    
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+  }
+
+  // Confirm dialog
+  &__confirm {
+    text-align: center;
+    padding: $spacing-md 0;
+  }
+
+  &__confirm-icon {
+    font-size: 3rem;
+    color: $warning-color;
+    margin-bottom: $spacing-md;
+  }
+
+  &__confirm-text {
+    color: $text-color;
+    line-height: 1.5;
+    margin: 0;
+    
+    strong {
+      color: $text-color;
+      font-weight: $font-weight-semibold;
+    }
+  }
+
+  // Spinner
+  &__spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 1s linear infinite;
+    
+    .admin-products__modal-btn--secondary & {
+      border: 2px solid rgba($text-color, 0.3);
+      border-top-color: $text-color;
+    }
+  }
+
+  // Animation keyframes
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  @keyframes modalFadeIn {
+    from {
+      opacity: 0;
+      transform: scale(0.9) translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+  }} </style>

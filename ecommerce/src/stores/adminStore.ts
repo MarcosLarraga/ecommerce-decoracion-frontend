@@ -166,6 +166,7 @@ export const useAdminStore = defineStore('admin', {
       }
     },
 
+    // stores/adminStore.ts - Método createUser corregido para el backend actualizado
     async createUser(userData: {
       nombre: string;
       email: string;
@@ -179,14 +180,19 @@ export const useAdminStore = defineStore('admin', {
       try {
         console.log('Creando usuario desde admin:', userData);
 
-        const response = await axios.post('/api/Auth/register', {
-          nombre: userData.nombre,
-          email: userData.email,
-          password: userData.password,
-          esAdmin: userData.esAdmin,
-          telefono: userData.telefono || '',
-          direccion: userData.direccion || ''
-        }, {
+        // Ahora el backend acepta directamente teléfono y dirección
+        const requestData = {
+          Nombre: userData.nombre,
+          Email: userData.email,
+          Password: userData.password,
+          EsAdmin: userData.esAdmin,
+          Telefono: userData.telefono || '',      // NUEVO: Ahora sí se puede enviar
+          Direccion: userData.direccion || ''     // NUEVO: Ahora sí se puede enviar
+        };
+
+        console.log('Datos a enviar al backend:', requestData);
+
+        const response = await axios.post('/api/Auth/register', requestData, {
           headers: {
             Authorization: `Bearer ${this.token}`,
             'Content-Type': 'application/json'
@@ -196,14 +202,13 @@ export const useAdminStore = defineStore('admin', {
         console.log('Usuario creado:', response.data);
 
         // CRÍTICO: Siempre recargar la lista completa después de crear
-        // Esto asegura que tenemos todos los datos actualizados del usuario
         console.log('Recargando lista de usuarios para obtener datos completos...');
         await this.fetchAllUsers();
 
         return response.data;
       } catch (error: any) {
         console.error('Error creating user:', error);
-        this.error = error.response?.data?.message || 'Error al crear usuario';
+        this.error = error.response?.data?.message || error.response?.data || 'Error al crear usuario';
         throw error;
       } finally {
         this.loading = false;
