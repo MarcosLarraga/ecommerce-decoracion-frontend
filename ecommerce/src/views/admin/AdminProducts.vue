@@ -808,7 +808,7 @@ const deleteProduct = async () => {
     }
   }
 
-  // Tarjetas de producto
+  // Tarjetas de producto MEJORADAS
   &__card {
     background: white;
     border-radius: $border-radius-lg;
@@ -822,6 +822,20 @@ const deleteProduct = async () => {
     &:hover {
       transform: translateY(-5px);
       box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+
+      .admin-products__card-image {
+        border-color: rgba($primary-color, 0.4);
+        box-shadow: 0 4px 12px rgba($primary-color, 0.2);
+
+        img {
+          transform: scale(1.05);
+        }
+      }
+      
+      .admin-products__card-id {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba($primary-color, 0.4);
+      }
     }
 
     &-header {
@@ -831,10 +845,21 @@ const deleteProduct = async () => {
       justify-content: space-between;
       align-items: flex-start;
       gap: $spacing-sm;
+      min-height: 100px; 
       
       @media (min-width: $breakpoint-sm) {
         padding: $spacing-lg;
         gap: $spacing-md;
+        min-height: 120px;
+      }
+
+      // Responsive en móvil
+      @media (max-width: $breakpoint-sm - 1px) {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: $spacing-sm;
+        padding: $spacing-sm;
       }
     }
 
@@ -843,28 +868,52 @@ const deleteProduct = async () => {
       flex-direction: column;
       align-items: center;
       gap: $spacing-xs;
+      flex: 1;
+
+      @media (max-width: $breakpoint-sm - 1px) {
+        order: 1;
+      }
     }
 
+    // IMAGEN MEJORADA
     &-image {
-      width: 60px;
-      height: 60px;
+      width: 70px;
+      height: 70px;
       border-radius: $border-radius;
       overflow: hidden;
-      border: 1px solid $border-color;
+      border: 2px solid rgba($primary-color, 0.1);
       display: flex;
       align-items: center;
       justify-content: center;
       background: white;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      position: relative;
       
       @media (min-width: $breakpoint-sm) {
-        width: 80px;
-        height: 80px;
+        width: 90px;
+        height: 90px;
+        border: 3px solid rgba($primary-color, 0.15);
       }
       
       img {
-        max-width: 100%;
-        max-height: 100%;
-        object-fit: contain;
+        width: 100%;
+        height: 100%;
+        object-fit: cover; 
+        object-position: center;
+        transition: transform 0.3s ease;
+        animation: imageLoad 0.3s ease-out;
+      }
+      
+      // Overlay sutil para mejorar contraste
+      &::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 50%);
+        pointer-events: none;
       }
     }
 
@@ -875,28 +924,50 @@ const deleteProduct = async () => {
       width: 100%;
       height: 100%;
       color: $text-color-secondary;
-      font-size: 20px;
+      font-size: 24px;
+      background: linear-gradient(135deg, rgba($primary-color, 0.05) 0%, rgba($primary-color, 0.02) 100%);
       
       @media (min-width: $breakpoint-sm) {
-        font-size: 28px;
+        font-size: 32px;
+      }
+      
+      i {
+        opacity: 0.6;
       }
     }
 
     &-id {
-      background: rgba($primary-color, 0.1);
-      color: $primary-color;
-      padding: 2px 6px;
+      background: linear-gradient(135deg, $primary-color 0%, #4bc286 100%);
+      color: white;
+      padding: 4px 8px;
       border-radius: $border-radius-sm;
       font-size: $font-size-small;
-      font-weight: $font-weight-medium;
-      align-self: flex-start;
+      font-weight: $font-weight-semibold;
+      align-self: center;
       margin-top: $spacing-xs;
+      box-shadow: 0 2px 4px rgba($primary-color, 0.3);
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+      
+      @media (min-width: $breakpoint-sm) {
+        padding: 5px 10px;
+      }
     }
 
     &-actions {
       display: flex;
       gap: $spacing-xs;
       flex-shrink: 0;
+
+      @media (max-width: $breakpoint-sm - 1px) {
+        order: 2;
+        flex-direction: row;
+        justify-content: center;
+      }
+
+      @media (min-width: $breakpoint-sm) {
+        flex-direction: column;
+      }
     }
 
     &-content {
@@ -908,26 +979,33 @@ const deleteProduct = async () => {
     }
 
     &-title {
-      font-size: $font-size-large;
+      font-size: $font-size-base;
       font-weight: $font-weight-bold;
       color: $text-color;
       margin: 0 0 $spacing-sm;
       text-align: center;
+      line-height: 1.3;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      min-height: 2.6em;
       
       @media (min-width: $breakpoint-sm) {
-        font-size: $font-size-xl;
+        font-size: $font-size-large;
       }
     }
 
     &-price {
-      font-size: $font-size-xl;
+      font-size: $font-size-large;
       font-weight: $font-weight-bold;
       color: $primary-color;
       text-align: center;
       margin-bottom: $spacing-md;
+      text-shadow: 0 1px 2px rgba($primary-color, 0.1);
       
       @media (min-width: $breakpoint-sm) {
-        font-size: $font-size-xxl;
+        font-size: $font-size-xl;
       }
     }
 
@@ -1057,6 +1135,43 @@ const deleteProduct = async () => {
     }
   }
 
+  // Thumbnail para la tabla desktop MEJORADO
+  .thumb-image {
+    width: 50px;
+    height: 50px;
+    border-radius: $border-radius-sm;
+    overflow: hidden;
+    border: 2px solid rgba($primary-color, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    margin: 0 auto;
+    
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      animation: imageLoad 0.3s ease-out;
+    }
+    
+    &__placeholder {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      color: $text-color-secondary;
+      font-size: 18px;
+      background: linear-gradient(135deg, rgba($primary-color, 0.05) 0%, rgba($primary-color, 0.02) 100%);
+      
+      i {
+        opacity: 0.6;
+      }
+    }
+  }
+
   // Modal
   &__modal-overlay {
     position: fixed;
@@ -1142,7 +1257,6 @@ const deleteProduct = async () => {
     bottom: 0;
   }
 
-  // Form
   &__form-grid {
     display: grid;
     grid-template-columns: 1fr;
@@ -1234,10 +1348,10 @@ const deleteProduct = async () => {
 
   &__form-image-preview {
     margin-top: $spacing-sm;
-    padding: $spacing-sm;
-    border: 1px solid $border-color;
+    padding: $spacing-md;
+    border: 2px dashed rgba($primary-color, 0.3);
     border-radius: $border-radius;
-    background: $tertiary-color;
+    background: linear-gradient(135deg, rgba($primary-color, 0.02) 0%, rgba($primary-color, 0.05) 100%);
     text-align: center;
     
     img {
@@ -1245,10 +1359,12 @@ const deleteProduct = async () => {
       max-height: 200px;
       object-fit: contain;
       border-radius: $border-radius-sm;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      border: 2px solid white;
+      animation: imageLoad 0.3s ease-out;
     }
   }
 
-  // Modal buttons
   &__modal-btn {
     display: flex;
     align-items: center;
@@ -1299,7 +1415,6 @@ const deleteProduct = async () => {
     }
   }
 
-  // Confirm dialog
   &__confirm {
     text-align: center;
     padding: $spacing-md 0;
@@ -1322,7 +1437,6 @@ const deleteProduct = async () => {
     }
   }
 
-  // Spinner
   &__spinner {
     width: 16px;
     height: 16px;
@@ -1337,7 +1451,6 @@ const deleteProduct = async () => {
     }
   }
 
-  // Animation keyframes
   @keyframes spin {
     to { transform: rotate(360deg); }
   }
@@ -1351,4 +1464,17 @@ const deleteProduct = async () => {
       opacity: 1;
       transform: scale(1) translateY(0);
     }
-  }} </style>
+  }
+
+  @keyframes imageLoad {
+    from {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+}
+</style>
