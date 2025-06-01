@@ -1,4 +1,4 @@
-<!-- @/views/admin/AdminOrders.vue -->
+<!-- @/views/admin/AdminOrders.vue - Versión corregida -->
 <template>
   <div class="admin-view admin-orders">
     <!-- Header optimizado -->
@@ -42,10 +42,16 @@
       </div>
     </div>
 
+    <!-- Debug info -->
+    <div v-if="debugMode" class="admin-orders__debug">
+      <p><strong>Debug:</strong> Pedidos: {{ adminStore.orders.length }}, Cache: {{ ordersWithDetails.size }}</p>
+      <button @click="loadOrdersDetails" class="admin-orders__debug-btn">Recargar detalles</button>
+    </div>
+
     <!-- Estado de carga inicial -->
-    <div v-if="loading && adminStore.orders.length === 0" class="admin-orders__loading">
+    <div v-if="initialLoading" class="admin-orders__loading">
       <div class="admin-orders__spinner"></div>
-      <p>Cargando pedidos...</p>
+      <p>Cargando pedidos y detalles...</p>
     </div>
 
     <!-- Contenido principal -->
@@ -85,7 +91,7 @@
                 <span class="admin-orders__info-label">Cliente:</span>
                 <span class="admin-orders__info-value">{{ getUserName(order.usuarioId) }}</span>
               </div>
-              <div class="admin-orders__info-item" v-if="getOrderProductsCount(order) !== 'N/A'">
+              <div class="admin-orders__info-item">
                 <i class="fas fa-box"></i>
                 <span class="admin-orders__info-label">Productos:</span>
                 <span class="admin-orders__info-value">{{ getOrderProductsCount(order) }}</span>
@@ -115,7 +121,7 @@
               <th>Cliente</th>
               <th>Fecha</th>
               <th>Total</th>
-              <th>Productos</th>
+              <th>Nº Productos</th>
               <th>Acciones</th>
             </tr>
           </thead>
@@ -125,7 +131,12 @@
               <td class="admin-orders__table-cell">{{ getUserName(order.usuarioId) }}</td>
               <td class="admin-orders__table-cell">{{ order.fechaFormateada }}</td>
               <td class="admin-orders__table-cell">{{ formatCurrency(order.total) }}</td>
-              <td class="admin-orders__table-cell">{{ getOrderProductsCount(order) }}</td>
+              <td class="admin-orders__table-cell">
+                <div class="admin-orders__products-count">
+                  <i class="fas fa-box"></i>
+                  <span>{{ getOrderProductsCount(order) }}</span>
+                </div>
+              </td>
               <td class="admin-orders__table-cell">
                 <div class="admin-orders__table-actions">
                   <button class="admin-orders__action-btn admin-orders__action-btn--view"
@@ -227,7 +238,7 @@
               <div class="admin-orders__info-card-header">
                 <h3 class="admin-orders__info-card-title">
                   <i class="fas fa-box"></i>
-                  Productos
+                  Productos ({{ getOrderProductsCount(selectedOrder) }})
                 </h3>
               </div>
               <div class="admin-orders__info-card-content">
@@ -238,6 +249,11 @@
 
                 <!-- Vista móvil de productos -->
                 <div v-else class="admin-orders__products-mobile">
+                  <div v-if="orderDetails.length === 0" class="admin-orders__no-products">
+                    <i class="fas fa-box-open"></i>
+                    <p>No se encontraron productos en este pedido</p>
+                  </div>
+
                   <div v-for="item in orderDetails" :key="item.id" class="admin-orders__product-card">
                     <div class="admin-orders__product-image">
                       <div class="admin-orders__thumb-image">
@@ -260,22 +276,28 @@
                           {{ formatCurrency(item.precioUnitario) }}
                         </span>
                         <span class="admin-orders__product-quantity">
-                          Cant: {{ item.cantidad }}
+                          Cantidad: {{ item.cantidad }}
                         </span>
                         <span class="admin-orders__product-subtotal">
-                          {{ formatCurrency(item.precioUnitario * item.cantidad) }}
+                          Subtotal: {{ formatCurrency(item.precioUnitario * item.cantidad) }}
                         </span>
                       </div>
                     </div>
                   </div>
-                  <div class="admin-orders__products-total">
+
+                  <div v-if="orderDetails.length > 0" class="admin-orders__products-total">
                     <strong>Total: {{ formatCurrency(selectedOrder?.total || 0) }}</strong>
                   </div>
                 </div>
 
                 <!-- Vista desktop de productos -->
                 <div class="admin-orders__products-desktop">
-                  <table class="admin-orders__products-table">
+                  <div v-if="orderDetails.length === 0" class="admin-orders__no-products">
+                    <i class="fas fa-box-open"></i>
+                    <p>No se encontraron productos en este pedido</p>
+                  </div>
+
+                  <table v-else class="admin-orders__products-table">
                     <thead>
                       <tr>
                         <th>Producto</th>
@@ -408,12 +430,17 @@ const searchQuery = ref('');
 const dateFilter = ref('all');
 const sortBy = ref('date_desc');
 const loading = ref(false);
+const initialLoading = ref(true);
 const loadingOrderDetails = ref(false);
 const selectedOrder = ref<Pedido | null>(null);
 const orderToDelete = ref<Pedido | null>(null);
 const orderDetails = ref<DetallePedido[]>([]);
 const showOrderDetails = ref(false);
 const showDeleteConfirmation = ref(false);
+const debugMode = ref(false); // Para debug en desarrollo
+
+// Store para cachear los detalles de pedidos ya cargados
+const ordersWithDetails = ref<Map<number, DetallePedido[]>>(new Map());
 
 // Computed properties
 const filteredOrders = computed(() => {
@@ -479,21 +506,77 @@ const filteredOrders = computed(() => {
 });
 
 onMounted(async () => {
-  // Cargar pedidos si no están ya cargados
-  if (adminStore.orders.length === 0) {
-    await adminStore.fetchAllOrders();
-  }
+  console.log('=== INICIANDO CARGA DE PEDIDOS ===');
 
-  // Cargar usuarios si no están ya cargados
-  if (adminStore.users.length === 0) {
-    await adminStore.fetchAllUsers();
-  }
+  try {
+    initialLoading.value = true;
 
-  // Cargar productos si no están ya cargados
-  if (adminStore.products.length === 0) {
-    await adminStore.fetchAllProducts();
+    // 1. Cargar datos básicos si no están cargados
+    const loadPromises = [];
+
+    if (adminStore.orders.length === 0) {
+      console.log('Cargando pedidos...');
+      loadPromises.push(adminStore.fetchAllOrders());
+    }
+
+    if (adminStore.users.length === 0) {
+      console.log('Cargando usuarios...');
+      loadPromises.push(adminStore.fetchAllUsers());
+    }
+
+    if (adminStore.products.length === 0) {
+      console.log('Cargando productos...');
+      loadPromises.push(adminStore.fetchAllProducts());
+    }
+
+    if (loadPromises.length > 0) {
+      await Promise.all(loadPromises);
+    }
+
+    console.log(`Datos básicos cargados: ${adminStore.orders.length} pedidos, ${adminStore.users.length} usuarios, ${adminStore.products.length} productos`);
+
+    // 2. Cargar detalles de pedidos
+    await loadOrdersDetails();
+
+  } catch (error) {
+    console.error('Error en la carga inicial:', error);
+    toast.error('Error al cargar los datos de pedidos');
+  } finally {
+    initialLoading.value = false;
+    console.log('=== CARGA COMPLETADA ===');
   }
 });
+
+// Función para cargar los detalles de todos los pedidos
+const loadOrdersDetails = async () => {
+  if (adminStore.orders.length === 0) {
+    console.log('No hay pedidos para cargar detalles');
+    return;
+  }
+
+  console.log(`Iniciando carga de detalles para ${adminStore.orders.length} pedidos...`);
+
+  try {
+    // Usar el nuevo método del store que carga en lotes
+    const detailsMap = await adminStore.loadOrdersDetails();
+
+    // Actualizar nuestro cache local
+    ordersWithDetails.value = detailsMap;
+
+    console.log(`✅ Detalles cargados para ${detailsMap.size} pedidos`);
+
+    // Log de resumen
+    const totalProducts = Array.from(detailsMap.values()).reduce((total, details) => {
+      return total + details.reduce((sum, detail) => sum + detail.cantidad, 0);
+    }, 0);
+
+    console.log(`📊 Total de productos en todos los pedidos: ${totalProducts}`);
+
+  } catch (error) {
+    console.error('Error al cargar detalles de pedidos:', error);
+    toast.error('Error al cargar los detalles de los pedidos');
+  }
+};
 
 // Funciones
 const formatCurrency = (value: number) => {
@@ -533,11 +616,28 @@ const getProductImage = (productId: number) => {
   return product ? product.urlImagen : '';
 };
 
-const getOrderProductsCount = (order: Pedido) => {
-  if (order.detalles) {
-    return order.detalles.length;
+const getOrderProductsCount = (order: Pedido | null) => {
+  if (!order) return '-';
+
+  console.log(`Calculando productos para pedido ${order.id}...`);
+
+  // Primero intentar con los detalles del pedido si ya los tiene
+  if (order.detalles && order.detalles.length > 0) {
+    const totalItems = order.detalles.reduce((total, detail) => total + detail.cantidad, 0);
+    console.log(`Pedido ${order.id}: ${totalItems} productos (desde order.detalles)`);
+    return totalItems.toString();
   }
-  return 'N/A';
+
+  // Si no, buscar en el cache local
+  const cachedDetails = ordersWithDetails.value.get(order.id);
+  if (cachedDetails && cachedDetails.length > 0) {
+    const totalItems = cachedDetails.reduce((total, detail) => total + detail.cantidad, 0);
+    console.log(`Pedido ${order.id}: ${totalItems} productos (desde cache)`);
+    return totalItems.toString();
+  }
+
+  console.log(`Pedido ${order.id}: Sin detalles disponibles`);
+  return '-';
 };
 
 const handleOverlayClick = () => {
@@ -545,28 +645,46 @@ const handleOverlayClick = () => {
 };
 
 const viewOrderDetails = async (order: Pedido) => {
-  console.log('Viendo detalles del pedido:', order);
+  console.log('=== ABRIENDO DETALLES DEL PEDIDO ===');
+  console.log('Pedido seleccionado:', order);
+
   selectedOrder.value = order;
   showOrderDetails.value = true;
 
-  if (!order.detalles) {
-    loadingOrderDetails.value = true;
-    try {
-      const orderWithDetails = await adminStore.getOrderDetails(order.id);
-      if (orderWithDetails && orderWithDetails.detalles) {
-        orderDetails.value = orderWithDetails.detalles;
-      } else {
-        orderDetails.value = [];
-      }
-    } catch (error) {
-      console.error('Error fetching order details:', error);
-      toast.error('Error al cargar los detalles del pedido');
-      orderDetails.value = [];
-    } finally {
-      loadingOrderDetails.value = false;
-    }
-  } else {
+  // Comprobar si ya tenemos los detalles en el cache
+  const cachedDetails = ordersWithDetails.value.get(order.id);
+  if (cachedDetails && cachedDetails.length > 0) {
+    orderDetails.value = cachedDetails;
+    console.log(`✅ Usando detalles del cache: ${cachedDetails.length} productos`);
+    return;
+  }
+
+  // Si están en el objeto order
+  if (order.detalles && order.detalles.length > 0) {
     orderDetails.value = order.detalles;
+    console.log(`✅ Usando detalles del objeto order: ${order.detalles.length} productos`);
+    return;
+  }
+
+  // Si no están disponibles, cargarlos desde el servidor
+  loadingOrderDetails.value = true;
+  try {
+    console.log('🔄 Cargando detalles desde el servidor...');
+
+    const details = await adminStore.getOrderDetails(order.id);
+    orderDetails.value = details;
+
+    // Guardar en cache
+    ordersWithDetails.value.set(order.id, details);
+
+    console.log(`✅ Detalles cargados desde servidor: ${details.length} productos`);
+
+  } catch (error) {
+    console.error('❌ Error al cargar detalles del pedido:', error);
+    toast.error('Error al cargar los detalles del pedido');
+    orderDetails.value = [];
+  } finally {
+    loadingOrderDetails.value = false;
   }
 };
 
@@ -607,8 +725,14 @@ const deleteOrder = async () => {
   try {
     await adminStore.deleteOrder(orderToDelete.value.id);
 
+    // Eliminar del cache si existe
+    ordersWithDetails.value.delete(orderToDelete.value.id);
+
     console.log('Recargando lista de pedidos después de eliminar...');
     await adminStore.fetchAllOrders();
+
+    // Recargar detalles
+    await loadOrdersDetails();
 
     toast.success('Pedido eliminado correctamente');
     showDeleteConfirmation.value = false;
@@ -629,7 +753,6 @@ const deleteOrder = async () => {
 @use '@/styles/variables' as *;
 
 .admin-orders {
-  // Base móvil
   padding: $spacing-sm;
   min-height: 100vh;
   background-color: $tertiary-color;
@@ -640,6 +763,27 @@ const deleteOrder = async () => {
 
   @media (min-width: $breakpoint-md) {
     padding: $spacing-lg;
+  }
+
+  // Debug panel
+  &__debug {
+    background: rgba($warning-color, 0.1);
+    border: 1px solid $warning-color;
+    border-radius: $border-radius;
+    padding: $spacing-sm;
+    margin-bottom: $spacing-md;
+    font-size: $font-size-small;
+
+    &-btn {
+      margin-left: $spacing-sm;
+      padding: $spacing-xs $spacing-sm;
+      background: $warning-color;
+      color: white;
+      border: none;
+      border-radius: $border-radius-sm;
+      cursor: pointer;
+      font-size: $font-size-small;
+    }
   }
 
   // Loading state
@@ -998,6 +1142,24 @@ const deleteOrder = async () => {
     gap: $spacing-xs;
   }
 
+  // Estilo específico para el contador de productos en la tabla
+  &__products-count {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+    justify-content: center;
+    padding: $spacing-xs $spacing-sm;
+    background: rgba($primary-color, 0.1);
+    border-radius: $border-radius-sm;
+    font-weight: $font-weight-semibold;
+    color: $primary-color;
+    min-width: 50px;
+
+    i {
+      font-size: 12px;
+    }
+  }
+
   // Modal
   &__modal-overlay {
     position: fixed;
@@ -1326,6 +1488,24 @@ const deleteOrder = async () => {
     font-weight: $font-weight-bold;
   }
 
+  // Estado sin productos
+  &__no-products {
+    text-align: center;
+    padding: $spacing-xl;
+    color: $text-color-secondary;
+
+    i {
+      font-size: 3rem;
+      margin-bottom: $spacing-md;
+      opacity: 0.5;
+    }
+
+    p {
+      margin: 0;
+      font-style: italic;
+    }
+  }
+
   // Imagen thumbnail
   &__thumb-image {
     width: 40px;
@@ -1468,170 +1648,6 @@ const deleteOrder = async () => {
     to {
       opacity: 1;
       transform: scale(1) translateY(0);
-    }
-  }
-
-  // Responsive adjustments
-  @media (min-width: $breakpoint-sm) {
-    &__card {
-      padding: 0;
-    }
-
-    &__card-header {
-      padding: $spacing-lg;
-    }
-
-    &__card-body {
-      padding: $spacing-lg;
-    }
-
-    &__card-total {
-      font-size: $font-size-xxl;
-    }
-
-    &__info-item {
-      font-size: $font-size-base;
-
-      i {
-        font-size: 14px;
-      }
-    }
-
-    &__action-btn {
-      width: 36px;
-      height: 36px;
-
-      i {
-        font-size: 14px;
-      }
-    }
-
-    &__info-grid {
-      gap: $spacing-md;
-    }
-
-    &__info-item {
-      padding: $spacing-sm;
-    }
-
-    &__info-label {
-      min-width: 80px;
-      font-size: $font-size-base;
-    }
-
-    &__info-value {
-      font-size: $font-size-base;
-    }
-
-    &__product-card {
-      padding: $spacing-md;
-      gap: $spacing-md;
-    }
-
-    &__product-name {
-      font-size: $font-size-base;
-    }
-
-    &__product-id {
-      font-size: $font-size-small;
-    }
-
-    &__product-details {
-      font-size: $font-size-small;
-      gap: $spacing-xs;
-    }
-
-    &__products-total {
-      font-size: $font-size-large;
-      padding: $spacing-md;
-    }
-
-    &__thumb-image {
-      width: 50px;
-      height: 50px;
-    }
-
-    &__thumb-placeholder {
-      font-size: 20px;
-    }
-
-    &__btn-text {
-      display: inline;
-    }
-  }
-
-  @media (min-width: $breakpoint-md) {
-    &__modal {
-      &--large {
-        max-width: 900px;
-      }
-    }
-
-    &__details {
-      gap: $spacing-xl;
-    }
-
-    &__info-card-header {
-      padding: $spacing-lg;
-    }
-
-    &__info-card-content {
-      padding: $spacing-lg;
-    }
-
-    &__info-card-title {
-      font-size: $font-size-large;
-
-      i {
-        font-size: 16px;
-      }
-    }
-
-    &__loading {
-      padding: $spacing-xxl;
-      font-size: $font-size-base;
-    }
-
-    &__thumb-image {
-      width: 60px;
-      height: 60px;
-    }
-
-    &__thumb-placeholder {
-      font-size: 24px;
-    }
-
-    &__table-product {
-      gap: $spacing-md;
-    }
-
-    &__table-product-name {
-      font-size: $font-size-base;
-    }
-
-    &__table-product-id {
-      font-size: $font-size-small;
-    }
-  }
-
-  @media (min-width: $breakpoint-lg) {
-    &__modal {
-      &--large {
-        max-width: 1000px;
-      }
-    }
-
-    &__info-grid {
-      grid-template-columns: repeat(4, 1fr);
-    }
-
-    &__thumb-image {
-      width: 70px;
-      height: 70px;
-    }
-
-    &__table-product {
-      gap: $spacing-lg;
     }
   }
 }

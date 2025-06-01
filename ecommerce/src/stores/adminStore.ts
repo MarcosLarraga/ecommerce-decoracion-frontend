@@ -447,28 +447,108 @@ export const useAdminStore = defineStore('admin', {
       }
     },
 
-    async getOrderDetails(id: number) {
-      this.loading = true;
-      this.error = null;
+     // NUEVO: Método específico para obtener detalles de un pedido
+    async getOrderDetails(orderId: number): Promise<DetallePedido[]> {
       try {
-        const response = await axios.get<Pedido>(`/api/Pedido/${id}`, {
+        console.log(`Cargando detalles del pedido ${orderId}...`);
+        
+        // Usar el endpoint correcto de DetallePedido
+        const response = await axios.get<DetallePedido[]>(`/api/DetallePedido/pedido/${orderId}`, {
           headers: { Authorization: `Bearer ${this.token}` }
         });
 
-        // Incluir fecha formateada
-        const orderWithFormattedDate = {
-          ...response.data,
-          fechaFormateada: parseFechaPedido(response.data.fechaPedido)
-        };
-
-        return orderWithFormattedDate;
+        console.log(`Detalles del pedido ${orderId} cargados:`, response.data.length, 'items');
+        return response.data;
       } catch (error: any) {
-        console.error('Error fetching order details:', error);
-        this.error = error.response?.data?.message || `Error al obtener detalles del pedido ${id}`;
-        return null;
-      } finally {
-        this.loading = false;
+        console.error(`Error fetching order details for order ${orderId}:`, error);
+        
+        // Si el endpoint no existe o hay error, intentar con el endpoint de Pedido
+        try {
+          console.log(`Intentando con endpoint alternativo para pedido ${orderId}...`);
+          const fallbackResponse = await axios.get<Pedido>(`/api/Pedido/${orderId}`, {
+            headers: { Authorization: `Bearer ${this.token}` }
+          });
+          
+          if (fallbackResponse.data.detalles) {
+            console.log(`Detalles obtenidos del endpoint alternativo:`, fallbackResponse.data.detalles.length, 'items');
+            return fallbackResponse.data.detalles;
+          }
+        } catch (fallbackError) {
+          console.error(`Error en endpoint alternativo:`, fallbackError);
+        }
+        
+        return [];
       }
+    },
+
+    async getOrderWithDetails(orderId: number): Promise<Pedido | null> {
+      try {
+        console.log(`Obteniendo pedido completo ${orderId}...`);
+        
+        const orderResponse = await axios.get<Pedido>(`/api/Pedido/${orderId}`, {
+          headers: { Authorization: `Bearer ${this.token}` }
+        });
+
+        const order = orderResponse.data;
+        
+        if (order.detalles && order.detalles.length > 0) {
+          return {
+            ...order,
+            fechaFormateada: parseFechaPedido(order.fechaPedido)
+          };
+        }
+
+        const details = await this.getOrderDetails(orderId);
+        
+        return {
+          ...order,
+          detalles: details,
+          fechaFormateada: parseFechaPedido(order.fechaPedido)
+        };
+      } catch (error: any) {
+        console.error(`Error fetching complete order ${orderId}:`, error);
+        this.error = error.response?.data?.message || `Error al obtener pedido ${orderId}`;
+        return null;
+      }
+    },
+
+    async loadOrdersDetails(orderIds?: number[]): Promise<Map<number, DetallePedido[]>> {
+      const ordersToLoad = orderIds || this.orders.map(o => o.id);
+      const detailsMap = new Map<number, DetallePedido[]>();
+      
+      console.log(`Cargando detalles para ${ordersToLoad.length} pedidos...`);
+      
+      const batchSize = 5;
+      const batches = [];
+      
+      for (let i = 0; i < ordersToLoad.length; i += batchSize) {
+        batches.push(ordersToLoad.slice(i, i + batchSize));
+      }
+      
+      for (const batch of batches) {
+        const promises = batch.map(async (orderId) => {
+          try {
+            const details = await this.getOrderDetails(orderId);
+            detailsMap.set(orderId, details);
+            return { orderId, success: true, count: details.length };
+          } catch (error) {
+            console.error(`Error loading details for order ${orderId}:`, error);
+            detailsMap.set(orderId, []);
+            return { orderId, success: false, count: 0 };
+          }
+        });
+        
+        const results = await Promise.all(promises);
+        console.log(`Lote completado:`, results);
+        
+        // Pequeña pausa entre lotes para no sobrecargar el servidor
+        if (batches.indexOf(batch) < batches.length - 1) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+        }
+      }
+      
+      console.log(`Detalles cargados para ${detailsMap.size} pedidos`);
+      return detailsMap;
     },
 
     async deleteOrder(orderId: number) {

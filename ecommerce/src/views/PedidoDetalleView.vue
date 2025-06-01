@@ -1,70 +1,119 @@
 <template>
   <div class="pedido-detalle">
     <div class="pedido-detalle__container">
-      <!-- Header simple -->
+      <!-- Header del ticket -->
       <div class="pedido-detalle__header">
-        <h1 class="pedido-detalle__title">Mi Pedido #{{ pedidoId }}</h1>
+        <h1 class="pedido-detalle__title">Detalle del Pedido #{{ pedidoId }}</h1>
+        <div class="pedido-detalle__subtitle">Gracias por tu compra</div>
       </div>
 
       <!-- Loading -->
       <div v-if="loading" class="pedido-detalle__loading">
         <div class="spinner"></div>
-        <p>Cargando detalles...</p>
+        <p>Cargando información del pedido...</p>
       </div>
 
       <!-- Contenido principal -->
       <div v-else-if="pedido && usuario" class="pedido-detalle__content">
         
-        <!-- Información del pedido -->
+        <!-- Información del pedido - Estilo ticket -->
         <div class="pedido-info">
+          <!-- Bordes perforados -->
+          <div class="ticket-perforation ticket-perforation--top"></div>
+          
           <div class="pedido-info__status">
             <span class="status-badge">{{ pedido.estado || 'Procesando' }}</span>
+            <div class="status-details">
+              <span class="status-date">{{ formatDate(pedido.fechaPedido) }}</span>
+            </div>
           </div>
           
           <div class="pedido-info__details">
-            <div class="detail-item">
-              <span class="label">Fecha:</span>
-              <span class="value">{{ formatDate(pedido.fechaPedido) }}</span>
+            <div class="detail-item detail-item--fecha">
+              <div class="detail-icon">📅</div>
+              <div class="detail-content">
+                <span class="label">Fecha del pedido</span>
+                <span class="value">{{ formatDate(pedido.fechaPedido) }}</span>
+              </div>
             </div>
-            <div class="detail-item">
-              <span class="label">Total:</span>
-              <span class="value total">{{ formatCurrency(pedido.total) }}</span>
+            <div class="detail-item detail-item--total">
+              <div class="detail-icon">💰</div>
+              <div class="detail-content">
+                <span class="label">Importe total</span>
+                <span class="value total">{{ formatCurrency(pedido.total) }}</span>
+              </div>
             </div>
           </div>
+
+          <div class="ticket-perforation ticket-perforation--bottom"></div>
         </div>
 
         <!-- Datos de envío -->
         <div class="envio-info">
-          <h3 class="section-title">Datos de envío</h3>
+          <h3 class="section-title">
+            <span class="section-icon">🚚</span>
+            Información de envío
+          </h3>
           <div class="envio-details">
-            <p><strong>{{ usuario.nombre }}</strong></p>
-            <p>{{ usuario.email }}</p>
-            <p v-if="usuario.telefono">{{ usuario.telefono }}</p>
-            <p v-if="usuario.direccion">{{ usuario.direccion }}</p>
-            <p v-else class="no-direccion">⚠️ No hay dirección de envío registrada</p>
+            <div class="envio-item">
+              <span class="envio-label">Destinatario:</span>
+              <span class="envio-value">{{ usuario.nombre }}</span>
+            </div>
+            <div class="envio-item">
+              <span class="envio-label">Email:</span>
+              <span class="envio-value">{{ usuario.email }}</span>
+            </div>
+            <div class="envio-item" v-if="usuario.telefono">
+              <span class="envio-label">Teléfono:</span>
+              <span class="envio-value">{{ usuario.telefono }}</span>
+            </div>
+            <div class="envio-item">
+              <span class="envio-label">Dirección:</span>
+              <span class="envio-value" v-if="usuario.direccion">{{ usuario.direccion }}</span>
+              <span class="envio-value envio-value--warning" v-else>
+                ⚠️ No hay dirección de envío registrada
+              </span>
+            </div>
           </div>
         </div>
 
         <!-- Lista de productos -->
         <div class="productos-lista" v-if="detallesPedido.length > 0">
-          <h3 class="section-title">Productos ({{ detallesPedido.length }})</h3>
-          
-          <div class="producto-item" v-for="item in detallesPedido" :key="item.id">
-            <div class="producto-info">
-              <h4 class="producto-nombre">{{ item.producto?.nombre || 'Producto no disponible' }}</h4>
-              <p class="producto-categoria">{{ item.producto?.categoria?.nombre || 'Sin categoría' }}</p>
-            </div>
-            <div class="producto-precio">
-              <div class="cantidad">x{{ item.cantidad }}</div>
-              <div class="precio">{{ formatCurrency(item.precioUnitario) }}</div>
-              <div class="subtotal">{{ formatCurrency(item.cantidad * item.precioUnitario) }}</div>
-            </div>
+          <div class="productos-header">
+            <h3 class="section-title">
+              <span class="section-icon">🛍️</span>
+              Productos ({{ detallesPedido.length }})
+            </h3>
           </div>
+          
+          <div class="productos-container">
+            <div class="producto-item" v-for="(item, index) in detallesPedido" :key="item.id">
+              <div class="producto-numero">{{ index + 1 }}</div>
+              <div class="producto-info">
+                <h4 class="producto-nombre">{{ item.producto?.nombre || 'Producto no disponible' }}</h4>
+                <p class="producto-categoria">
+                  <span class="categoria-tag">{{ item.producto?.categoria?.nombre || 'Sin categoría' }}</span>
+                </p>
+              </div>
+              <div class="producto-precio">
+                <div class="precio-detalle">
+                  <span class="cantidad-badge">{{ item.cantidad }}x</span>
+                  <span class="precio-unitario">{{ formatCurrency(item.precioUnitario) }}</span>
+                </div>
+                <div class="subtotal">{{ formatCurrency(item.cantidad * item.precioUnitario) }}</div>
+              </div>
+            </div>
 
-          <!-- Total final -->
-          <div class="total-final">
-            <span class="total-label">Total del pedido:</span>
-            <span class="total-amount">{{ formatCurrency(pedido.total) }}</span>
+            <!-- Línea separadora -->
+            <div class="productos-separator"></div>
+
+            <!-- Total final -->
+            <div class="total-final">
+              <div class="total-content">
+                <span class="total-label">Total del pedido:</span>
+                <span class="total-amount">{{ formatCurrency(pedido.total) }}</span>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -74,20 +123,26 @@
             @click="enviarCorreoConfirmacion" 
             class="btn btn-primary"
             :disabled="enviandoCorreo">
+            <span class="btn-icon">📧</span>
             {{ enviandoCorreo ? 'Enviando...' : 'Reenviar confirmación' }}
           </button>
           
           <router-link to="/mi-cuenta" class="btn btn-secondary">
-            ← Volver a mis pedidos
+            <span class="btn-icon">←</span>
+            Volver a mis pedidos
           </router-link>
         </div>
       </div>
 
       <!-- Error -->
       <div v-else class="pedido-detalle__error">
+        <div class="error-icon">❌</div>
         <h3>Pedido no encontrado</h3>
         <p>No pudimos encontrar la información de este pedido.</p>
-        <router-link to="/" class="btn btn-primary">Ir a la tienda</router-link>
+        <router-link to="/" class="btn btn-primary">
+          <span class="btn-icon">🏠</span>
+          Ir a la tienda
+        </router-link>
       </div>
     </div>
   </div>
@@ -171,81 +226,138 @@ const enviarCorreoConfirmacion = async () => {
 <style lang="scss" scoped>
 @use '../styles/variables' as *;
 
+// Reset y base
+* {
+  box-sizing: border-box;
+}
+
 .pedido-detalle {
   min-height: 100vh;
-  background-color: $tertiary-color;
-  padding: $spacing-md;
+  background: linear-gradient(135deg, #f1f3f6 0%, #e8edf5 50%, #dde4ef 100%);
+  padding: $spacing-lg;
+  position: relative;
+  font-family: $font-family-secondary;
 
-  @media (min-width: $breakpoint-md) {
-    padding: $spacing-lg;
+  // Patrón de fondo sutil
+  &::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+      radial-gradient(circle at 20% 20%, rgba($primary-color, 0.04) 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba($primary-color, 0.03) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  @media (max-width: $breakpoint-md) {
+    padding: $spacing-md;
   }
 
   &__container {
-    max-width: 800px;
+    max-width: 900px;
     margin: 0 auto;
+    position: relative;
+    z-index: 1;
   }
 
   &__header {
     text-align: center;
     margin-bottom: $spacing-xl;
+    background: white;
+    padding: $spacing-xl;
+    border-radius: $border-radius-xl;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+    border: 1px solid rgba($primary-color, 0.1);
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 6px;
+      background: linear-gradient(90deg, $primary-color 0%, #059447 50%, $primary-color 100%);
+    }
   }
 
   &__title {
     font-family: $font-family-primary;
-    font-size: $font-size-xl;
+    font-size: clamp(1.5rem, 4vw, 2.5rem);
     color: $text-color;
-    margin: 0;
-    font-weight: $font-weight-semibold;
+    margin: 0 0 $spacing-sm;
+    font-weight: $font-weight-bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
 
-    @media (min-width: $breakpoint-md) {
-      font-size: $font-size-xxl;
-    }
+  &__subtitle {
+    color: $text-color-secondary;
+    font-size: $font-size-base;
+    font-weight: $font-weight-medium;
   }
 
   &__loading {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: $spacing-xxl 0;
+    padding: $spacing-xxl * 2;
     background: white;
-    border-radius: $border-radius-lg;
+    border-radius: $border-radius-xl;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
     
     .spinner {
-      border: 3px solid $tertiary-color;
-      border-top: 3px solid $primary-color;
+      border: 4px solid rgba($primary-color, 0.2);
+      border-top: 4px solid $primary-color;
       border-radius: 50%;
-      width: 40px;
-      height: 40px;
+      width: 60px;
+      height: 60px;
       animation: spin 1s linear infinite;
-      margin-bottom: $spacing-md;
+      margin-bottom: $spacing-lg;
     }
     
     p {
       color: $text-color-secondary;
       margin: 0;
+      font-size: $font-size-large;
+      font-weight: $font-weight-medium;
     }
   }
 
   &__content {
     display: flex;
     flex-direction: column;
-    gap: $spacing-lg;
+    gap: $spacing-xl;
   }
 
   &__error {
     text-align: center;
     background: white;
-    padding: $spacing-xxl;
-    border-radius: $border-radius-lg;
+    padding: $spacing-xxl * 2;
+    border-radius: $border-radius-xl;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    border-left: 6px solid $error-color;
+    
+    .error-icon {
+      font-size: 4rem;
+      margin-bottom: $spacing-lg;
+    }
     
     h3 {
       color: $error-color;
       margin-bottom: $spacing-md;
+      font-size: $font-size-xl;
     }
     
     p {
       color: $text-color-secondary;
       margin-bottom: $spacing-lg;
+      font-size: $font-size-base;
     }
   }
 }
@@ -255,61 +367,134 @@ const enviarCorreoConfirmacion = async () => {
   100% { transform: rotate(360deg); }
 }
 
-// Card básica para secciones
-.pedido-info, .envio-info, .productos-lista {
-  background: white;
-  border-radius: $border-radius-lg;
-  padding: $spacing-lg;
-  box-shadow: $box-shadow-sm;
+// Perforaciones del ticket
+.ticket-perforation {
+  height: 20px;
+  background-image: radial-gradient(circle at 20px 10px, transparent 8px, white 8px);
+  background-size: 40px 20px;
+  background-repeat: repeat-x;
+  position: relative;
+  z-index: 2;
+
+  &--top {
+    margin-bottom: -10px;
+  }
+
+  &--bottom {
+    margin-top: -10px;
+  }
 }
 
-// Información del pedido
+// Información principal del pedido
 .pedido-info {
+  background: white;
+  border-radius: $border-radius-xl;
+  overflow: hidden;
+  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba($primary-color, 0.1);
+  position: relative;
+
   &__status {
+    background: linear-gradient(135deg, $primary-color 0%, #059447 100%);
+    color: white;
+    padding: $spacing-xl;
     text-align: center;
-    margin-bottom: $spacing-lg;
+    position: relative;
     
     .status-badge {
-      background: $success-color;
+      background: rgba(255, 255, 255, 0.25);
       color: white;
-      padding: $spacing-sm $spacing-lg;
+      padding: $spacing-sm $spacing-xl;
       border-radius: $border-radius-pill;
-      font-weight: $font-weight-semibold;
-      font-size: $font-size-base;
+      font-weight: $font-weight-bold;
+      font-size: $font-size-large;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      display: inline-flex;
+      align-items: center;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      margin-bottom: $spacing-md;
+
+      &::before {
+        content: '✓';
+        margin-right: $spacing-sm;
+        font-size: 1.2em;
+      }
+    }
+
+    .status-details {
+      .status-date {
+        font-size: $font-size-base;
+        opacity: 0.9;
+        font-weight: $font-weight-medium;
+      }
     }
   }
 
   &__details {
-    display: flex;
-    flex-direction: column;
-    gap: $spacing-md;
+    padding: $spacing-xl;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: $spacing-lg;
+    background: linear-gradient(135deg, #fafbfc 0%, #f8f9fa 100%);
 
-    @media (min-width: $breakpoint-sm) {
-      flex-direction: row;
-      justify-content: space-around;
+    @media (min-width: $breakpoint-md) {
+      grid-template-columns: 1fr 1fr;
     }
 
     .detail-item {
-      text-align: center;
-      
-      .label {
-        display: block;
-        color: $text-color-secondary;
-        font-size: $font-size-small;
-        margin-bottom: $spacing-xs;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
+      background: white;
+      padding: $spacing-lg;
+      border-radius: $border-radius-lg;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+      border: 1px solid rgba($primary-color, 0.1);
+      transition: all $transition-fast;
+      display: flex;
+      align-items: center;
+      gap: $spacing-md;
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
       }
-      
-      .value {
-        display: block;
-        font-weight: $font-weight-semibold;
-        font-size: $font-size-large;
+
+      .detail-icon {
+        font-size: 2rem;
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, rgba($primary-color, 0.1) 0%, rgba($primary-color, 0.05) 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+
+      .detail-content {
+        flex: 1;
+
+        .label {
+          display: block;
+          color: $text-color-secondary;
+          font-size: $font-size-small;
+          margin-bottom: $spacing-xs;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          font-weight: $font-weight-semibold;
+        }
         
-        &.total {
-          color: $primary-color;
-          font-size: $font-size-xl;
+        .value {
+          display: block;
           font-weight: $font-weight-bold;
+          font-size: $font-size-large;
+          color: $text-color;
+          
+          &.total {
+            color: $primary-color;
+            font-size: $font-size-xxl;
+            font-weight: $font-weight-black;
+          }
         }
       }
     }
@@ -318,17 +503,49 @@ const enviarCorreoConfirmacion = async () => {
 
 // Información de envío
 .envio-info {
+  background: white;
+  border-radius: $border-radius-xl;
+  padding: $spacing-xl;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  border-left: 6px solid $info-color;
+  position: relative;
+
   .envio-details {
-    p {
-      margin: $spacing-xs 0;
-      line-height: 1.5;
-      
-      &.no-direccion {
-        color: $warning-color;
+    background: linear-gradient(135deg, rgba($info-color, 0.05) 0%, rgba($info-color, 0.02) 100%);
+    padding: $spacing-lg;
+    border-radius: $border-radius-lg;
+    border: 1px solid rgba($info-color, 0.2);
+
+    .envio-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: $spacing-md 0;
+      border-bottom: 1px solid rgba($info-color, 0.1);
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      .envio-label {
+        font-weight: $font-weight-semibold;
+        color: $text-color-secondary;
+        min-width: 120px;
+      }
+
+      .envio-value {
+        color: $text-color;
         font-weight: $font-weight-medium;
-        background: rgba($warning-color, 0.1);
-        padding: $spacing-sm;
-        border-radius: $border-radius-sm;
+        text-align: right;
+        flex: 1;
+
+        &--warning {
+          color: $warning-color;
+          font-weight: $font-weight-bold;
+          background: rgba($warning-color, 0.1);
+          padding: $spacing-xs $spacing-sm;
+          border-radius: $border-radius-sm;
+        }
       }
     }
   }
@@ -336,105 +553,200 @@ const enviarCorreoConfirmacion = async () => {
 
 // Títulos de sección
 .section-title {
-  margin: 0 0 $spacing-md;
-  font-size: $font-size-large;
-  font-weight: $font-weight-semibold;
+  margin: 0 0 $spacing-lg;
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
   color: $text-color;
-  border-bottom: 2px solid $tertiary-color;
-  padding-bottom: $spacing-sm;
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+
+  .section-icon {
+    font-size: 1.5em;
+  }
 }
 
 // Lista de productos
 .productos-lista {
+  background: white;
+  border-radius: $border-radius-xl;
+  overflow: hidden;
+  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba($primary-color, 0.1);
+
+  .productos-header {
+    background: linear-gradient(135deg, $secondary-color 0%, #2c3e50 100%);
+    color: white;
+    padding: $spacing-lg $spacing-xl;
+
+    .section-title {
+      margin: 0;
+      color: white;
+      font-size: $font-size-large;
+    }
+  }
+
+  .productos-container {
+    padding: $spacing-xl;
+  }
+
   .producto-item {
     display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    padding: $spacing-md 0;
-    border-bottom: 1px solid $tertiary-color;
+    align-items: center;
+    gap: $spacing-lg;
+    padding: $spacing-lg 0;
+    border-bottom: 2px dashed rgba($primary-color, 0.2);
+    position: relative;
+    transition: all $transition-fast;
     
     &:last-child {
       border-bottom: none;
     }
 
-    @media (max-width: $breakpoint-xs) {
-      flex-direction: column;
-      gap: $spacing-sm;
+    &:hover {
+      background: linear-gradient(135deg, rgba($primary-color, 0.02) 0%, rgba($primary-color, 0.01) 100%);
+      border-radius: $border-radius-md;
+      transform: translateX(4px);
+      padding-left: $spacing-md;
     }
-  }
 
-  .producto-info {
-    flex: 1;
-    
-    .producto-nombre {
-      margin: 0 0 $spacing-xs;
-      font-size: $font-size-base;
-      font-weight: $font-weight-semibold;
-      color: $text-color;
-      line-height: 1.3;
-    }
-    
-    .producto-categoria {
-      margin: 0;
-      color: $text-color-secondary;
-      font-size: $font-size-small;
-    }
-  }
-
-  .producto-precio {
-    text-align: right;
-    display: flex;
-    flex-direction: column;
-    gap: $spacing-xs;
-    
-    @media (max-width: $breakpoint-xs) {
-      text-align: left;
-      flex-direction: row;
-      justify-content: space-between;
-    }
-    
-    .cantidad {
-      background: $secondary-color;
+    .producto-numero {
+      background: linear-gradient(135deg, $primary-color 0%, #059447 100%);
       color: white;
-      padding: 2px $spacing-sm;
-      border-radius: $border-radius-sm;
-      font-size: $font-size-small;
-      align-self: flex-end;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: $font-weight-bold;
+      font-size: $font-size-base;
+      flex-shrink: 0;
+    }
+
+    .producto-info {
+      flex: 1;
       
-      @media (max-width: $breakpoint-xs) {
-        align-self: flex-start;
+      .producto-nombre {
+        margin: 0 0 $spacing-xs;
+        font-size: $font-size-base;
+        font-weight: $font-weight-bold;
+        color: $text-color;
+        line-height: 1.4;
+      }
+      
+      .producto-categoria {
+        margin: 0;
+        
+        .categoria-tag {
+          background: rgba($primary-color, 0.1);
+          color: $primary-color;
+          padding: 2px $spacing-sm;
+          border-radius: $border-radius-pill;
+          font-size: $font-size-small;
+          font-weight: $font-weight-medium;
+        }
       }
     }
-    
-    .precio {
-      color: $text-color-secondary;
-      font-size: $font-size-small;
+
+    .producto-precio {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: $spacing-xs;
+      min-width: 150px;
+      
+      .precio-detalle {
+        display: flex;
+        align-items: center;
+        gap: $spacing-sm;
+        
+        .cantidad-badge {
+          background: linear-gradient(135deg, $secondary-color 0%, #2c3e50 100%);
+          color: white;
+          padding: 4px $spacing-sm;
+          border-radius: $border-radius-pill;
+          font-size: $font-size-small;
+          font-weight: $font-weight-bold;
+        }
+        
+        .precio-unitario {
+          color: $text-color;
+          font-size: $font-size-base;
+          font-weight: $font-weight-medium;
+        }
+      }
+      
+      .subtotal {
+        font-weight: $font-weight-bold;
+        color: $primary-color;
+        font-size: $font-size-large;
+      }
     }
-    
-    .subtotal {
-      font-weight: $font-weight-bold;
-      color: $primary-color;
+
+    @media (max-width: $breakpoint-sm) {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: $spacing-md;
+
+      .producto-precio {
+        width: 100%;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+      }
     }
   }
   
+  .productos-separator {
+    height: 3px;
+    background: linear-gradient(90deg, transparent 0%, $primary-color 50%, transparent 100%);
+    margin: $spacing-lg 0;
+    border-radius: 2px;
+  }
+
   .total-final {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: $spacing-lg;
-    padding-top: $spacing-lg;
-    border-top: 2px solid $primary-color;
-    
-    .total-label {
-      font-size: $font-size-large;
-      font-weight: $font-weight-semibold;
-      color: $text-color;
+    background: linear-gradient(135deg, rgba($primary-color, 0.1) 0%, rgba($primary-color, 0.05) 100%);
+    padding: $spacing-xl;
+    border-radius: $border-radius-lg;
+    border: 2px solid $primary-color;
+    position: relative;
+
+    .total-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      
+      .total-label {
+        font-size: $font-size-large;
+        font-weight: $font-weight-bold;
+        color: $text-color;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+      
+      .total-amount {
+        font-size: $font-size-xxl;
+        font-weight: $font-weight-black;
+        color: $primary-color;
+        background: white;
+        padding: $spacing-sm $spacing-lg;
+        border-radius: $border-radius-pill;
+        box-shadow: 0 4px 16px rgba($primary-color, 0.2);
+        border: 2px solid $primary-color;
+      }
     }
-    
-    .total-amount {
-      font-size: $font-size-xl;
-      font-weight: $font-weight-bold;
-      color: $primary-color;
+
+    @media (max-width: $breakpoint-sm) {
+      .total-content {
+        flex-direction: column;
+        gap: $spacing-md;
+        text-align: center;
+
+        .total-amount {
+          font-size: $font-size-xl;
+        }
+      }
     }
   }
 }
@@ -442,72 +754,140 @@ const enviarCorreoConfirmacion = async () => {
 // Acciones
 .acciones {
   display: flex;
-  flex-direction: column;
   gap: $spacing-md;
   background: white;
-  padding: $spacing-lg;
-  border-radius: $border-radius-lg;
-  box-shadow: $box-shadow-sm;
+  padding: $spacing-xl;
+  border-radius: $border-radius-xl;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  justify-content: center;
 
-  @media (min-width: $breakpoint-sm) {
-    flex-direction: row;
-    justify-content: center;
+  @media (max-width: $breakpoint-sm) {
+    flex-direction: column;
   }
 }
 
-// Botones simples
+// Botones mejorados
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: $spacing-md $spacing-lg;
+  gap: $spacing-sm;
+  padding: $spacing-md $spacing-xl;
   border: none;
-  border-radius: $border-radius-md;
+  border-radius: $border-radius-lg;
   font-size: $font-size-base;
-  font-weight: $font-weight-medium;
+  font-weight: $font-weight-bold;
   text-decoration: none;
   cursor: pointer;
   transition: all $transition-fast;
-  font-family: $font-family-secondary;
+  font-family: inherit;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  position: relative;
+  overflow: hidden;
+  min-width: 200px;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+  }
+
+  &:hover::before {
+    left: 100%;
+  }
+
+  .btn-icon {
+    font-size: 1.2em;
+  }
 
   &:disabled {
     opacity: 0.6;
     cursor: not-allowed;
+    transform: none;
   }
 
   &.btn-primary {
-    background-color: $primary-color;
+    background: linear-gradient(135deg, $primary-color 0%, #059447 100%);
     color: white;
+    box-shadow: 0 6px 20px rgba($primary-color, 0.3);
 
     &:hover:not(:disabled) {
-      background-color: $primary-color-hover;
+      transform: translateY(-3px);
+      box-shadow: 0 10px 30px rgba($primary-color, 0.4);
     }
   }
 
   &.btn-secondary {
-    background-color: white;
+    background: white;
     color: $primary-color;
-    border: 1px solid $primary-color;
+    border: 2px solid $primary-color;
+    box-shadow: 0 4px 16px rgba($primary-color, 0.1);
 
     &:hover {
-      background-color: $primary-color;
+      background: $primary-color;
       color: white;
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba($primary-color, 0.3);
     }
   }
 }
 
-// Responsive
-@media (max-width: $breakpoint-sm) {
+// Responsive adicional
+@media (max-width: $breakpoint-md) {
   .pedido-detalle {
-    padding: $spacing-sm;
-
-    &__container {
-      margin: 0;
+    &__header {
+      padding: $spacing-lg;
     }
-    
-    .pedido-info, .envio-info, .productos-lista, .acciones {
+
+    .pedido-info__details {
+      grid-template-columns: 1fr;
+      padding: $spacing-md;
+    }
+
+    .productos-lista {
+      .productos-header {
+        padding: $spacing-md;
+      }
+
+      .productos-container {
+        padding: $spacing-md;
+      }
+    }
+
+    .envio-info,
+    .acciones {
       padding: $spacing-md;
     }
   }
+}
+
+// Animaciones de entrada
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.pedido-info,
+.envio-info,
+.productos-lista,
+.acciones {
+  animation: fadeInUp 0.6s ease-out;
+
+  &:nth-child(2) { animation-delay: 0.1s; }
+  &:nth-child(3) { animation-delay: 0.2s; }
+  &:nth-child(4) { animation-delay: 0.3s; }
+  &:nth-child(5) { animation-delay: 0.4s; }
 }
 </style>

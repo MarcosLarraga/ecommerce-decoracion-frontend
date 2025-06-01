@@ -291,8 +291,6 @@ async updateUserPhoneAndAddress(telefono: string, direccion: string) {
       this.user.direccion = direccion;
       localStorage.setItem('user', JSON.stringify(this.user));
       
-      // Notificar al usuario del éxito
-      toast.success("Datos de contacto actualizados correctamente");
     }
     
     return true;
