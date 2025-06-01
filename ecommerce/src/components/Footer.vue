@@ -1,4 +1,4 @@
-<!-- Footer.vue (actualizado con acceso trabajadores) -->
+<!-- Footer.vue (actualizado con enlaces funcionales) -->
 <template>
   <v-footer app class="footer">
     <v-container>
@@ -13,22 +13,32 @@
         </v-col>
         
         <v-col cols="12" md="3" class="footer__section footer__logo">
-          <LogoCanvasWhite class="footer__logo-img" />
+          <router-link to="/">
+            <LogoCanvasWhite class="footer__logo-img" />
+          </router-link>
         </v-col>
         
         <v-col cols="12" md="3" class="footer__section footer__social">
-          <v-btn icon class="footer__icon">
-            <v-icon color="black">mdi-instagram</v-icon>
-          </v-btn>
-          <v-btn icon class="footer__icon">
-            <v-icon color="black">mdi-linkedin</v-icon>
-          </v-btn>
-          <v-btn icon class="footer__icon">
-            <v-icon color="black">mdi-youtube</v-icon>
-          </v-btn>
-          <v-btn icon class="footer__icon">
-            <v-icon color="black">mdi-twitter</v-icon>
-          </v-btn>
+          <a href="https://www.instagram.com/lmdecoracionsocial" target="_blank" rel="noopener noreferrer" class="footer__icon">
+            <div class="footer__icon-wrapper">
+              <i class="fab fa-instagram"></i>
+            </div>
+          </a>
+          <a href="https://www.linkedin.com/company/lmdecoracionsocial" target="_blank" rel="noopener noreferrer" class="footer__icon">
+            <div class="footer__icon-wrapper">
+              <i class="fab fa-linkedin-in"></i>
+            </div>
+          </a>
+          <a href="https://www.youtube.com/@lmdecoracionsocial" target="_blank" rel="noopener noreferrer" class="footer__icon">
+            <div class="footer__icon-wrapper">
+              <i class="fab fa-youtube"></i>
+            </div>
+          </a>
+          <a href="https://twitter.com/lmdecoracionsocial" target="_blank" rel="noopener noreferrer" class="footer__icon">
+            <div class="footer__icon-wrapper">
+              <i class="fab fa-twitter"></i>
+            </div>
+          </a>
         </v-col>
       </v-row>
       
@@ -103,6 +113,17 @@ import LogoCanvasWhite from '../components/LogoCanvasWhite.vue'
     }
   }
   
+  &__logo {
+    a {
+      display: inline-block;
+      transition: transform 0.3s ease;
+      
+      &:hover {
+        transform: scale(1.05);
+      }
+    }
+  }
+  
   &__logo-img {
     height: 50px;
     margin-bottom: $spacing-sm;
@@ -115,13 +136,38 @@ import LogoCanvasWhite from '../components/LogoCanvasWhite.vue'
   }
   
   &__icon {
-    background-color: white;
-    border-radius: 50%;
-    padding: 8px;
-    transition: transform 0.3s;
+    text-decoration: none;
+    display: inline-block;
+    transition: transform 0.3s ease;
+    
     &:hover {
       transform: scale(1.1);
-      color: $primary-color;
+      
+      .footer__icon-wrapper {
+        background-color: rgba($primary-color, 0.1);
+        
+        i {
+          color: $primary-color;
+        }
+      }
+    }
+  }
+  
+  &__icon-wrapper {
+    width: 50px;
+    height: 50px;
+    background-color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    
+    i {
+      font-size: 20px;
+      color: #333;
+      transition: color 0.3s ease;
     }
   }
   

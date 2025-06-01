@@ -1,114 +1,149 @@
 <!-- @/views/admin/AdminOrders.vue -->
 <template>
   <div class="admin-view admin-orders">
-    <AdminHeader title="Gestión de Pedidos">
-      <template #actions>
-        <AdminSearch 
-          v-model="searchQuery" 
-          placeholder="Buscar pedidos..."
-        />
-      </template>
-    </AdminHeader>
-    
-    <AdminContent>
-      <template #filters>
-        <AdminFilter label="Filtrar por fecha:">
-          <AdminSelect v-model="dateFilter">
-            <option value="all">Todas las fechas</option>
-            <option value="today">Hoy</option>
-            <option value="week">Esta semana</option>
-            <option value="month">Este mes</option>
-            <option value="year">Este año</option>
-          </AdminSelect>
-        </AdminFilter>
-        
-        <AdminFilter label="Ordenar por:">
-          <AdminSelect v-model="sortBy">
-            <option value="date_desc">Fecha (más reciente primero)</option>
-            <option value="date_asc">Fecha (más antigua primero)</option>
-            <option value="total_desc">Total (mayor primero)</option>
-            <option value="total_asc">Total (menor primero)</option>
-          </AdminSelect>
-        </AdminFilter>
-      </template>
-      
-      <!-- Vista móvil (cards) -->
-      <div class="mobile-orders-list" v-if="filteredOrders.length > 0">
-        <div 
-          v-for="order in filteredOrders" 
-          :key="order.id" 
-          class="mobile-order-card"
-          @click="viewOrderDetails(order)"
-        >
-          <div class="mobile-order-card__header">
-            <div class="mobile-order-card__id">
-              <i class="fas fa-hashtag"></i>
-              {{ order.id }}
-            </div>
-            <div class="mobile-order-card__total">
-              {{ formatCurrency(order.total) }}
-            </div>
+    <!-- Header optimizado -->
+    <div class="admin-orders__header">
+      <h1 class="admin-orders__title">Gestión de Pedidos</h1>
+
+      <!-- Búsqueda -->
+      <div class="admin-orders__search">
+        <input v-model="searchQuery" placeholder="Buscar pedidos..." class="admin-orders__search-input" />
+        <i class="fas fa-search admin-orders__search-icon"></i>
+      </div>
+    </div>
+
+    <!-- Filtros móviles -->
+    <div class="admin-orders__filters">
+      <div class="admin-orders__filter-group">
+        <label class="admin-orders__filter-label">
+          <i class="fas fa-calendar-alt"></i>
+          Filtrar por fecha
+        </label>
+        <select v-model="dateFilter" class="admin-orders__filter-select">
+          <option value="all">Todas las fechas</option>
+          <option value="today">Hoy</option>
+          <option value="week">Esta semana</option>
+          <option value="month">Este mes</option>
+          <option value="year">Este año</option>
+        </select>
+      </div>
+
+      <div class="admin-orders__filter-group">
+        <label class="admin-orders__filter-label">
+          <i class="fas fa-sort"></i>
+          Ordenar por
+        </label>
+        <select v-model="sortBy" class="admin-orders__filter-select">
+          <option value="date_desc">Fecha (más reciente primero)</option>
+          <option value="date_asc">Fecha (más antigua primero)</option>
+          <option value="total_desc">Total (mayor primero)</option>
+          <option value="total_asc">Total (menor primero)</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Estado de carga inicial -->
+    <div v-if="loading && adminStore.orders.length === 0" class="admin-orders__loading">
+      <div class="admin-orders__spinner"></div>
+      <p>Cargando pedidos...</p>
+    </div>
+
+    <!-- Contenido principal -->
+    <div v-else class="admin-orders__content">
+      <!-- Vista móvil: Cards -->
+      <div class="admin-orders__mobile-list">
+        <div v-if="filteredOrders.length === 0" class="admin-orders__empty">
+          <div class="admin-orders__empty-icon">
+            <i class="fas fa-shopping-cart"></i>
           </div>
-          
-          <div class="mobile-order-card__info">
-            <div class="mobile-order-card__client">
-              <i class="fas fa-user"></i>
-              {{ getUserName(order.usuarioId) }}
+          <h3 class="admin-orders__empty-title">
+            {{ searchQuery || dateFilter !== 'all' ? 'Sin resultados' : 'No hay pedidos' }}
+          </h3>
+          <p class="admin-orders__empty-description">
+            {{
+              searchQuery || dateFilter !== 'all'
+                ? 'No se encontraron pedidos con esos criterios'
+                : 'No hay pedidos registrados'
+            }}
+          </p>
+        </div>
+
+        <div v-for="order in filteredOrders" :key="order.id" class="admin-orders__card"
+          @click="viewOrderDetails(order)">
+          <div class="admin-orders__card-header">
+            <div class="admin-orders__card-info-section">
+              <div class="admin-orders__card-id">#{{ order.id }}</div>
+              <div class="admin-orders__card-date">{{ order.fechaFormateada }}</div>
             </div>
-            <div class="mobile-order-card__date">
-              <i class="fas fa-calendar-alt"></i>
-              {{ order.fechaFormateada }}
-            </div>
-            <div class="mobile-order-card__products" v-if="getOrderProductsCount(order) !== 'N/A'">
-              <i class="fas fa-box"></i>
-              {{ getOrderProductsCount(order) }} productos
-            </div>
+            <div class="admin-orders__card-total">{{ formatCurrency(order.total) }}</div>
           </div>
-          
-          <div class="mobile-order-card__actions">
-            <button 
-              class="mobile-action-btn mobile-action-btn--view" 
-              @click.stop="viewOrderDetails(order)"
-              aria-label="Ver detalles"
-            >
-              <i class="fas fa-eye"></i>
-            </button>
-            <button 
-              class="mobile-action-btn mobile-action-btn--delete" 
-              @click.stop="confirmDeleteOrder(order)"
-              aria-label="Eliminar"
-            >
-              <i class="fas fa-trash-alt"></i>
-            </button>
+
+          <div class="admin-orders__card-body">
+            <div class="admin-orders__card-info">
+              <div class="admin-orders__info-item">
+                <i class="fas fa-user"></i>
+                <span class="admin-orders__info-label">Cliente:</span>
+                <span class="admin-orders__info-value">{{ getUserName(order.usuarioId) }}</span>
+              </div>
+              <div class="admin-orders__info-item" v-if="getOrderProductsCount(order) !== 'N/A'">
+                <i class="fas fa-box"></i>
+                <span class="admin-orders__info-label">Productos:</span>
+                <span class="admin-orders__info-value">{{ getOrderProductsCount(order) }}</span>
+              </div>
+            </div>
+
+            <div class="admin-orders__card-actions">
+              <button class="admin-orders__action-btn admin-orders__action-btn--view"
+                @click.stop="viewOrderDetails(order)" title="Ver detalles">
+                <i class="fas fa-eye"></i>
+              </button>
+              <button class="admin-orders__action-btn admin-orders__action-btn--delete"
+                @click.stop="confirmDeleteOrder(order)" title="Eliminar">
+                <i class="fas fa-trash-alt"></i>
+              </button>
+            </div>
           </div>
         </div>
       </div>
-      
-      <!-- Vista desktop (tabla) -->
-      <AdminTable 
-        :columns="columns"
-        :isEmpty="filteredOrders.length === 0"
-        :emptyMessage="searchQuery || dateFilter !== 'all' ? 'No se encontraron pedidos con esos criterios' : 'No hay pedidos registrados'"
-        class="desktop-table"
-      >
-        <tr v-for="order in filteredOrders" :key="order.id">
-          <td>#{{ order.id }}</td>
-          <td>{{ getUserName(order.usuarioId) }}</td>
-          <td>{{ order.fechaFormateada }}</td>
-          <td>{{ formatCurrency(order.total) }}</td>
-          <td>{{ getOrderProductsCount(order) }}</td>
-          <td class="action-buttons">
-            <button class="btn btn-view" @click="viewOrderDetails(order)" title="Ver detalles">
-              <i class="fas fa-eye"></i>
-            </button>
-            <button class="btn btn-delete" @click="confirmDeleteOrder(order)" title="Eliminar pedido">
-              <i class="fas fa-trash-alt"></i>
-            </button>
-          </td>
-        </tr>
-      </AdminTable>
-    </AdminContent>
-    
+
+      <!-- Vista desktop: Tabla -->
+      <div class="admin-orders__desktop-table">
+        <table class="admin-orders__table">
+          <thead class="admin-orders__table-head">
+            <tr>
+              <th>ID</th>
+              <th>Cliente</th>
+              <th>Fecha</th>
+              <th>Total</th>
+              <th>Productos</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody class="admin-orders__table-body">
+            <tr v-for="order in filteredOrders" :key="order.id" class="admin-orders__table-row">
+              <td class="admin-orders__table-cell">#{{ order.id }}</td>
+              <td class="admin-orders__table-cell">{{ getUserName(order.usuarioId) }}</td>
+              <td class="admin-orders__table-cell">{{ order.fechaFormateada }}</td>
+              <td class="admin-orders__table-cell">{{ formatCurrency(order.total) }}</td>
+              <td class="admin-orders__table-cell">{{ getOrderProductsCount(order) }}</td>
+              <td class="admin-orders__table-cell">
+                <div class="admin-orders__table-actions">
+                  <button class="admin-orders__action-btn admin-orders__action-btn--view"
+                    @click="viewOrderDetails(order)">
+                    <i class="fas fa-eye"></i>
+                  </button>
+                  <button class="admin-orders__action-btn admin-orders__action-btn--delete"
+                    @click="confirmDeleteOrder(order)">
+                    <i class="fas fa-trash-alt"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
     <!-- Modal de detalles de pedido -->
     <div v-if="showOrderDetails" class="admin-orders__modal-overlay" @click="handleOverlayClick">
       <div class="admin-orders__modal admin-orders__modal--large" @click.stop>
@@ -146,12 +181,13 @@
                   <div class="admin-orders__info-item">
                     <i class="fas fa-euro-sign"></i>
                     <span class="admin-orders__info-label">Total:</span>
-                    <span class="admin-orders__info-value admin-orders__info-value--price">{{ formatCurrency(selectedOrder?.total || 0) }}</span>
+                    <span class="admin-orders__info-value admin-orders__info-value--price">{{
+                      formatCurrency(selectedOrder?.total || 0) }}</span>
                   </div>
                 </div>
               </div>
             </div>
-            
+
             <!-- Información del Cliente -->
             <div class="admin-orders__info-card">
               <div class="admin-orders__info-card-header">
@@ -185,7 +221,7 @@
                 </div>
               </div>
             </div>
-            
+
             <!-- Productos -->
             <div class="admin-orders__info-card">
               <div class="admin-orders__info-card-header">
@@ -199,17 +235,14 @@
                   <div class="admin-orders__spinner"></div>
                   <span>Cargando detalles...</span>
                 </div>
-                
+
                 <!-- Vista móvil de productos -->
                 <div v-else class="admin-orders__products-mobile">
                   <div v-for="item in orderDetails" :key="item.id" class="admin-orders__product-card">
                     <div class="admin-orders__product-image">
                       <div class="admin-orders__thumb-image">
-                        <img 
-                          v-if="getProductImage(item.productoId)" 
-                          :src="getProductImage(item.productoId)"
-                          :alt="getProductName(item.productoId)"
-                        >
+                        <img v-if="getProductImage(item.productoId)" :src="getProductImage(item.productoId)"
+                          :alt="getProductName(item.productoId)">
                         <div v-else class="admin-orders__thumb-placeholder">
                           <i class="fas fa-box"></i>
                         </div>
@@ -239,7 +272,7 @@
                     <strong>Total: {{ formatCurrency(selectedOrder?.total || 0) }}</strong>
                   </div>
                 </div>
-                
+
                 <!-- Vista desktop de productos -->
                 <div class="admin-orders__products-desktop">
                   <table class="admin-orders__products-table">
@@ -256,11 +289,8 @@
                         <td>
                           <div class="admin-orders__table-product">
                             <div class="admin-orders__thumb-image">
-                              <img 
-                                v-if="getProductImage(item.productoId)" 
-                                :src="getProductImage(item.productoId)"
-                                :alt="getProductName(item.productoId)"
-                              >
+                              <img v-if="getProductImage(item.productoId)" :src="getProductImage(item.productoId)"
+                                :alt="getProductName(item.productoId)">
                               <div v-else class="admin-orders__thumb-placeholder">
                                 <i class="fas fa-box"></i>
                               </div>
@@ -302,14 +332,15 @@
             <i class="fas fa-times"></i>
             <span class="admin-orders__btn-text">Cerrar</span>
           </button>
-          <button class="admin-orders__modal-btn admin-orders__modal-btn--danger" @click="confirmDeleteOrder(selectedOrder)">
+          <button class="admin-orders__modal-btn admin-orders__modal-btn--danger"
+            @click="confirmDeleteOrder(selectedOrder)">
             <i class="fas fa-trash-alt"></i>
             <span class="admin-orders__btn-text">Eliminar</span>
           </button>
         </div>
       </div>
     </div>
-    
+
     <!-- Modal de confirmación de eliminación -->
     <div v-if="showDeleteConfirmation" class="admin-orders__modal-overlay" @click="cancelDelete">
       <div class="admin-orders__modal admin-orders__modal--small" @click.stop>
@@ -331,11 +362,13 @@
         </div>
 
         <div class="admin-orders__modal-footer">
-          <button class="admin-orders__modal-btn admin-orders__modal-btn--secondary" @click="cancelDelete" :disabled="loading">
+          <button class="admin-orders__modal-btn admin-orders__modal-btn--secondary" @click="cancelDelete"
+            :disabled="loading">
             <i class="fas fa-times"></i>
             <span class="admin-orders__btn-text">Cancelar</span>
           </button>
-          <button class="admin-orders__modal-btn admin-orders__modal-btn--danger" @click="deleteOrder" :disabled="loading">
+          <button class="admin-orders__modal-btn admin-orders__modal-btn--danger" @click="deleteOrder"
+            :disabled="loading">
             <i v-if="loading" class="admin-orders__spinner"></i>
             <i v-else class="fas fa-trash-alt"></i>
             <span class="admin-orders__btn-text">{{ loading ? 'Eliminando...' : 'Eliminar' }}</span>
@@ -350,14 +383,6 @@
 import { ref, computed, onMounted } from 'vue';
 import { useAdminStore } from '@/stores/adminStore';
 import { useToast } from 'vue-toastification';
-
-// Componentes
-import AdminHeader from '@/components/admin/AdminHeader.vue';
-import AdminSearch from '@/components/admin/AdminSearch.vue';
-import AdminContent from '@/components/admin/AdminContent.vue';
-import AdminFilter from '@/components/admin/AdminFilter.vue';
-import AdminSelect from '@/components/admin/AdminSelect.vue';
-import AdminTable from '@/components/admin/AdminTable.vue';
 
 interface DetallePedido {
   id: number;
@@ -390,43 +415,35 @@ const orderDetails = ref<DetallePedido[]>([]);
 const showOrderDetails = ref(false);
 const showDeleteConfirmation = ref(false);
 
-const columns = [
-  { label: 'ID', key: 'id' },
-  { label: 'Cliente', key: 'usuarioId' },
-  { label: 'Fecha', key: 'fechaFormateada' },
-  { label: 'Total', key: 'total' },
-  { label: 'Productos', key: 'detalles' }
-];
-
 // Computed properties
 const filteredOrders = computed(() => {
   let result = [...adminStore.orders];
-  
+
   // Filtrar por texto de búsqueda
   if (searchQuery.value.trim()) {
     const query = searchQuery.value.toLowerCase().trim();
-    result = result.filter(order => 
+    result = result.filter(order =>
       String(order.id).includes(query) ||
       String(order.usuarioId).includes(query) ||
       getUserName(order.usuarioId).toLowerCase().includes(query)
     );
   }
-  
+
   // Filtrar por fecha
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  
+
   const startOfWeek = new Date(today);
   startOfWeek.setDate(today.getDate() - today.getDay());
-  
+
   const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-  
+
   const startOfYear = new Date(today.getFullYear(), 0, 1);
-  
+
   if (dateFilter.value !== 'all') {
     result = result.filter(order => {
       const orderDate = new Date(order.fechaPedido);
-      
+
       switch (dateFilter.value) {
         case 'today':
           return orderDate >= today;
@@ -441,7 +458,7 @@ const filteredOrders = computed(() => {
       }
     });
   }
-  
+
   // Ordenar resultados
   result.sort((a, b) => {
     switch (sortBy.value) {
@@ -457,7 +474,7 @@ const filteredOrders = computed(() => {
         return 0;
     }
   });
-  
+
   return result;
 });
 
@@ -466,12 +483,12 @@ onMounted(async () => {
   if (adminStore.orders.length === 0) {
     await adminStore.fetchAllOrders();
   }
-  
+
   // Cargar usuarios si no están ya cargados
   if (adminStore.users.length === 0) {
     await adminStore.fetchAllUsers();
   }
-  
+
   // Cargar productos si no están ya cargados
   if (adminStore.products.length === 0) {
     await adminStore.fetchAllProducts();
@@ -531,7 +548,7 @@ const viewOrderDetails = async (order: Pedido) => {
   console.log('Viendo detalles del pedido:', order);
   selectedOrder.value = order;
   showOrderDetails.value = true;
-  
+
   if (!order.detalles) {
     loadingOrderDetails.value = true;
     try {
@@ -565,7 +582,7 @@ const confirmDeleteOrder = (order: Pedido | null) => {
   console.log('Confirmando eliminación de pedido:', order);
   orderToDelete.value = order;
   showDeleteConfirmation.value = true;
-  
+
   if (showOrderDetails.value) {
     showOrderDetails.value = false;
   }
@@ -579,7 +596,7 @@ const cancelDelete = () => {
 
 const deleteOrder = async () => {
   console.log('Eliminando pedido...', orderToDelete.value);
-  
+
   if (!orderToDelete.value?.id) {
     toast.error('No hay pedido seleccionado para eliminar');
     return;
@@ -589,16 +606,16 @@ const deleteOrder = async () => {
 
   try {
     await adminStore.deleteOrder(orderToDelete.value.id);
-    
+
     console.log('Recargando lista de pedidos después de eliminar...');
     await adminStore.fetchAllOrders();
-    
+
     toast.success('Pedido eliminado correctamente');
     showDeleteConfirmation.value = false;
     orderToDelete.value = null;
-    
+
     console.log('Eliminación completada. Total pedidos:', adminStore.orders.length);
-    
+
   } catch (error: any) {
     console.error('Error al eliminar pedido:', error);
     toast.error(error.message || 'Error al eliminar pedido');
@@ -612,108 +629,295 @@ const deleteOrder = async () => {
 @use '@/styles/variables' as *;
 
 .admin-orders {
+  // Base móvil
   padding: $spacing-sm;
   min-height: 100vh;
   background-color: $tertiary-color;
-  
+
   @media (min-width: $breakpoint-sm) {
     padding: $spacing-md;
   }
-  
+
   @media (min-width: $breakpoint-md) {
     padding: $spacing-lg;
   }
 
-  .mobile-orders-list {
-    display: block;
+  // Loading state
+  &__loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: $spacing-xl;
+    text-align: center;
+
+    p {
+      margin-top: $spacing-md;
+      color: $text-color-secondary;
+    }
+  }
+
+  // Header móvil optimizado
+  &__header {
+    display: flex;
+    flex-direction: column;
     gap: $spacing-sm;
-    padding: $spacing-sm;
-    
+    margin-bottom: $spacing-lg;
+
+    @media (min-width: $breakpoint-sm) {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+    }
+  }
+
+  &__title {
+    font-size: $font-size-xl;
+    font-weight: $font-weight-bold;
+    color: $text-color;
+    margin: 0;
+    font-family: $font-family-primary;
+
+    @media (min-width: $breakpoint-md) {
+      font-size: $font-size-xxl;
+    }
+  }
+
+  &__search {
+    position: relative;
+    flex: 1;
+    max-width: 100%;
+
+    @media (min-width: $breakpoint-sm) {
+      max-width: 300px;
+    }
+  }
+
+  &__search-input {
+    width: 100%;
+    padding: $spacing-sm $spacing-xl $spacing-sm $spacing-sm;
+    border: 1px solid $border-color;
+    border-radius: $border-radius;
+    font-size: $font-size-base;
+
+    &:focus {
+      outline: none;
+      border-color: $primary-color;
+      box-shadow: 0 0 0 2px rgba($primary-color, 0.2);
+    }
+  }
+
+  &__search-icon {
+    position: absolute;
+    right: $spacing-sm;
+    top: 50%;
+    transform: translateY(-50%);
+    color: $text-color-secondary;
+  }
+
+  // Filtros
+  &__filters {
+    background: white;
+    border-radius: $border-radius-lg;
+    box-shadow: $box-shadow;
+    border: 1px solid $border-color;
+    padding: $spacing-md;
+    margin-bottom: $spacing-lg;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+
+    @media (min-width: $breakpoint-sm) {
+      flex-direction: row;
+      gap: $spacing-lg;
+      padding: $spacing-lg;
+    }
+  }
+
+  &__filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+    width: 100%;
+
+    @media (min-width: $breakpoint-sm) {
+      max-width: 250px;
+    }
+  }
+
+  &__filter-label {
+    font-size: $font-size-small;
+    font-weight: $font-weight-semibold;
+    color: $text-color;
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+
+    i {
+      color: $primary-color;
+      font-size: 12px;
+    }
+  }
+
+  &__filter-select {
+    padding: $spacing-sm $spacing-md;
+    border: 1px solid $border-color;
+    border-radius: $border-radius;
+    font-size: $font-size-base;
+    cursor: pointer;
+
+    &:focus {
+      outline: none;
+      border-color: $primary-color;
+      box-shadow: 0 0 0 2px rgba($primary-color, 0.2);
+    }
+  }
+
+  // Lista móvil (cards)
+  &__mobile-list {
+    display: block;
+
     @media (min-width: $breakpoint-md) {
       display: none;
     }
   }
-  
-  .mobile-order-card {
+
+  &__empty {
+    text-align: center;
+    padding: $spacing-xl;
+    color: $text-color-secondary;
     background: white;
     border-radius: $border-radius-lg;
-    padding: $spacing-md;
     box-shadow: $box-shadow;
-    border: 1px solid $border-color;
+
+    &-icon {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, rgba($primary-color, 0.1) 0%, rgba($primary-color, 0.05) 100%);
+      border-radius: $border-radius-circle;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto $spacing-lg;
+
+      i {
+        font-size: 36px;
+        color: rgba($primary-color, 0.6);
+      }
+    }
+
+    &-title {
+      font-size: $font-size-xl;
+      font-weight: $font-weight-bold;
+      color: $text-color;
+      margin: 0 0 $spacing-sm;
+    }
+
+    &-description {
+      color: $text-color-secondary;
+      margin: 0;
+      line-height: 1.5;
+    }
+  }
+
+  &__card {
+    background: white;
+    border-radius: $border-radius-lg;
+    box-shadow: $box-shadow;
     margin-bottom: $spacing-md;
+    overflow: hidden;
+    transition: transform $transition-fast, box-shadow $transition-fast;
     cursor: pointer;
-    transition: all $transition-fast;
-    
+
     &:hover {
       transform: translateY(-2px);
       box-shadow: $box-shadow-lg;
     }
-    
-    &__header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: $spacing-sm;
-      padding-bottom: $spacing-sm;
-      border-bottom: 1px solid $tertiary-color;
-    }
-    
-    &__id {
-      display: flex;
-      align-items: center;
-      gap: $spacing-xs;
-      font-weight: $font-weight-semibold;
-      color: $text-color;
-      font-size: $font-size-base;
-      
-      i {
-        color: $primary-color;
-        font-size: 12px;
-      }
-    }
-    
-    &__total {
-      font-weight: $font-weight-bold;
+  }
+
+  &__card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: $spacing-md;
+    background: linear-gradient(135deg, rgba($primary-color, 0.05) 0%, rgba($primary-color, 0.02) 100%);
+    border-bottom: 1px solid $tertiary-color;
+  }
+
+  &__card-info-section {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+  }
+
+  &__card-id {
+    background: linear-gradient(135deg, $primary-color 0%, #4bc286 100%);
+    color: white;
+    padding: 4px 8px;
+    border-radius: $border-radius-sm;
+    font-size: $font-size-small;
+    font-weight: $font-weight-semibold;
+    box-shadow: 0 2px 4px rgba($primary-color, 0.3);
+    align-self: flex-start;
+  }
+
+  &__card-date {
+    font-size: $font-size-small;
+    color: $text-color-secondary;
+    font-weight: $font-weight-medium;
+  }
+
+  &__card-total {
+    font-size: $font-size-xl;
+    font-weight: $font-weight-bold;
+    color: $primary-color;
+  }
+
+  &__card-body {
+    padding: $spacing-md;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+
+  &__card-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+  }
+
+  &__info-item {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+    font-size: $font-size-small;
+
+    i {
       color: $primary-color;
-      font-size: $font-size-base;
-    }
-    
-    &__info {
-      display: flex;
-      flex-direction: column;
-      gap: $spacing-xs;
-      margin-bottom: $spacing-sm;
-    }
-    
-    &__client,
-    &__date,
-    &__products {
-      display: flex;
-      align-items: center;
-      gap: $spacing-xs;
-      font-size: $font-size-small;
-      color: $text-color-secondary;
-      
-      i {
-        color: $primary-color;
-        width: 14px;
-        font-size: 12px;
-      }
-    }
-    
-    &__client {
-      font-weight: $font-weight-medium;
-      color: $text-color;
-    }
-    
-    &__actions {
-      display: flex;
-      justify-content: flex-end;
-      gap: $spacing-xs;
+      width: 14px;
+      font-size: 12px;
     }
   }
-  
-  .mobile-action-btn {
+
+  &__info-label {
+    font-weight: $font-weight-semibold;
+    color: $text-color-secondary;
+    min-width: 80px;
+  }
+
+  &__info-value {
+    color: $text-color;
+    font-weight: $font-weight-medium;
+  }
+
+  &__card-actions {
+    display: flex;
+    gap: $spacing-xs;
+  }
+
+  // Action buttons
+  &__action-btn {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -723,39 +927,75 @@ const deleteOrder = async () => {
     border-radius: $border-radius;
     cursor: pointer;
     transition: all $transition-fast;
-    
-    i {
-      font-size: 12px;
-    }
-    
+
     &--view {
       background: rgba($info-color, 0.1);
       color: $info-color;
-      
+
       &:hover {
         background: $info-color;
         color: white;
       }
     }
-    
+
     &--delete {
       background: rgba($error-color, 0.1);
       color: $error-color;
-      
+
       &:hover {
         background: $error-color;
         color: white;
       }
     }
   }
-  
-  // Ocultar tabla en móvil
-  .desktop-table {
+
+  // Vista desktop (tabla)
+  &__desktop-table {
     display: none;
-    
+
     @media (min-width: $breakpoint-md) {
       display: block;
+      background: white;
+      border-radius: $border-radius-lg;
+      box-shadow: $box-shadow;
+      overflow: hidden;
     }
+  }
+
+  &__table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  &__table-head {
+    background: $tertiary-color;
+
+    th {
+      padding: $spacing-md;
+      text-align: left;
+      font-weight: $font-weight-semibold;
+      color: $text-color;
+      border-bottom: 1px solid $border-color;
+    }
+  }
+
+  &__table-row {
+    transition: background-color $transition-fast;
+
+    &:hover {
+      background: rgba($primary-color, 0.05);
+    }
+  }
+
+  &__table-cell {
+    padding: $spacing-md;
+    border-bottom: 1px solid $tertiary-color;
+    vertical-align: middle;
+  }
+
+  &__table-actions {
+    display: flex;
+    gap: $spacing-xs;
   }
 
   // Modal
@@ -783,11 +1023,11 @@ const deleteOrder = async () => {
     max-height: 90vh;
     overflow-y: auto;
     animation: modalFadeIn 0.3s ease;
-    
+
     &--small {
       max-width: 400px;
     }
-    
+
     &--large {
       max-width: 800px;
     }
@@ -824,7 +1064,7 @@ const deleteOrder = async () => {
     cursor: pointer;
     color: $text-color-secondary;
     transition: all $transition-fast;
-    
+
     &:hover {
       background: $tertiary-color;
       color: $text-color;
@@ -875,7 +1115,7 @@ const deleteOrder = async () => {
     display: flex;
     align-items: center;
     gap: $spacing-xs;
-    
+
     i {
       color: $primary-color;
       font-size: 14px;
@@ -890,11 +1130,11 @@ const deleteOrder = async () => {
     display: grid;
     grid-template-columns: 1fr;
     gap: $spacing-sm;
-    
+
     @media (min-width: $breakpoint-sm) {
       grid-template-columns: repeat(2, 1fr);
     }
-    
+
     @media (min-width: $breakpoint-md) {
       grid-template-columns: repeat(3, 1fr);
     }
@@ -905,7 +1145,7 @@ const deleteOrder = async () => {
     align-items: center;
     gap: $spacing-xs;
     padding: $spacing-xs;
-    
+
     i {
       color: $primary-color;
       font-size: 12px;
@@ -926,27 +1166,17 @@ const deleteOrder = async () => {
     color: $text-color;
     font-size: $font-size-small;
     word-break: break-word;
-    
+
     &--price {
       color: $primary-color;
       font-weight: $font-weight-semibold;
     }
   }
 
-  &__loading {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: $spacing-xl;
-    gap: $spacing-sm;
-    color: $text-color-secondary;
-    font-size: $font-size-small;
-  }
-
   // Vista móvil de productos
   &__products-mobile {
     display: block;
-    
+
     @media (min-width: $breakpoint-md) {
       display: none;
     }
@@ -1019,7 +1249,7 @@ const deleteOrder = async () => {
   // Vista desktop de productos
   &__products-desktop {
     display: none;
-    
+
     @media (min-width: $breakpoint-md) {
       display: block;
     }
@@ -1031,28 +1261,29 @@ const deleteOrder = async () => {
     border: 1px solid $border-color;
     border-radius: $border-radius;
     overflow: hidden;
-    
-    th, td {
+
+    th,
+    td {
       padding: $spacing-sm;
       text-align: left;
       border-bottom: 1px solid $border-color;
-      
+
       @media (min-width: $breakpoint-lg) {
         padding: $spacing-md;
       }
     }
-    
+
     th {
       background-color: rgba($primary-color, 0.1);
       font-weight: $font-weight-semibold;
       color: $text-color;
       font-size: $font-size-small;
     }
-    
+
     tbody tr:last-child td {
       border-bottom: none;
     }
-    
+
     tfoot {
       td {
         font-weight: $font-weight-semibold;
@@ -1107,7 +1338,7 @@ const deleteOrder = async () => {
     justify-content: center;
     background: white;
     flex-shrink: 0;
-    
+
     img {
       max-width: 100%;
       max-height: 100%;
@@ -1123,6 +1354,7 @@ const deleteOrder = async () => {
     height: 100%;
     color: $text-color-secondary;
     font-size: 16px;
+    background: linear-gradient(135deg, rgba($primary-color, 0.05) 0%, rgba($primary-color, 0.02) 100%);
   }
 
   // Modal buttons
@@ -1138,37 +1370,37 @@ const deleteOrder = async () => {
     transition: all $transition-fast;
     min-width: 100px;
     justify-content: center;
-    
+
     &--primary {
       background: $primary-color;
       color: white;
-      
+
       &:hover:not(:disabled) {
         background: $primary-color-hover;
         transform: translateY(-1px);
       }
     }
-    
+
     &--secondary {
       background: $tertiary-color;
       color: $text-color;
       border: 1px solid $border-color;
-      
+
       &:hover:not(:disabled) {
         background: $tertiary-color-hover;
       }
     }
-    
+
     &--danger {
       background: $error-color;
       color: white;
-      
+
       &:hover:not(:disabled) {
         background: $error-color-hover;
         transform: translateY(-1px);
       }
     }
-    
+
     &:disabled {
       opacity: 0.6;
       cursor: not-allowed;
@@ -1198,7 +1430,7 @@ const deleteOrder = async () => {
     color: $text-color;
     line-height: 1.5;
     margin: 0;
-    
+
     strong {
       color: $text-color;
       font-weight: $font-weight-semibold;
@@ -1213,7 +1445,7 @@ const deleteOrder = async () => {
     border-radius: 50%;
     border-top-color: white;
     animation: spin 1s linear infinite;
-    
+
     .admin-orders__modal-btn--secondary & {
       border: 2px solid rgba($text-color, 0.3);
       border-top-color: $text-color;
@@ -1222,7 +1454,9 @@ const deleteOrder = async () => {
 
   // Animation keyframes
   @keyframes spin {
-    to { transform: rotate(360deg); }
+    to {
+      transform: rotate(360deg);
+    }
   }
 
   @keyframes modalFadeIn {
@@ -1230,6 +1464,7 @@ const deleteOrder = async () => {
       opacity: 0;
       transform: scale(0.9) translateY(-20px);
     }
+
     to {
       opacity: 1;
       transform: scale(1) translateY(0);
@@ -1238,49 +1473,34 @@ const deleteOrder = async () => {
 
   // Responsive adjustments
   @media (min-width: $breakpoint-sm) {
-    .mobile-order-card {
+    &__card {
+      padding: 0;
+    }
+
+    &__card-header {
       padding: $spacing-lg;
-      
-      &__header {
-        margin-bottom: $spacing-md;
-        padding-bottom: $spacing-md;
-      }
-      
-      &__info {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: $spacing-sm;
-        margin-bottom: $spacing-md;
-      }
-      
-      &__products {
-        grid-column: span 2;
-      }
-      
-      &__id,
-      &__total {
-        font-size: $font-size-large;
-      }
-      
-      &__client,
-      &__date,
-      &__products {
-        font-size: $font-size-base;
-        
-        i {
-          font-size: 14px;
-        }
-      }
-      
-      &__actions {
-        gap: $spacing-sm;
+    }
+
+    &__card-body {
+      padding: $spacing-lg;
+    }
+
+    &__card-total {
+      font-size: $font-size-xxl;
+    }
+
+    &__info-item {
+      font-size: $font-size-base;
+
+      i {
+        font-size: 14px;
       }
     }
-    
-    .mobile-action-btn {
+
+    &__action-btn {
       width: 36px;
       height: 36px;
-      
+
       i {
         font-size: 14px;
       }
@@ -1361,7 +1581,7 @@ const deleteOrder = async () => {
 
     &__info-card-title {
       font-size: $font-size-large;
-      
+
       i {
         font-size: 16px;
       }
@@ -1414,4 +1634,5 @@ const deleteOrder = async () => {
       gap: $spacing-lg;
     }
   }
-} </style>
+}
+</style>
