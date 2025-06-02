@@ -59,3 +59,4 @@ npm run test:e2e
 ```sh
 npm run lint
 ```
+# CI/CD Pipeline Ready 🚀
