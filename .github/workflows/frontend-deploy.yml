@@ -26,9 +26,11 @@ jobs:
 
     - name: Install dependencies
       run: npm ci
+      working-directory: ./ecommerce
 
     - name: Build application
       run: npm run build
+      working-directory: ./ecommerce
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
@@ -47,8 +49,8 @@ jobs:
     - name: Build and push Docker image
       uses: docker/build-push-action@v5
       with:
-        context: .
-        file: ./Dockerfile
+        context: ./ecommerce
+        file: ./ecommerce/Dockerfile
         push: true
         tags: |
           ${{ env.DOCKER_IMAGE }}:${{ steps.version.outputs.VERSION }}
