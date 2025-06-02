@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: decoracion-web-svc
+  labels:
+    app: decoracion-web
+spec:
+  ports:
+    - port: 80
+  selector:
+    app: decoracion-web
+    tier: frontend
+  type: LoadBalancer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: decoracion-web-deploy
+  labels:
+    app: decoracion-web
+spec:
+  selector:
+    matchLabels:
+      app: decoracion-web
+      tier: frontend
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: decoracion-web
+        tier: frontend
+    spec:
+      containers:
+      - name: decoracion-web
+        image: marcoslarraga04/lm-decoracion-front:v3.3
+        ports:
+        - containerPort: 80
