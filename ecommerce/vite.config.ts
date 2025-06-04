@@ -12,7 +12,7 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      '/api': 'http://a2d6d6344a19e42dda5e217bcbd1a685-1049325702.us-east-1.elb.amazonaws.com'
+      '/api': 'https://a2d6d6344a19e42dda5e217bcbd1a685-1049325702.us-east-1.elb.amazonaws.com'
     }
   }
 })
